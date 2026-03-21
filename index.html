@@ -778,17 +778,36 @@ body::before {
     <!-- TAB: EMAIL PREVIEW -->
     <div id="tab-emailpreview" class="tab-pane">
 
+      <!-- EMAIL SETTINGS (remembered) -->
+      <div id="ep-settings-panel" style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:16px 20px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Email Recipients</div>
+          <span style="font-size:10px;color:var(--green);font-weight:600;" id="ep-emails-saved-note" style="display:none;"></span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Tiffany's Email</div>
+            <input id="ep-email-tiffany" type="email" placeholder="tiffany@example.com" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Team Emails <span style="font-weight:400;font-style:italic;text-transform:none;">(comma separated)</span></div>
+            <input id="ep-email-team" type="text" placeholder="diana@example.com, erica@example.com" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+          </div>
+        </div>
+      </div>
+
       <!-- STATUS BAR -->
-      <div id="ep-status-bar" style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <div>
           <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Weekly Voiceover Topics</div>
           <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--charcoal);" id="ep-week-label">Loading...</div>
           <div style="font-size:11px;color:var(--charcoal3);margin-top:3px;" id="ep-status-note"></div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <div id="ep-approved-badge" style="display:none;background:rgba(58,158,110,0.1);border:1px solid rgba(58,158,110,0.25);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;">Approved</div>
           <button class="btn-secondary" id="ep-retry-btn" onclick="generateEmailPreview(true)">Retry</button>
-          <button class="btn-primary" id="ep-approve-btn" onclick="approveTopics()" style="background:var(--green);border:none;">Approve + Copy Email</button>
+          <button class="btn-primary" id="ep-approve-btn" onclick="approveAndGeneratePDF()" style="background:var(--charcoal);">Approve + Generate PDF</button>
+          <button class="btn-primary" id="ep-send-btn" onclick="sendEmailDraft()" style="background:var(--red);display:none;">Send Email</button>
         </div>
       </div>
 
@@ -797,9 +816,7 @@ body::before {
         <div style="font-size:22px;flex-shrink:0;">&#128197;</div>
         <div>
           <div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">2-Week Planning Horizon</div>
-          <div style="font-size:12px;color:var(--charcoal2);line-height:1.65;" id="ep-horizon-note">
-            Topics sent this Friday are for recording next week. Editing happens the week after. Publishing begins 2 weeks from now.
-          </div>
+          <div style="font-size:12px;color:var(--charcoal2);line-height:1.65;" id="ep-horizon-note">Topics sent this Friday are for recording next week. Editing happens the week after. Publishing begins 2 weeks from now.</div>
         </div>
       </div>
 
@@ -822,19 +839,28 @@ body::before {
         <!-- 12 TOPIC CARDS -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px;" id="ep-cards-grid"></div>
 
-        <!-- EMAIL COPY BLOCK -->
-        <div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);">
-          <div style="background:var(--cream-2);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-            <div>
-              <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Email Copy</div>
-              <div style="font-size:10px;color:var(--charcoal3);margin-top:1px;">Ready to paste into Gmail or any email client</div>
-            </div>
-            <button class="copy-btn" id="ep-copy-btn" onclick="copyEmailText()">Copy Email</button>
+        <!-- PDF DOWNLOAD STATUS -->
+        <div id="ep-pdf-status" style="display:none;background:var(--green-bg);border:1px solid rgba(58,158,110,0.25);border-radius:8px;padding:14px 18px;margin-bottom:16px;display:none;align-items:center;gap:12px;">
+          <div style="font-size:18px;">&#10003;</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--green);">PDF Downloaded</div>
+            <div style="font-size:11px;color:var(--charcoal2);margin-top:2px;">Attach the downloaded PDF to your email before sending.</div>
           </div>
-          <div id="ep-email-text" style="padding:18px 20px;font-size:12px;color:var(--charcoal2);line-height:1.8;white-space:pre-wrap;font-family:'Inter',sans-serif;max-height:400px;overflow-y:auto;"></div>
         </div>
 
-        <div style="text-align:center;margin-top:20px;font-size:10px;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Not Financial Advice &bull; Internal Use Only &bull; Tiffany Haynes &amp; Co. Media Team</div>
+        <!-- EMAIL DRAFT PREVIEW -->
+        <div id="ep-email-draft-wrap" style="display:none;background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);margin-bottom:20px;">
+          <div style="background:var(--cream-2);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Email Draft</div>
+              <div style="font-size:10px;color:var(--charcoal3);margin-top:1px;">Brief email to accompany the PDF attachment</div>
+            </div>
+            <button class="copy-btn" id="ep-copy-btn" onclick="copyEmailDraftText()">Copy Email Body</button>
+          </div>
+          <div id="ep-email-draft-text" style="padding:18px 20px;font-size:13px;color:var(--charcoal2);line-height:1.8;white-space:pre-wrap;font-family:'Inter',sans-serif;"></div>
+        </div>
+
+        <div style="text-align:center;margin-top:20px;font-size:10px;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Tiffany Haynes &amp; Co. Media Team &bull; Internal Use Only</div>
 
       </div>
 
@@ -1760,6 +1786,612 @@ var epLoaderMsgs = [
   'Almost ready...'
 ];
 
+var epCurrentData = null;
+
+function saveEmailSettings() {
+  var t = (document.getElementById('ep-email-tiffany')||{}).value || '';
+  var team = (document.getElementById('ep-email-team')||{}).value || '';
+  if (t) localStorage.setItem('tiffany_ep_email_tiffany', t);
+  if (team) localStorage.setItem('tiffany_ep_email_team', team);
+  var note = document.getElementById('ep-emails-saved-note');
+  if (note) { note.textContent = 'Saved'; note.style.display = 'inline'; setTimeout(function() { note.style.display = 'none'; }, 2000); }
+}
+
+function loadEmailSettings() {
+  var t = localStorage.getItem('tiffany_ep_email_tiffany') || '';
+  var team = localStorage.getItem('tiffany_ep_email_team') || '';
+  var tf = document.getElementById('ep-email-tiffany');
+  var te = document.getElementById('ep-email-team');
+  if (tf && t) tf.value = t;
+  if (te && team) te.value = team;
+}
+
+function getEPCache() {
+  var raw = localStorage.getItem('tiffany_ep_cache');
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch(e) { return null; }
+}
+
+function saveEPCache(data) {
+  data.generated_at = Date.now();
+  data.week_key = getEPWeekKey();
+  localStorage.setItem('tiffany_ep_cache', JSON.stringify(data));
+}
+
+function getEPWeekKey() {
+  var monday = getNextMonday();
+  return monday.toISOString().split('T')[0];
+}
+
+function isThursday() {
+  var et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+  return et.getDay() === 4;
+}
+
+function getRecordingWeek() {
+  var monday = getNextMonday();
+  var sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+  return monday.toLocaleDateString('en-US', {month:'long', day:'numeric'}) + ' - ' +
+    sunday.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+}
+
+function getPublishingWeek() {
+  var monday = getNextMonday();
+  var pubMonday = new Date(monday); pubMonday.setDate(monday.getDate() + 14);
+  var pubSunday = new Date(pubMonday); pubSunday.setDate(pubMonday.getDate() + 6);
+  return pubMonday.toLocaleDateString('en-US', {month:'long', day:'numeric'}) + ' - ' +
+    pubSunday.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+}
+
+function initEmailPreview() {
+  loadEmailSettings();
+  var cache = getEPCache();
+  var weekKey = getEPWeekKey();
+  var approved = localStorage.getItem('tiffany_ep_approved_' + weekKey) === '1';
+  updateEPHorizonNote();
+
+  if (cache && cache.week_key === weekKey) {
+    epCurrentData = cache;
+    renderEmailPreview(cache, approved);
+    return;
+  }
+
+  if (isThursday()) {
+    generateEmailPreview(false);
+  } else {
+    document.getElementById('ep-week-label').textContent = 'Topics for ' + getRecordingWeek();
+    document.getElementById('ep-status-note').textContent = 'Auto-generates on Thursdays. Click Retry to generate now.';
+  }
+}
+
+function updateEPHorizonNote() {
+  var recWeek = getRecordingWeek();
+  var pubWeek = getPublishingWeek();
+  var note = document.getElementById('ep-horizon-note');
+  if (note) note.textContent = 'Topics sent this Friday are for recording the week of ' + recWeek + '. Editing happens the following week. Publishing begins the week of ' + pubWeek + '.';
+}
+
+async function generateEmailPreview(isRetry) {
+  if (!checkApiKey()) return;
+  var weekKey = getEPWeekKey();
+  if (isRetry) localStorage.removeItem('tiffany_ep_approved_' + weekKey);
+
+  document.getElementById('ep-loading').style.display = 'block';
+  document.getElementById('ep-topics-grid').style.display = 'none';
+  document.getElementById('ep-error').style.display = 'none';
+  document.getElementById('ep-approved-badge').style.display = 'none';
+  document.getElementById('ep-send-btn').style.display = 'none';
+  document.getElementById('ep-week-label').textContent = 'Generating topics...';
+  document.getElementById('ep-status-note').textContent = '';
+  document.getElementById('ep-retry-btn').disabled = true;
+  document.getElementById('ep-approve-btn').disabled = true;
+  startLoader('ep-loading-msg', epLoaderMsgs);
+
+  var profile = getProfile();
+  var kb = getKnowledgeBase();
+  var recWeek = getRecordingWeek();
+  var pubWeek = getPublishingWeek();
+
+  var profileCtx = '';
+  if (profile.transcript_count > 0) {
+    profileCtx = 'TIFFANY\'S CONTENT HISTORY (never repeat any of these):\n' +
+      'Topics covered: ' + (profile.topics.slice(-30).join(', ') || 'none yet') + '\n' +
+      'Her phrases and voice patterns: ' + (profile.phrases.slice(-10).join(', ') || 'building') + '\n' +
+      'Core themes: ' + (profile.themes.slice(-10).join(', ') || 'building') + '\n' +
+      'Pillar usage history: ' + JSON.stringify(profile.pillars) + '\n' +
+      'Total scripts analyzed: ' + profile.transcript_count + '\n\n';
+  }
+
+  var kbCtx = '';
+  if (kb.length > 0) {
+    var latest = kb[0].data || {};
+    kbCtx = 'PERFORMANCE DATA:\n' +
+      'What resonates: ' + (latest.what_is_working || []).slice(0,3).join(', ') + '\n' +
+      'Top content: ' + (latest.top_performing_content || []).slice(0,3).join(', ') + '\n' +
+      'Audience insights: ' + (latest.audience_insights || []).slice(0,3).join(', ') + '\n' +
+      'Priorities: ' + (latest.strategic_priorities || []).slice(0,3).join(', ') + '\n\n';
+  }
+
+  var underusedPillars = BRAND.pillars.filter(function(p) { return (profile.pillars[p] || 0) < 3; });
+
+  var prompt = 'You are lead content strategist for Tiffany Haynes and Co.\n\n' +
+    'BRAND: ' + BRAND.voice + '\nAVOID: ' + BRAND.avoid + '\nPILLARS: ' + BRAND.pillars.join(', ') + '\n\n' +
+    profileCtx + kbCtx +
+    'PRIORITIZE UNDERUSED PILLARS: ' + (underusedPillars.join(', ') || 'all balanced') + '\n\n' +
+    'Recording window: ' + recWeek + '\nPublishing window: ' + pubWeek + '\n\n' +
+    'Generate exactly 12 FRESH ORIGINAL voiceover topics. Never repeat history. Cover all pillars. Specific enough to record, open enough for her own experience. Vary content types.\n\n' +
+    'Return ONLY valid JSON. No markdown. Start with {.\n\n' +
+    '{"recording_week":"' + recWeek + '","publishing_week":"' + pubWeek + '",' +
+    '"planning_note":"One sentence on why this mix serves Tiffany right now.",' +
+    '"topics":[{"number":1,"title":"5-8 word title","pillar":"pillar","content_type":"Talking Head or B-Roll with Text or Teaching or Testimony or Lifestyle or Shenanigans",' +
+    '"hook":"Exact first 3 seconds in her voice",' +
+    '"what_to_cover":["point 1","point 2","point 3"],' +
+    '"why_this_works":"One sentence on why this resonates.",' +
+    '"scripture_angle":"scripture if applicable else empty",' +
+    '"estimated_length":"15 sec or 30 sec or 60 sec"}]}';
+
+  try {
+    var result = await callAPI(prompt, 4000);
+
+    if (result.topics) {
+      var pl = { topics_covered:[], recurring_phrases:[], themes:[], pillar_hits:{}, transcript_count:0 };
+      result.topics.forEach(function(t) {
+        if (t.title) pl.topics_covered.push(t.title);
+        if (t.pillar) pl.pillar_hits[t.pillar] = (pl.pillar_hits[t.pillar] || 0) + 1;
+      });
+      updateProfileFromLearning(pl);
+    }
+
+    epCurrentData = result;
+    saveEPCache(result);
+    stopLoader('ep-loading-msg');
+    document.getElementById('ep-loading').style.display = 'none';
+    renderEmailPreview(result, false);
+
+  } catch(e) {
+    stopLoader('ep-loading-msg');
+    document.getElementById('ep-loading').style.display = 'none';
+    var el = document.getElementById('ep-error');
+    el.style.display = 'block';
+    el.innerHTML = '<strong>Error generating topics:</strong> ' + escRaw(e.message);
+    document.getElementById('ep-week-label').textContent = 'Generation failed';
+    console.error(e);
+  }
+  document.getElementById('ep-retry-btn').disabled = false;
+  document.getElementById('ep-approve-btn').disabled = false;
+}
+
+// ================================================================
+// PDF GENERATION
+// ================================================================
+function approveAndGeneratePDF() {
+  if (!epCurrentData) { alert('Please generate topics first.'); return; }
+  var weekKey = getEPWeekKey();
+  localStorage.setItem('tiffany_ep_approved_' + weekKey, '1');
+  document.getElementById('ep-approved-badge').style.display = 'inline-block';
+  document.getElementById('ep-approve-btn').textContent = 'Regenerate PDF';
+  generatePDF(epCurrentData);
+  buildEmailDraft(epCurrentData);
+  document.getElementById('ep-send-btn').style.display = 'inline-block';
+  document.getElementById('ep-email-draft-wrap').style.display = 'block';
+}
+
+function generatePDF(data) {
+  var topics = data.topics || [];
+  var recWeek = data.recording_week || getRecordingWeek();
+  var pubWeek = data.publishing_week || getPublishingWeek();
+  var dateStr = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+
+  // Use jsPDF loaded from CDN
+  var jsPDF = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDF) {
+    // Fallback: generate HTML and print
+    generatePDFFallback(data);
+    return;
+  }
+
+  var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  var pageW = 210; var pageH = 297;
+  var margin = 18; var contentW = pageW - margin * 2;
+  var y = margin;
+
+  var CREAM = [255, 253, 245];
+  var RED = [160, 6, 5];
+  var CHARCOAL = [65, 65, 65];
+  var CHARCOAL2 = [90, 90, 90];
+  var CHARCOAL3 = [138, 138, 138];
+  var BORDER = [227, 211, 200];
+
+  var PILLAR_COLORS = {
+    "Business and Entrepreneurship": [184, 120, 48],
+    "Spiritual Development and Gods Math Teaching": [160, 6, 5],
+    "Family and Lifestyle": [58, 158, 110],
+    "Humor and Personality Shenanigans": [106, 80, 168],
+    "Community and Testimony": [58, 110, 168]
+  };
+
+  function setPillarColor(pillar) {
+    return PILLAR_COLORS[pillar] || CHARCOAL3;
+  }
+
+  function addPage() {
+    doc.addPage();
+    y = margin;
+    // Subtle header line on each page
+    doc.setDrawColor.apply(doc, BORDER);
+    doc.setLineWidth(0.3);
+    doc.line(margin, 8, pageW - margin, 8);
+    doc.setFontSize(7);
+    doc.setTextColor.apply(doc, CHARCOAL3);
+    doc.text('TIFFANY HAYNES & CO. | VOICEOVER TOPICS | ' + recWeek.toUpperCase(), pageW / 2, 6, { align: 'center' });
+  }
+
+  function checkPageBreak(needed) {
+    if (y + needed > pageH - margin) { addPage(); }
+  }
+
+  //  COVER 
+  doc.setFillColor.apply(doc, CHARCOAL);
+  doc.rect(0, 0, pageW, 60, 'F');
+
+  doc.setFontSize(8);
+  doc.setTextColor(196, 158, 60);
+  doc.setFont('helvetica', 'bold');
+  doc.text('TIFFANY HAYNES & CO. MEDIA TEAM', margin, 18);
+
+  doc.setFontSize(22);
+  doc.setTextColor(255, 253, 245);
+  doc.setFont('helvetica', 'bold');
+  doc.text('12 Voiceover Topics', margin, 32);
+
+  doc.setFontSize(11);
+  doc.setTextColor(180, 180, 180);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Recording: ' + recWeek, margin, 42);
+  doc.text('Publishing: ' + pubWeek, margin, 49);
+
+  doc.setFontSize(8);
+  doc.setTextColor(140, 145, 165);
+  doc.text('Generated: ' + dateStr, pageW - margin, 49, { align: 'right' });
+
+  // Math formula accent
+  doc.setFontSize(9);
+  doc.setTextColor(196, 158, 60);
+  doc.text('1 + 1 = 10,000', pageW - margin, 18, { align: 'right' });
+
+  y = 68;
+
+  // Planning note
+  if (data.planning_note) {
+    doc.setFontSize(10);
+    doc.setTextColor.apply(doc, CHARCOAL2);
+    doc.setFont('helvetica', 'italic');
+    var noteLines = doc.splitTextToSize(data.planning_note, contentW);
+    doc.text(noteLines, margin, y);
+    y += noteLines.length * 5 + 4;
+  }
+
+  // Instruction
+  doc.setFontSize(9);
+  doc.setTextColor.apply(doc, CHARCOAL3);
+  doc.setFont('helvetica', 'normal');
+  var instrText = 'Choose the topics that resonate. Record them this week at your own pace. You do not need to record all 12.';
+  var instrLines = doc.splitTextToSize(instrText, contentW);
+  doc.text(instrLines, margin, y);
+  y += instrLines.length * 4.5 + 10;
+
+  // Divider
+  doc.setDrawColor.apply(doc, BORDER);
+  doc.setLineWidth(0.4);
+  doc.line(margin, y, pageW - margin, y);
+  y += 8;
+
+  //  TOPICS 
+  topics.forEach(function(t, idx) {
+    var coverPoints = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover || '').split('\n').filter(Boolean);
+    var pillarCol = setPillarColor(t.pillar);
+
+    // Estimate height needed
+    var hookLines = doc.splitTextToSize('"' + (t.hook || '') + '"', contentW - 6);
+    var coverH = coverPoints.length * 5;
+    var scriptureLines = t.scripture_angle ? doc.splitTextToSize(t.scripture_angle, contentW - 10) : [];
+    var whyLines = doc.splitTextToSize((t.why_this_works || ''), contentW - 6);
+    var estimatedH = 12 + hookLines.length * 5 + 10 + coverH + (scriptureLines.length ? scriptureLines.length * 4 + 8 : 0) + whyLines.length * 4 + 16;
+    checkPageBreak(estimatedH);
+
+    // Topic header background
+    doc.setFillColor(pillarCol[0], pillarCol[1], pillarCol[2], 0.08);
+    var bgAlpha = [Math.min(255, pillarCol[0] + 180), Math.min(255, pillarCol[1] + 180), Math.min(255, pillarCol[2] + 180)];
+    doc.setFillColor.apply(doc, bgAlpha);
+    doc.roundedRect(margin, y, contentW, 12, 2, 2, 'F');
+
+    // Number circle
+    doc.setFillColor.apply(doc, pillarCol);
+    doc.circle(margin + 5, y + 6, 4, 'F');
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.text(String(t.number || idx + 1), margin + 5, y + 7, { align: 'center' });
+
+    // Title
+    doc.setFontSize(11);
+    doc.setTextColor.apply(doc, CHARCOAL);
+    doc.setFont('helvetica', 'bold');
+    doc.text(t.title || '', margin + 12, y + 7);
+
+    // Meta tags
+    var metaX = margin + 12;
+    var metaY = y + 11.5;
+    doc.setFontSize(7);
+    doc.setTextColor.apply(doc, pillarCol);
+    doc.setFont('helvetica', 'bold');
+    doc.text((t.pillar || '').toUpperCase(), metaX, metaY);
+    if (t.content_type) {
+      var pillarW = doc.getTextWidth((t.pillar || '').toUpperCase());
+      doc.setTextColor.apply(doc, CHARCOAL3);
+      doc.setFont('helvetica', 'normal');
+      doc.text('  |  ' + t.content_type + '  |  ' + (t.estimated_length || ''), metaX + pillarW, metaY);
+    }
+
+    y += 16;
+
+    // Hook
+    doc.setFontSize(8);
+    doc.setTextColor.apply(doc, RED);
+    doc.setFont('helvetica', 'bold');
+    doc.text('HOOK - FIRST 3 SECONDS', margin, y);
+    y += 4.5;
+
+    doc.setFontSize(10);
+    doc.setTextColor.apply(doc, CHARCOAL);
+    doc.setFont('helvetica', 'bolditalic');
+    doc.text(hookLines, margin, y);
+    y += hookLines.length * 5 + 6;
+
+    // What to cover
+    doc.setFontSize(8);
+    doc.setTextColor.apply(doc, CHARCOAL3);
+    doc.setFont('helvetica', 'bold');
+    doc.text('WHAT TO COVER', margin, y);
+    y += 4.5;
+
+    doc.setFontSize(9.5);
+    doc.setTextColor.apply(doc, CHARCOAL2);
+    doc.setFont('helvetica', 'normal');
+    coverPoints.forEach(function(pt) {
+      var ptLines = doc.splitTextToSize('- ' + pt, contentW - 4);
+      checkPageBreak(ptLines.length * 5 + 2);
+      doc.text(ptLines, margin + 2, y);
+      y += ptLines.length * 5;
+    });
+    y += 3;
+
+    // Scripture
+    if (t.scripture_angle && t.scripture_angle.trim()) {
+      checkPageBreak(scriptureLines.length * 4 + 10);
+      doc.setFillColor(255, 245, 245);
+      doc.roundedRect(margin, y, contentW, scriptureLines.length * 4.5 + 6, 1, 1, 'F');
+      doc.setDrawColor.apply(doc, RED);
+      doc.setLineWidth(1.5);
+      doc.line(margin, y, margin, y + scriptureLines.length * 4.5 + 6);
+      doc.setLineWidth(0.3);
+      doc.setFontSize(9);
+      doc.setTextColor.apply(doc, RED);
+      doc.setFont('helvetica', 'italic');
+      doc.text(scriptureLines, margin + 4, y + 4.5);
+      y += scriptureLines.length * 4.5 + 10;
+    }
+
+    // Why this works
+    doc.setFontSize(8);
+    doc.setTextColor.apply(doc, CHARCOAL3);
+    doc.setFont('helvetica', 'bold');
+    doc.text('WHY THIS WORKS:', margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor.apply(doc, CHARCOAL2);
+    var whyStart = margin + doc.getTextWidth('WHY THIS WORKS:  ');
+    doc.text(whyLines[0] || '', whyStart, y);
+    if (whyLines.length > 1) {
+      y += 4.5;
+      doc.text(whyLines.slice(1).join(' '), margin, y);
+    }
+    y += 6;
+
+    // Divider between topics
+    doc.setDrawColor.apply(doc, BORDER);
+    doc.setLineWidth(0.2);
+    doc.line(margin, y, pageW - margin, y);
+    y += 7;
+  });
+
+  // FOOTER
+  checkPageBreak(20);
+  doc.setDrawColor.apply(doc, BORDER);
+  doc.line(margin, y, pageW - margin, y);
+  y += 6;
+  doc.setFontSize(8);
+  doc.setTextColor.apply(doc, CHARCOAL3);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Tiffany Haynes & Co. Media Team  |  Internal use only  |  Not for distribution outside the media team', pageW / 2, y, { align: 'center' });
+  y += 4;
+  doc.setFontSize(9);
+  doc.setTextColor(196, 158, 60);
+  doc.setFont('helvetica', 'bold');
+  doc.text('1 + 1 = 10,000', pageW / 2, y + 4, { align: 'center' });
+
+  var filename = 'VoiceoverTopics_' + recWeek.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf';
+  doc.save(filename);
+
+  // Show success
+  var status = document.getElementById('ep-pdf-status');
+  if (status) { status.style.display = 'flex'; }
+}
+
+function generatePDFFallback(data) {
+  // Fallback: open a print-ready HTML page
+  var topics = data.topics || [];
+  var recWeek = data.recording_week || getRecordingWeek();
+  var html = '<html><head><title>Voiceover Topics</title><style>body{font-family:Georgia,serif;margin:40px;color:#414141;background:#FFFDF5;}h1{color:#414141;}h2{color:#A00605;font-size:14px;}p{font-size:13px;line-height:1.7;}li{font-size:13px;line-height:1.6;}.topic{margin-bottom:32px;border-bottom:1px solid #E3D3C8;padding-bottom:24px;}.hook{font-style:italic;font-weight:bold;font-size:15px;color:#414141;}.pillar{font-size:10px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;}.scripture{border-left:3px solid #A00605;padding-left:10px;color:#A00605;font-style:italic;background:#FFF5F5;padding:8px 12px;margin:8px 0;}</head><body>';
+  html += '<h1>12 Voiceover Topics</h1><p><strong>Recording:</strong> ' + recWeek + '</p>';
+  if (data.planning_note) html += '<p><em>' + data.planning_note + '</em></p>';
+  html += '<hr>';
+  topics.forEach(function(t) {
+    var pts = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover||'').split('\n').filter(Boolean);
+    html += '<div class="topic">';
+    html += '<h2>' + t.number + '. ' + t.title + '</h2>';
+    html += '<div class="pillar">' + (t.pillar||'') + ' &bull; ' + (t.content_type||'') + ' &bull; ' + (t.estimated_length||'') + '</div>';
+    html += '<p class="hook">"' + t.hook + '"</p>';
+    html += '<ul>' + pts.map(function(p){return '<li>'+p+'</li>';}).join('') + '</ul>';
+    if (t.scripture_angle) html += '<div class="scripture">' + t.scripture_angle + '</div>';
+    html += '<p><strong>Why this works:</strong> ' + t.why_this_works + '</p>';
+    html += '</div>';
+  });
+  html += '<p style="text-align:center;color:#C49E3C;font-size:14px;font-weight:bold;">1 + 1 = 10,000</p>';
+  html += '</body></html>';
+  var win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.print();
+}
+
+// ================================================================
+// EMAIL DRAFT
+// ================================================================
+function buildEmailDraft(data) {
+  var recWeek = data.recording_week || getRecordingWeek();
+  var pubWeek = data.publishing_week || getPublishingWeek();
+  var dateStr = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+  var topicTitles = (data.topics || []).map(function(t) { return t.number + '. ' + t.title; }).join('\n');
+
+  var draft = 'Subject: Your 12 Voiceover Topics - Week of ' + recWeek + '\n\n' +
+    'Hi Tiffany,\n\n' +
+    'Your voiceover topics for the week of ' + recWeek + ' are attached.\n\n' +
+    'The PDF includes 12 topic ideas with hooks, what to cover, and scripture angles. Choose the ones that speak to you. You do not need to record all 12.\n\n' +
+    'Recording window: ' + recWeek + '\n' +
+    'Publishing window: ' + pubWeek + '\n\n' +
+    'Topics at a glance:\n' + topicTitles + '\n\n' +
+    'The team will begin editing the following week for publishing the week of ' + pubWeek + '.\n\n' +
+    '1 + 1 = 10,000\n\n' +
+    'Tiffany Haynes & Co. Media Team';
+
+  document.getElementById('ep-email-draft-text').textContent = draft;
+  document.getElementById('ep-email-draft-wrap').style.display = 'block';
+}
+
+function copyEmailDraftText() {
+  var el = document.getElementById('ep-email-draft-text');
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent).then(function() {
+    var btn = document.getElementById('ep-copy-btn');
+    if (btn) { btn.textContent = 'Copied'; btn.classList.add('copied'); setTimeout(function() { btn.textContent = 'Copy Email Body'; btn.classList.remove('copied'); }, 2500); }
+  });
+}
+
+function sendEmailDraft() {
+  if (!epCurrentData) return;
+  var tiffany = (document.getElementById('ep-email-tiffany')||{}).value || '';
+  var team = (document.getElementById('ep-email-team')||{}).value || '';
+  if (!tiffany) { alert('Please enter Tiffany\'s email address above.'); return; }
+
+  var recWeek = epCurrentData.recording_week || getRecordingWeek();
+  var pubWeek = epCurrentData.publishing_week || getPublishingWeek();
+  var topicTitles = (epCurrentData.topics || []).map(function(t) { return t.number + '. ' + t.title; }).join('%0A');
+
+  var subject = encodeURIComponent('Your 12 Voiceover Topics - Week of ' + recWeek);
+  var body = encodeURIComponent(
+    'Hi Tiffany,' + '\n\n' +
+    'Your voiceover topics for the week of ' + recWeek + ' are attached.' + '\n\n' +
+    'The PDF includes 12 topic ideas with hooks, what to cover, and scripture angles. Choose the ones that speak to you. You do not need to record all 12.' + '\n\n' +
+    'Recording window: ' + recWeek + '\n' +
+    'Publishing window: ' + pubWeek + '\n\n' +
+    'Topics at a glance:\n' + (epCurrentData.topics || []).map(function(t) { return t.number + '. ' + t.title; }).join('\n') + '\n\n' +
+    'The team will begin editing the following week for publishing the week of ' + pubWeek + '.' + '\n\n' +
+    '1 + 1 = 10,000' + '\n\n' +
+    'Tiffany Haynes & Co. Media Team'
+  );
+
+  var ccList = team.split(',').map(function(e) { return e.trim(); }).filter(Boolean).join(',');
+  var mailto = 'mailto:' + encodeURIComponent(tiffany) + (ccList ? '?cc=' + encodeURIComponent(ccList) + '&subject=' + subject + '&body=' + body : '?subject=' + subject + '&body=' + body);
+
+  window.location.href = mailto;
+}
+
+function renderEmailPreview(data, approved) {
+  epCurrentData = data;
+  document.getElementById('ep-week-label').textContent = 'Topics for ' + (data.recording_week || getRecordingWeek());
+  document.getElementById('ep-status-note').textContent = approved ? 'Approved. PDF generated. Ready to send.' : 'Review topics then click Approve + Generate PDF.';
+
+  if (approved) {
+    document.getElementById('ep-approved-badge').style.display = 'inline-block';
+    document.getElementById('ep-approve-btn').textContent = 'Regenerate PDF';
+    document.getElementById('ep-send-btn').style.display = 'inline-block';
+    buildEmailDraft(data);
+    document.getElementById('ep-email-draft-wrap').style.display = 'block';
+  } else {
+    document.getElementById('ep-approved-badge').style.display = 'none';
+    document.getElementById('ep-approve-btn').textContent = 'Approve + Generate PDF';
+    document.getElementById('ep-send-btn').style.display = 'none';
+  }
+
+  var topics = data.topics || [];
+  var pillarCounts = {};
+  topics.forEach(function(t) { pillarCounts[t.pillar] = (pillarCounts[t.pillar] || 0) + 1; });
+  var psHtml = '';
+  Object.keys(pillarCounts).forEach(function(p) {
+    var pc = BRAND.pillarColors[p] || { color:'#888', bg:'rgba(136,136,136,0.1)' };
+    psHtml += '<span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:12px;background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(p) + ' (' + pillarCounts[p] + ')</span>';
+  });
+  if (data.planning_note) psHtml += '<span style="font-size:11px;color:var(--charcoal2);font-style:italic;padding:3px 6px;">' + escRaw(data.planning_note) + '</span>';
+  document.getElementById('ep-pillar-summary').innerHTML = psHtml;
+
+  var cardsHtml = '';
+  topics.forEach(function(t) {
+    var pc = BRAND.pillarColors[t.pillar] || { color:'#888', bg:'rgba(136,136,136,0.1)' };
+    var coverPoints = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover || '').split('\n').filter(Boolean);
+
+    cardsHtml += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
+    cardsHtml += '<div style="background:' + pc.bg + ';padding:11px 14px;border-bottom:1px solid rgba(65,65,65,0.08);display:flex;align-items:flex-start;gap:10px;">';
+    cardsHtml += '<div style="width:24px;height:24px;border-radius:50%;background:' + pc.color + ';color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">' + (t.number || '') + '</div>';
+    cardsHtml += '<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--charcoal);line-height:1.3;margin-bottom:3px;">' + escRaw(t.title || '') + '</div>';
+    cardsHtml += '<div style="font-size:9px;font-weight:700;color:' + pc.color + ';letter-spacing:1px;text-transform:uppercase;">' + escRaw(t.pillar||'') + '</div>';
+    if (t.content_type || t.estimated_length) cardsHtml += '<div style="font-size:9px;color:var(--charcoal3);margin-top:1px;">' + escRaw(t.content_type||'') + (t.estimated_length?' &bull; '+escRaw(t.estimated_length):'') + '</div>';
+    cardsHtml += '</div></div>';
+
+    cardsHtml += '<div style="padding:11px 14px;background:#FFFDF5;border-bottom:1px solid var(--border);">';
+    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Hook</div>';
+    cardsHtml += '<div style="font-size:12px;font-weight:600;color:var(--charcoal);font-style:italic;line-height:1.4;">"' + escRaw(t.hook||'') + '"</div>';
+    cardsHtml += '</div>';
+
+    cardsHtml += '<div style="padding:11px 14px;border-bottom:1px solid var(--border);">';
+    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">What to Cover</div>';
+    cardsHtml += '<ul style="margin:0;padding-left:15px;color:var(--charcoal2);font-size:11px;line-height:1.7;">';
+    coverPoints.forEach(function(pt) { cardsHtml += '<li style="margin-bottom:2px;">' + escRaw(pt) + '</li>'; });
+    cardsHtml += '</ul>';
+    if (t.scripture_angle && t.scripture_angle.trim()) {
+      cardsHtml += '<div style="margin-top:7px;padding:7px 10px;border-left:3px solid var(--red);background:var(--red-dim);font-size:10px;font-style:italic;color:var(--red);line-height:1.5;">' + escRaw(t.scripture_angle) + '</div>';
+    }
+    cardsHtml += '</div>';
+
+    cardsHtml += '<div style="padding:8px 14px;background:var(--cream-2);">';
+    cardsHtml += '<span style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Why this works: </span>';
+    cardsHtml += '<span style="font-size:11px;color:var(--charcoal2);">' + escRaw(t.why_this_works||'') + '</span>';
+    cardsHtml += '</div></div>';
+  });
+
+  document.getElementById('ep-cards-grid').innerHTML = cardsHtml;
+  document.getElementById('ep-topics-grid').style.display = 'block';
+}
+
+  'Reading the content profile...',
+  'Reviewing all past scripts and topics...',
+  'Identifying content gaps...',
+  'Developing fresh voiceover angles...',
+  'Balancing content pillars...',
+  'Writing topic directions...',
+  'Almost ready...'
+];
+
 function getEPCache() {
   var raw = localStorage.getItem('tiffany_ep_cache');
   if (!raw) return null;
@@ -2259,5 +2891,6 @@ function renderKnowledgeBase() {
   container.innerHTML = h;
 }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </body>
 </html>
