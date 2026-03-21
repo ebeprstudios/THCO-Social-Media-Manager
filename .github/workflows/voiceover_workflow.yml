@@ -1,0 +1,35 @@
+name: Weekly Voiceover Topics Email
+
+on:
+  schedule:
+    # Every Friday at 1PM CST = 7PM UTC
+    - cron: '0 19 * * 5'
+  workflow_dispatch:
+    # Allows manual trigger from GitHub UI or via API (Send Now button)
+
+jobs:
+  send-voiceover-email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Send voiceover topics email
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EMAIL_FROM:        ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD:    ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO:          ${{ secrets.EMAIL_TO }}
+          EMAIL_CC:          ${{ secrets.EMAIL_CC }}
+          GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python voiceover_topics.py
