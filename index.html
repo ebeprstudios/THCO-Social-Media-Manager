@@ -493,6 +493,7 @@ body::before {
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importProfile(event)" />
       <button class="tb-btn" onclick="showKeyModal()">API Key</button>
       <button class="tb-btn" onclick="window.print()">Print</button>
+      <button class="tb-btn" id="send-report-btn" onclick="sendMonthlyReport()" style="border-color:var(--red);color:var(--red);">Send Report</button>
     </div>
   </div>
 </div>
@@ -799,7 +800,98 @@ body::before {
     <!-- TAB: KNOWLEDGE BASE -->
     <div id="tab-knowledge" class="tab-pane">
 
-      <!-- TWO COLUMN LAYOUT: Upload + List -->
+      <!-- META ANALYTICS PANEL -->
+      <div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px var(--shadow);margin-bottom:24px;">
+
+        <!-- HEADER -->
+        <div style="background:var(--charcoal);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#C49E3C;letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Live Data</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:white;">Meta Analytics</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">Facebook Page + Instagram Business — last 30 posts</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span id="meta-last-fetched" style="font-size:10px;color:rgba(255,255,255,0.35);padding:5px 10px;align-self:center;"></span>
+            <button id="meta-fetch-btn" onclick="fetchMetaAnalytics()" style="background:#C49E3C;color:#414141;border:none;padding:9px 18px;border-radius:7px;font-family:Georgia,serif;font-size:13px;font-weight:700;cursor:pointer;">Fetch Analytics</button>
+          </div>
+        </div>
+
+        <!-- SETTINGS ROW -->
+        <div style="padding:14px 20px;background:var(--cream-2);border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;" id="meta-settings-row">
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Page Access Token</div>
+            <input id="meta-token" type="password" placeholder="EAA..." onchange="saveMetaSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:Inter,sans-serif;font-size:11px;padding:7px 10px;border-radius:6px;outline:none;" />
+            <div style="font-size:9px;color:var(--charcoal3);margin-top:3px;">From Meta Developer App → Tools → Graph API Explorer</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Instagram Business ID</div>
+            <input id="meta-ig-id" type="text" placeholder="17841400000000000" onchange="saveMetaSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:Inter,sans-serif;font-size:11px;padding:7px 10px;border-radius:6px;outline:none;" />
+            <div style="font-size:9px;color:var(--charcoal3);margin-top:3px;">Settings → Linked Accounts → Instagram → ID</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Facebook Page ID</div>
+            <input id="meta-page-id" type="text" placeholder="123456789" onchange="saveMetaSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:Inter,sans-serif;font-size:11px;padding:7px 10px;border-radius:6px;outline:none;" />
+            <div style="font-size:9px;color:var(--charcoal3);margin-top:3px;">About section of your Facebook Page</div>
+          </div>
+        </div>
+
+        <!-- ERROR -->
+        <div id="meta-error" style="display:none;padding:12px 20px;background:rgba(160,6,5,0.06);border-bottom:1px solid rgba(160,6,5,0.15);font-size:12px;color:var(--red);line-height:1.6;"></div>
+
+        <!-- LOADING -->
+        <div id="meta-loading" style="display:none;padding:32px 20px;text-align:center;color:var(--charcoal3);font-size:13px;">
+          <div style="width:28px;height:28px;border:3px solid var(--cream-3);border-top-color:var(--red);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+          Fetching from Meta Graph API...
+        </div>
+
+        <!-- RESULTS -->
+        <div id="meta-results" style="display:none;padding:20px;">
+
+          <!-- TOP STATS ROW -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;" id="meta-stats-row"></div>
+
+          <!-- TWO COLUMN: TOP POSTS + AUDIENCE -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
+
+            <!-- TOP POSTS -->
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Top 5 Posts by Engagement</div>
+              <div id="meta-top-posts"></div>
+            </div>
+
+            <!-- NEEDS ATTENTION -->
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Needs Attention</div>
+              <div id="meta-low-posts"></div>
+              <div style="margin-top:16px;">
+                <div style="font-size:10px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Audience Breakdown</div>
+                <div id="meta-audience"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- PILLAR PERFORMANCE -->
+          <div style="margin-bottom:20px;">
+            <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Engagement by Pillar (AI-Tagged)</div>
+            <div id="meta-pillar-perf"></div>
+          </div>
+
+          <!-- BEST TIMES -->
+          <div style="margin-bottom:16px;">
+            <div style="font-size:10px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">Best Posting Days</div>
+            <div id="meta-best-times"></div>
+          </div>
+
+          <!-- FEED TO PLANNER BUTTON -->
+          <div style="border-top:1px solid var(--border);padding-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+            <div style="font-size:12px;color:var(--charcoal3);">Feed this data to the Knowledge Base and Weekly Planner automatically.</div>
+            <button onclick="feedMetaToKB()" style="background:var(--charcoal);color:white;border:none;padding:10px 22px;border-radius:7px;font-family:Georgia,serif;font-size:13px;font-weight:700;cursor:pointer;">Feed to Knowledge Base + Planner</button>
+          </div>
+
+        </div>
+
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;align-items:start;">
 
         <!-- LEFT: UPLOAD PANEL -->
@@ -1191,7 +1283,7 @@ function switchTab(tab) {
   var tabs = ['dashboard','studio','planner','knowledge','emailpreview','voiceovers'];
   var idx = tabs.indexOf(tab);
   if (idx >= 0) document.querySelectorAll('.tab-btn')[idx].classList.add('active');
-  if (tab === 'knowledge') renderKnowledgeBase();
+  if (tab === 'knowledge') { renderKnowledgeBase(); loadMetaSettings(); }
   if (tab === 'emailpreview') initEmailPreview();
   if (tab === 'voiceovers') initVoiceovers();
   if (tab === 'planner') initPlannerBalance();
@@ -3116,6 +3208,458 @@ function getUploadUrl(topicTitle) {
 }
 
 // ================================================================
+// MONTHLY REPORT - Send Now
+// ================================================================
+async function sendMonthlyReport() {
+  var token = getGithubToken();
+  if (!token) { alert('No GitHub token saved. Go to Email Preview tab and enter your token in settings first.'); return; }
+
+  var btn = document.getElementById('send-report-btn');
+  btn.disabled = true; btn.textContent = 'Saving data...';
+
+  try {
+    var repoFull = getGitHubRepo();
+    if (!repoFull) throw new Error('GitHub repo not set. Fill in the GitHub Repo field in Email Preview settings.');
+
+    // Step 1 - save KB snapshot to repo so the Python script can read it
+    await saveKBSnapshot(token, repoFull);
+
+    // Step 2 - save approved plans history to repo
+    await saveApprovedPlansSnapshot(token, repoFull);
+
+    btn.textContent = 'Triggering report...';
+
+    // Step 3 - trigger the monthly report workflow
+    var parts = repoFull.split('/');
+    var res = await fetch('https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/actions/workflows/monthly_report_workflow.yml/dispatches', {
+      method: 'POST',
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ref: 'main' })
+    });
+
+    if (res.status === 204 || res.status === 200) {
+      btn.textContent = 'Report Sent!';
+      btn.style.borderColor = 'var(--green)';
+      btn.style.color = 'var(--green)';
+      setTimeout(function() {
+        btn.disabled = false;
+        btn.textContent = 'Send Report';
+        btn.style.borderColor = '';
+        btn.style.color = 'var(--red)';
+      }, 5000);
+      alert('Monthly report triggered! Check your inbox in about 60 seconds.');
+    } else {
+      var errBody = await res.text();
+      throw new Error('GitHub returned ' + res.status + ': ' + errBody.slice(0,200));
+    }
+
+  } catch(e) {
+    alert('Could not send report: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'Send Report';
+    console.error(e);
+  }
+}
+
+async function saveKBSnapshot(token, repoFull) {
+  var kb = getKnowledgeBase();
+  if (!kb.length) { console.log('No KB data to save'); return; }
+  var parts = repoFull.split('/');
+  var url = 'https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/contents/knowledge_base_snapshot.json';
+  var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
+  var sha = null;
+  var check = await fetch(url, { headers: headers });
+  if (check.ok) sha = (await check.json()).sha;
+  var content = btoa(unescape(encodeURIComponent(JSON.stringify(kb, null, 2))));
+  var body = { message: 'KB snapshot for monthly report', content: content };
+  if (sha) body.sha = sha;
+  await fetch(url, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+  console.log('KB snapshot saved');
+}
+
+async function saveApprovedPlansSnapshot(token, repoFull) {
+  var history = getApprovedPlanHistory();
+  if (!history.length) { console.log('No approved plans to save'); return; }
+  var parts = repoFull.split('/');
+  var url = 'https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/contents/approved_plans_history.json';
+  var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
+  var sha = null;
+  var check = await fetch(url, { headers: headers });
+  if (check.ok) sha = (await check.json()).sha;
+  var content = btoa(unescape(encodeURIComponent(JSON.stringify(history, null, 2))));
+  var body = { message: 'Approved plans snapshot for monthly report', content: content };
+  if (sha) body.sha = sha;
+  await fetch(url, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+  console.log('Approved plans snapshot saved');
+}
+
+
+var metaData = null;
+
+function saveMetaSettings() {
+  var token = document.getElementById('meta-token').value;
+  var igId  = document.getElementById('meta-ig-id').value.trim();
+  var pageId= document.getElementById('meta-page-id').value.trim();
+  if (token && token !== '****saved****') localStorage.setItem('tiffany_meta_token', token);
+  if (igId)   localStorage.setItem('tiffany_meta_ig_id', igId);
+  if (pageId) localStorage.setItem('tiffany_meta_page_id', pageId);
+}
+
+function loadMetaSettings() {
+  var token  = localStorage.getItem('tiffany_meta_token');
+  var igId   = localStorage.getItem('tiffany_meta_ig_id');
+  var pageId = localStorage.getItem('tiffany_meta_page_id');
+  var tEl = document.getElementById('meta-token');
+  var iEl = document.getElementById('meta-ig-id');
+  var pEl = document.getElementById('meta-page-id');
+  if (tEl && token) tEl.value = '****saved****';
+  if (iEl && igId)  iEl.value = igId;
+  if (pEl && pageId) pEl.value = pageId;
+  // Show last fetched
+  var last = localStorage.getItem('tiffany_meta_last_fetched');
+  if (last) {
+    var el = document.getElementById('meta-last-fetched');
+    if (el) el.textContent = 'Last fetched: ' + new Date(last).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  }
+  // Show cached data if available
+  var cached = localStorage.getItem('tiffany_meta_data');
+  if (cached) {
+    try { metaData = JSON.parse(cached); renderMetaResults(metaData); } catch(e) {}
+  }
+}
+
+function getMetaToken() { return localStorage.getItem('tiffany_meta_token') || ''; }
+
+async function metaFetch(url) {
+  var res = await fetch(url);
+  if (!res.ok) {
+    var j = {}; try { j = await res.json(); } catch(x) {}
+    throw new Error((j.error && j.error.message) ? j.error.message : 'Meta API error ' + res.status);
+  }
+  return res.json();
+}
+
+async function fetchMetaAnalytics() {
+  var token  = getMetaToken();
+  var igId   = localStorage.getItem('tiffany_meta_ig_id') || '';
+  var pageId = localStorage.getItem('tiffany_meta_page_id') || '';
+
+  if (!token) { showMetaError('No access token saved. Enter your Page Access Token above and click outside the field to save.'); return; }
+  if (!igId)  { showMetaError('No Instagram Business ID saved. Enter it above.'); return; }
+
+  var btn = document.getElementById('meta-fetch-btn');
+  btn.disabled = true; btn.textContent = 'Fetching...';
+  document.getElementById('meta-error').style.display = 'none';
+  document.getElementById('meta-results').style.display = 'none';
+  document.getElementById('meta-loading').style.display = 'block';
+
+  try {
+    var BASE = 'https://graph.facebook.com/v18.0';
+    var T = '?access_token=' + token;
+
+    // 1. IG Account info + follower count
+    var igAccount = await metaFetch(BASE + '/' + igId + T + '&fields=username,followers_count,media_count,profile_picture_url,biography');
+
+    // 2. Last 30 posts with insights
+    var mediaRes = await metaFetch(BASE + '/' + igId + '/media' + T + '&fields=id,caption,media_type,timestamp,like_count,comments_count,thumbnail_url,media_url&limit=30');
+    var posts = mediaRes.data || [];
+
+    // 3. Get insights for each post (reach, impressions, saved, shares)
+    var postsWithInsights = [];
+    for (var i = 0; i < Math.min(posts.length, 30); i++) {
+      var post = posts[i];
+      try {
+        var insights = await metaFetch(BASE + '/' + post.id + '/insights' + T + '&metric=reach,impressions,saved,shares');
+        var insightMap = {};
+        (insights.data || []).forEach(function(m) { insightMap[m.name] = m.values && m.values[0] ? m.values[0].value : 0; });
+        post.reach        = insightMap.reach || 0;
+        post.impressions  = insightMap.impressions || 0;
+        post.saved        = insightMap.saved || 0;
+        post.shares       = insightMap.shares || 0;
+        post.engagement   = (post.like_count || 0) + (post.comments_count || 0) + (post.saved || 0) + (post.shares || 0);
+        post.eng_rate     = post.reach > 0 ? ((post.engagement / post.reach) * 100).toFixed(2) : 0;
+      } catch(e) {
+        post.reach = 0; post.impressions = 0; post.saved = 0; post.shares = 0;
+        post.engagement = (post.like_count||0) + (post.comments_count||0);
+        post.eng_rate = 0;
+      }
+      postsWithInsights.push(post);
+    }
+
+    // 4. IG Audience insights (demographics)
+    var audienceData = {};
+    try {
+      var audienceRes = await metaFetch(BASE + '/' + igId + '/insights' + T + '&metric=audience_gender_age,audience_country,audience_city&period=lifetime');
+      (audienceRes.data || []).forEach(function(m) { audienceData[m.name] = m.values && m.values[0] ? m.values[0].value : {}; });
+    } catch(e) { console.warn('Audience insights not available:', e.message); }
+
+    // 5. Page insights if pageId provided
+    var pageData = {};
+    if (pageId) {
+      try {
+        var pageInsights = await metaFetch(BASE + '/' + pageId + '/insights' + T + '&metric=page_fans,page_engaged_users,page_impressions&period=week&date_preset=last_30d');
+        (pageInsights.data || []).forEach(function(m) { pageData[m.name] = m.values ? m.values : []; });
+      } catch(e) { console.warn('Page insights not available:', e.message); }
+    }
+
+    // Build compiled data object
+    var compiled = {
+      fetched_at: new Date().toISOString(),
+      account: {
+        username: igAccount.username || '',
+        followers: igAccount.followers_count || 0,
+        media_count: igAccount.media_count || 0
+      },
+      posts: postsWithInsights,
+      audience: audienceData,
+      page: pageData
+    };
+
+    // AI pillar tagging - tag each post's caption with a pillar
+    compiled.posts = await tagPostsWithPillars(compiled.posts);
+
+    metaData = compiled;
+    localStorage.setItem('tiffany_meta_data', JSON.stringify(compiled));
+    localStorage.setItem('tiffany_meta_last_fetched', compiled.fetched_at);
+
+    var lastEl = document.getElementById('meta-last-fetched');
+    if (lastEl) lastEl.textContent = 'Last fetched: just now';
+
+    document.getElementById('meta-loading').style.display = 'none';
+    renderMetaResults(compiled);
+
+  } catch(e) {
+    document.getElementById('meta-loading').style.display = 'none';
+    showMetaError(e.message);
+    console.error('Meta fetch error:', e);
+  }
+
+  btn.disabled = false; btn.textContent = 'Refresh';
+}
+
+async function tagPostsWithPillars(posts) {
+  // Use Claude to tag each caption with a pillar
+  if (!getApiKey() || !posts.length) return posts;
+  var captions = posts.map(function(p,i) {
+    return (i+1) + '. ' + (p.caption || '(no caption)').slice(0, 120);
+  }).join('\n');
+
+  var prompt = 'Tag each numbered post caption with the most relevant content pillar.\n' +
+    'Pillars: Business and Entrepreneurship, Spiritual Development and Gods Math Teaching, Family and Lifestyle, Humor and Personality Shenanigans, Community and Testimony\n\n' +
+    'Captions:\n' + captions + '\n\n' +
+    'Return ONLY JSON: {"tags":["pillar for 1","pillar for 2",...]} - one tag per post in order. No markdown.';
+
+  try {
+    var result = await callAPI(prompt, 1000);
+    var tags = result.tags || [];
+    posts.forEach(function(p, i) { p.pillar = tags[i] || 'Community and Testimony'; });
+  } catch(e) {
+    posts.forEach(function(p) { p.pillar = 'Community and Testimony'; });
+  }
+  return posts;
+}
+
+function renderMetaResults(data) {
+  if (!data) return;
+  document.getElementById('meta-results').style.display = 'block';
+
+  var posts = data.posts || [];
+  var account = data.account || {};
+  var audience = data.audience || {};
+
+  // Sort by engagement
+  var sorted = posts.slice().sort(function(a,b){ return (b.engagement||0)-(a.engagement||0); });
+  var top5 = sorted.slice(0, 5);
+  var bottom5 = sorted.slice(-5).reverse();
+
+  // Avg engagement rate
+  var avgEngRate = posts.length > 0 ? (posts.reduce(function(s,p){ return s + parseFloat(p.eng_rate||0); },0) / posts.length).toFixed(2) : 0;
+  var totalReach = posts.reduce(function(s,p){ return s + (p.reach||0); },0);
+
+  // STATS ROW
+  var stats = [
+    {label:'Followers', value: (account.followers||0).toLocaleString(), color:'var(--red)'},
+    {label:'Posts Analyzed', value: posts.length, color:'var(--charcoal)'},
+    {label:'Avg Engagement Rate', value: avgEngRate + '%', color:'var(--green)'},
+    {label:'Total Reach (30 posts)', value: totalReach > 1000 ? (totalReach/1000).toFixed(1)+'K' : totalReach, color:'var(--amber)'},
+    {label:'Total Posts', value: (account.media_count||0).toLocaleString(), color:'var(--charcoal3)'}
+  ];
+  var statsHtml = stats.map(function(s) {
+    return '<div style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:8px;padding:12px 14px;text-align:center;">' +
+      '<div style="font-size:18px;font-weight:700;color:' + s.color + ';font-family:Cormorant Garamond,serif;margin-bottom:4px;">' + s.value + '</div>' +
+      '<div style="font-size:10px;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;">' + s.label + '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('meta-stats-row').innerHTML = statsHtml;
+
+  // TOP POSTS
+  var topHtml = top5.map(function(p) {
+    var pc = BRAND.pillarColors[p.pillar] || {color:'#999', bg:'rgba(136,136,136,0.1)'};
+    var caption = (p.caption || '(no caption)').slice(0, 80) + (p.caption && p.caption.length > 80 ? '...' : '');
+    var date = p.timestamp ? new Date(p.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+    return '<div style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:7px;padding:10px 12px;margin-bottom:8px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;">' +
+        '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(p.pillar||'') + '</span>' +
+        '<span style="font-size:9px;color:var(--charcoal3);">' + date + '</span>' +
+      '</div>' +
+      '<div style="font-size:11px;color:var(--charcoal2);margin-bottom:6px;line-height:1.5;">' + escRaw(caption) + '</div>' +
+      '<div style="display:flex;gap:10px;font-size:10px;color:var(--charcoal3);">' +
+        '<span>&#10084; ' + (p.like_count||0) + '</span>' +
+        '<span>&#128172; ' + (p.comments_count||0) + '</span>' +
+        '<span>&#128276; ' + (p.saved||0) + '</span>' +
+        '<span>&#8594; ' + (p.shares||0) + '</span>' +
+        '<span style="font-weight:700;color:var(--green);">' + p.eng_rate + '% eng</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('meta-top-posts').innerHTML = topHtml || '<div style="font-size:12px;color:var(--charcoal3);">No posts found.</div>';
+
+  // LOW POSTS
+  var lowHtml = bottom5.map(function(p) {
+    var caption = (p.caption||'(no caption)').slice(0, 60) + '...';
+    return '<div style="background:rgba(160,6,5,0.04);border:1px solid rgba(160,6,5,0.1);border-radius:7px;padding:8px 12px;margin-bottom:7px;">' +
+      '<div style="font-size:11px;color:var(--charcoal2);margin-bottom:4px;">' + escRaw(caption) + '</div>' +
+      '<div style="font-size:10px;color:var(--charcoal3);">Engagement: ' + (p.engagement||0) + ' &bull; ' + p.eng_rate + '% rate</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('meta-low-posts').innerHTML = lowHtml;
+
+  // AUDIENCE
+  var audHtml = '';
+  var genderAge = audience.audience_gender_age || {};
+  if (Object.keys(genderAge).length > 0) {
+    var genderTotals = {F:0, M:0, U:0};
+    var ageTotals = {};
+    Object.keys(genderAge).forEach(function(key) {
+      var parts = key.split('.');
+      var gender = parts[0]; var age = parts[1];
+      genderTotals[gender] = (genderTotals[gender]||0) + genderAge[key];
+      ageTotals[age] = (ageTotals[age]||0) + genderAge[key];
+    });
+    var total = Object.values(genderTotals).reduce(function(a,b){return a+b;},0)||1;
+    audHtml += '<div style="font-size:11px;color:var(--charcoal2);margin-bottom:8px;">';
+    audHtml += 'Female: <strong>' + Math.round(genderTotals.F/total*100) + '%</strong> &bull; Male: <strong>' + Math.round(genderTotals.M/total*100) + '%</strong></div>';
+    var topAges = Object.entries(ageTotals).sort(function(a,b){return b[1]-a[1];}).slice(0,4);
+    audHtml += '<div style="font-size:11px;color:var(--charcoal2);">Top age groups: ' + topAges.map(function(a){ return '<strong>'+a[0]+'</strong> ('+Math.round(a[1]/total*100)+'%)'; }).join(', ') + '</div>';
+  } else {
+    audHtml = '<div style="font-size:11px;color:var(--charcoal3);">Audience data requires additional permissions. Upload a META export CSV to the Knowledge Base for demographic insights.</div>';
+  }
+  document.getElementById('meta-audience').innerHTML = audHtml;
+
+  // PILLAR PERFORMANCE
+  var pillarEngagement = {};
+  var pillarCount = {};
+  BRAND.pillars.forEach(function(p) { pillarEngagement[p] = 0; pillarCount[p] = 0; });
+  posts.forEach(function(p) {
+    if (p.pillar && pillarEngagement[p.pillar] !== undefined) {
+      pillarEngagement[p.pillar] += (p.engagement || 0);
+      pillarCount[p.pillar]++;
+    }
+  });
+  var maxEng = Math.max.apply(null, Object.values(pillarEngagement)) || 1;
+  var pillarHtml = BRAND.pillars.map(function(p) {
+    var col = (BRAND.pillarColors[p]||{color:'#999'}).color;
+    var eng = pillarEngagement[p] || 0;
+    var count = pillarCount[p] || 0;
+    var avgE = count > 0 ? Math.round(eng/count) : 0;
+    var pct = Math.round((eng/maxEng)*100);
+    var short = p.replace('and Entrepreneurship','').replace('and Gods Math Teaching','').replace('and Lifestyle','').replace('and Personality Shenanigans','').replace('and Testimony','').trim();
+    return '<div style="margin-bottom:8px;">' +
+      '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px;">' +
+        '<span style="color:var(--charcoal2);font-weight:600;">' + escRaw(short) + ' <span style="color:var(--charcoal3);font-weight:400;">(' + count + ' posts)</span></span>' +
+        '<span style="color:var(--charcoal3);">avg ' + avgE + ' eng</span>' +
+      '</div>' +
+      '<div style="height:7px;background:var(--cream-3);border-radius:4px;overflow:hidden;">' +
+        '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:4px;transition:width 0.3s;"></div>' +
+      '</div></div>';
+  }).join('');
+  document.getElementById('meta-pillar-perf').innerHTML = pillarHtml;
+
+  // BEST POSTING DAYS
+  var dayCounts = {0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  var dayEngagement = {0:0,1:0,2:0,3:0,4:0,5:0,6:0};
+  posts.forEach(function(p) {
+    if (p.timestamp) {
+      var d = new Date(p.timestamp).getDay();
+      dayCounts[d]++;
+      dayEngagement[d] += (p.engagement||0);
+    }
+  });
+  var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var dayData = Object.keys(dayEngagement).map(function(d) {
+    return { day: dayNames[d], avg: dayCounts[d] > 0 ? Math.round(dayEngagement[d]/dayCounts[d]) : 0, count: dayCounts[d] };
+  }).sort(function(a,b){ return b.avg - a.avg; });
+  var maxDay = dayData[0] ? dayData[0].avg : 1;
+  var bestTimesHtml = dayData.map(function(d) {
+    var pct = maxDay > 0 ? Math.round((d.avg/maxDay)*100) : 0;
+    var isBest = d.avg === maxDay && d.count > 0;
+    return '<div style="margin-bottom:6px;display:flex;align-items:center;gap:8px;">' +
+      '<div style="width:80px;font-size:10px;color:var(--charcoal2);font-weight:' + (isBest?'700':'400') + ';flex-shrink:0;">' + d.day + (isBest?' &#9733;':'') + '</div>' +
+      '<div style="flex:1;height:6px;background:var(--cream-3);border-radius:3px;overflow:hidden;">' +
+        '<div style="height:100%;width:' + pct + '%;background:' + (isBest?'var(--red)':'var(--charcoal3)') + ';border-radius:3px;"></div>' +
+      '</div>' +
+      '<div style="width:60px;font-size:10px;color:var(--charcoal3);text-align:right;">avg ' + d.avg + '</div>' +
+    '</div>';
+  }).join('');
+  document.getElementById('meta-best-times').innerHTML = bestTimesHtml;
+}
+
+function showMetaError(msg) {
+  var el = document.getElementById('meta-error');
+  el.innerHTML = '<strong>Error:</strong> ' + escRaw(msg) + '<br><span style="font-size:11px;">Make sure your token is a Page Access Token with instagram_basic, instagram_manage_insights, and pages_read_engagement permissions.</span>';
+  el.style.display = 'block';
+}
+
+function feedMetaToKB() {
+  if (!metaData) { alert('No Meta data loaded. Click Fetch Analytics first.'); return; }
+
+  var posts = metaData.posts || [];
+  var account = metaData.account || {};
+
+  var sorted = posts.slice().sort(function(a,b){ return (b.engagement||0)-(a.engagement||0); });
+  var top5 = sorted.slice(0,5).map(function(p){ return (p.caption||'').slice(0,60); });
+  var avgEng = posts.length > 0 ? (posts.reduce(function(s,p){ return s+parseFloat(p.eng_rate||0); },0)/posts.length).toFixed(2) : 0;
+
+  var pillarEng = {};
+  var pillarCount = {};
+  BRAND.pillars.forEach(function(p){ pillarEng[p]=0; pillarCount[p]=0; });
+  posts.forEach(function(p){
+    if(p.pillar && pillarEng[p.pillar]!==undefined){ pillarEng[p.pillar]+=(p.engagement||0); pillarCount[p.pillar]++; }
+  });
+  var bestPillar = BRAND.pillars.reduce(function(a,b){ return pillarEng[a]>pillarEng[b]?a:b; });
+  var worstPillar = BRAND.pillars.reduce(function(a,b){ return pillarEng[a]<pillarEng[b]?a:b; });
+
+  // Build KB entry
+  var kbEntry = {
+    id: Date.now(),
+    filename: 'Meta Analytics - ' + new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+    uploaded: new Date().toISOString(),
+    docType: 'meta-report',
+    data: {
+      what_is_working: top5,
+      what_needs_attention: sorted.slice(-3).map(function(p){ return (p.caption||'').slice(0,60); }),
+      top_performing_content: top5,
+      strategic_priorities: ['Prioritize ' + bestPillar + ' content', 'Improve ' + worstPillar + ' engagement', 'Post more on ' + (metaData.bestDay||'high-engagement days')],
+      audience_insights: ['Avg engagement rate: ' + avgEng + '%', 'Followers: ' + (account.followers||0).toLocaleString(), 'Most engaging pillar: ' + bestPillar],
+      key_metrics: {followers: account.followers, avg_engagement_rate: avgEng, posts_analyzed: posts.length},
+      pillar_performance: pillarEng
+    }
+  };
+
+  var kb = getKnowledgeBase();
+  kb.unshift(kbEntry);
+  saveKnowledgeBase(kb);
+
+  // Also update profile with Meta insights
+  var pl = { topics_covered:[], recurring_phrases:[], themes:[], pillar_hits:{}, transcript_count:0 };
+  pl.pillar_hits = pillarCount;
+  updateProfileFromLearning(pl);
+
+  renderKnowledgeBase();
+  alert('Meta analytics fed to Knowledge Base and Planner. The pillar balance and AI recommendations now include your real engagement data.');
+}
+
+// ================================================================
 // KNOWLEDGE BASE
 // ================================================================
 
@@ -3154,42 +3698,59 @@ async function processKBDocument(filename, docType, fileType, base64, textConten
 
   var labels = {'meta-report':'META Performance Report','strategy':'90-Day Strategic Plan','brand':'Brand Guidelines','audience':'Audience Research','calendar':'Content Calendar','csv':'CSV Data Export','other':'Document'};
 
-  var userPrompt = 'Extract all insights from this ' + (labels[docType]||'document') + ' for Tiffany Haynes and Co. content strategy.\n\n' +
-    'Return ONLY valid JSON. No markdown. Start with {.\n\n' +
-    '{"document_title":"descriptive title","document_type":"' + (labels[docType]||'Document') + '",' +
-    '"period_covered":"date range if applicable, else empty",' +
-    '"key_metrics":[{"label":"metric","value":"value","trend":"up or down or flat","note":"context"}],' +
-    '"audience_insights":["insight1","insight2"],' +
-    '"top_performing_content":["content1","content2"],' +
-    '"what_is_working":["observation1","observation2"],' +
+  // Tight system prompt = faster, more focused response
+  var systemPrompt = 'You extract structured insights from documents. Respond ONLY with raw valid JSON. No markdown. No backticks. No preamble. Start with { end with }. Be concise - max 5 items per array.';
+
+  var userPrompt = 'Extract key insights from this ' + (labels[docType]||'document') + ' for a social media content strategy.\n\n' +
+    'Return ONLY this JSON structure:\n' +
+    '{"document_title":"title","document_type":"' + (labels[docType]||'Document') + '",' +
+    '"period_covered":"date range or empty",' +
+    '"key_metrics":[{"label":"metric","value":"value","trend":"up or down or flat"}],' +
+    '"audience_insights":["insight1","insight2","insight3"],' +
+    '"top_performing_content":["content1","content2","content3"],' +
+    '"what_is_working":["observation1","observation2","observation3"],' +
     '"what_needs_attention":["issue1","issue2"],' +
-    '"strategic_priorities":["priority1","priority2"],' +
-    '"content_themes":["theme1","theme2"],' +
-    '"action_items":["action1","action2"],' +
+    '"strategic_priorities":["priority1","priority2","priority3"],' +
+    '"content_themes":["theme1","theme2","theme3"],' +
+    '"action_items":["action1","action2","action3"],' +
     '"profile_updates":{"audience_notes":[],"content_gaps":[],"winning_formats":[]}}';
 
   try {
     var messages;
     if (fileType === 'pdf') {
+      // For large PDFs, Claude processes the full document - this takes longer
+      // Show a note to the user
+      var loadMsg = document.getElementById('gen-msg-kb');
+      if (loadMsg) loadMsg.textContent = 'Reading PDF - large files may take 30-60 seconds...';
       messages = [{ role:'user', content:[
         {type:'document', source:{type:'base64', media_type:'application/pdf', data:base64}},
         {type:'text', text:userPrompt}
       ]}];
     } else {
-      messages = [{ role:'user', content:userPrompt + '\n\nDOCUMENT:\n' + textContent }];
+      // For text/CSV truncate to 8000 chars to keep it fast
+      var truncated = (textContent || '').slice(0, 8000);
+      messages = [{ role:'user', content: userPrompt + '\n\nDOCUMENT:\n' + truncated }];
     }
 
     if (!getApiKey()) throw new Error('No API key.');
     var res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:messages})
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        system: systemPrompt,
+        messages: messages
+      })
     });
     var bodyText = await res.text();
-    if (!res.ok) throw new Error('API error ' + res.status);
+    if (!res.ok) {
+      var errJ = {}; try { errJ = JSON.parse(bodyText); } catch(x) {}
+      throw new Error('API error ' + res.status + ': ' + (errJ.error && errJ.error.message ? errJ.error.message : bodyText.slice(0,150)));
+    }
     var data = JSON.parse(bodyText);
     var raw = (data.content||[]).find(function(b){return b.type==='text';});
-    if (!raw) throw new Error('No response');
+    if (!raw) throw new Error('No response from API');
     var extracted = safeParseJSON(raw.text);
 
     var p = getProfile();
