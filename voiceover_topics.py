@@ -170,6 +170,9 @@ def build_html(data, rec_week, pub_week, is_test=False):
   <div style="font-size:24px;font-weight:700;color:#FFFDF5;margin-bottom:6px;">12 Voiceover Topics</div>
   <div style="font-size:12px;color:#B8B8B8;">Recording: {rec_week} &bull; Publishing: {pub_week}</div>
   <div style="font-size:11px;color:#8A8A8A;margin-top:3px;">Sent: {today}</div>
+  <div style="margin-top:14px;">
+    <a href="https://ebeprstudios.github.io/THCO-Social-Media-Manager/topics.html" style="display:inline-block;background:#C49E3C;color:#414141;font-family:Georgia,serif;font-size:13px;font-weight:700;padding:9px 20px;border-radius:8px;text-decoration:none;">View All Topics &amp; Submit Voiceovers</a>
+  </div>
 </td></tr>
 <tr><td style="background:#FFFDF5;padding:18px 28px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">
   {note_html}
@@ -187,7 +190,34 @@ def build_html(data, rec_week, pub_week, is_test=False):
 </table></td></tr></table></body></html>"""
 
 
-def send_email(html, to_email, cc_emails, rec_week, is_test=False):
+def save_current_topics(data, rec_week, pub_week):
+    """Save current topics to repo so topics.html can fetch them."""
+    if not GITHUB_TOKEN or not GITHUB_REPOSITORY:
+        print("No GitHub token - skipping current_topics.json save.")
+        return
+    try:
+        payload = {
+            "recording_week": rec_week,
+            "publishing_week": pub_week,
+            "saved_at": datetime.now().isoformat(),
+            "topics": data.get("topics", [])
+        }
+        url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/current_topics.json"
+        headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+        sha = None
+        r = requests.get(url, headers=headers)
+        if r.status_code == 200:
+            sha = r.json().get("sha")
+        content = base64.b64encode(json.dumps(payload, indent=2).encode()).decode()
+        body = {"message": f"Update current topics - {rec_week}", "content": content}
+        if sha:
+            body["sha"] = sha
+        r2 = requests.put(url, headers=headers, json=body)
+        print(f"Saved current_topics.json: {r2.status_code}")
+    except Exception as e:
+        print(f"Could not save current_topics.json: {e}")
+
+
     prefix = "[TEST] " if is_test else ""
     msg = MIMEMultipart("alternative")
     msg["Subject"] = f"{prefix}Your 12 Voiceover Topics - Week of {rec_week}"
@@ -221,6 +251,7 @@ if __name__ == "__main__":
         pub_week  = publishing_week
 
     html = build_html(data, rec_week, pub_week, is_test=is_test)
+    save_current_topics(data, rec_week, pub_week)
     send_email(html, to_email, cc_emails, rec_week, is_test=is_test)
     if sha:
         delete_approved_file(sha)

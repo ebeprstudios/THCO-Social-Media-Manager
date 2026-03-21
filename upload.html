@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Submit Voiceover - Tiffany Haynes & Co.</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
-  height: 100%;
+  min-height: 100%;
   background: #F4F0EB;
   font-family: 'Georgia', serif;
   -webkit-font-smoothing: antialiased;
@@ -17,14 +17,13 @@ body {
   align-items: flex-start;
   justify-content: center;
   padding: 32px 20px 60px;
-  min-height: 100vh;
 }
 .card {
   background: #FFFDF5;
   border-radius: 16px;
-  padding: 36px 28px;
+  padding: 32px 24px;
   width: 100%;
-  max-width: 480px;
+  max-width: 460px;
   box-shadow: 0 4px 32px rgba(65,65,65,0.10);
 }
 .brand {
@@ -42,14 +41,13 @@ body {
   color: #414141;
   text-align: center;
   margin-bottom: 6px;
-  line-height: 1.2;
 }
 .math {
   font-size: 13px;
   color: #A00605;
   letter-spacing: 3px;
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 .topic-label {
   font-size: 10px;
@@ -57,61 +55,186 @@ body {
   color: #A00605;
   letter-spacing: 2px;
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 .topic-box {
   background: #F4F0EB;
   border-radius: 10px;
   padding: 14px 18px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 .topic-name {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: #414141;
   line-height: 1.3;
 }
-.instructions {
-  font-size: 14px;
-  color: #5A5A5A;
-  line-height: 1.75;
-  margin-bottom: 28px;
+
+/* MODE TOGGLE */
+.mode-toggle {
+  display: flex;
+  background: #F4F0EB;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+  gap: 4px;
+}
+.mode-btn {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  border-radius: 7px;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: transparent;
+  color: #8A8A8A;
+}
+.mode-btn.active {
+  background: #FFFDF5;
+  color: #414141;
+  box-shadow: 0 1px 4px rgba(65,65,65,0.12);
+}
+
+/* ── RECORD MODE ── */
+#record-section { display: block; }
+
+.record-status {
+  text-align: center;
+  font-size: 13px;
+  color: #8A8A8A;
+  margin-bottom: 20px;
+  min-height: 20px;
+}
+.record-status.recording { color: #A00605; font-weight: 700; }
+.record-status.ready { color: #3A9E6E; font-weight: 700; }
+
+/* Timer */
+.timer {
+  font-size: 48px;
+  font-weight: 700;
+  color: #414141;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.timer.recording { color: #A00605; }
+
+/* Waveform */
+.waveform-wrap {
+  height: 48px;
+  background: #F4F0EB;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  overflow: hidden;
+  padding: 0 12px;
+}
+.bar {
+  width: 4px;
+  background: #E3D3C8;
+  border-radius: 2px;
+  height: 8px;
+  transition: height 0.1s;
+  flex-shrink: 0;
+}
+.bar.active { background: #A00605; }
+
+/* Record button */
+.record-btn-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.record-btn {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  transition: all 0.2s;
+  background: #A00605;
+  box-shadow: 0 4px 20px rgba(160,6,5,0.35);
+}
+.record-btn:hover { transform: scale(1.05); }
+.record-btn:active { transform: scale(0.96); }
+.record-btn.recording {
+  background: #414141;
+  box-shadow: 0 4px 20px rgba(65,65,65,0.3);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 4px 20px rgba(65,65,65,0.3); }
+  50% { box-shadow: 0 4px 28px rgba(65,65,65,0.55), 0 0 0 10px rgba(65,65,65,0.08); }
+}
+.record-hint {
+  text-align: center;
+  font-size: 12px;
+  color: #8A8A8A;
+  margin-bottom: 20px;
+}
+
+/* Playback */
+.playback-section {
+  display: none;
+  background: #F0FAF4;
+  border: 1px solid rgba(58,158,110,0.25);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.playback-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #3A9E6E;
+  letter-spacing:2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.playback-section audio {
+  width: 100%;
+  height: 36px;
+  outline: none;
+}
+.re-record-btn {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px;
+  border: 1px solid #E3D3C8;
+  border-radius: 8px;
+  background: transparent;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  color: #8A8A8A;
+  cursor: pointer;
   text-align: center;
 }
-.instructions strong {
-  color: #414141;
-}
-/* Upload zone */
+
+/* ── UPLOAD MODE ── */
+#upload-section { display: none; }
 .upload-zone {
   border: 3px dashed #E3D3C8;
   border-radius: 14px;
-  padding: 40px 24px;
+  padding: 36px 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
   background: #FFFDF5;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   position: relative;
+  transition: all 0.2s;
 }
-.upload-zone:hover, .upload-zone.dragover {
-  border-color: #A00605;
-  background: #FFF5F5;
-}
-.upload-icon {
-  font-size: 40px;
-  margin-bottom: 12px;
-  display: block;
-}
-.upload-main-text {
-  font-size: 18px;
-  font-weight: 700;
-  color: #414141;
-  margin-bottom: 6px;
-}
-.upload-sub-text {
-  font-size: 13px;
-  color: #8A8A8A;
-}
+.upload-zone:hover { border-color: #A00605; background: #FFF5F5; }
 #file-input {
   position: absolute;
   inset: 0;
@@ -120,33 +243,22 @@ body {
   width: 100%;
   height: 100%;
 }
-/* File selected state */
+.upload-icon { font-size: 36px; margin-bottom: 10px; display: block; }
+.upload-main { font-size: 17px; font-weight: 700; color: #414141; margin-bottom: 4px; }
+.upload-sub { font-size: 12px; color: #8A8A8A; }
 .file-selected {
+  display: none;
   background: #F0FAF4;
   border: 2px solid #3A9E6E;
-  border-radius: 12px;
-  padding: 16px 18px;
-  margin-bottom: 16px;
-  display: none;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
   align-items: center;
-  gap: 12px;
-}
-.file-icon {
-  font-size: 28px;
-  flex-shrink: 0;
+  gap: 10px;
 }
 .file-info { flex: 1; }
-.file-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: #414141;
-  word-break: break-all;
-}
-.file-size {
-  font-size: 12px;
-  color: #5A5A5A;
-  margin-top: 2px;
-}
+.file-name { font-size: 13px; font-weight: 700; color: #414141; word-break: break-all; }
+.file-size { font-size: 11px; color: #5A5A5A; margin-top: 2px; }
 .change-btn {
   font-size: 11px;
   color: #A00605;
@@ -155,11 +267,11 @@ body {
   cursor: pointer;
   font-family: Georgia, serif;
   text-decoration: underline;
-  flex-shrink: 0;
 }
 
-/* Submit button */
-.submit-btn {
+/* Shared send button */
+.send-btn {
+  display: none;
   width: 100%;
   background: #A00605;
   color: white;
@@ -171,21 +283,20 @@ body {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
-  margin-bottom: 12px;
-  display: none;
+  margin-bottom: 10px;
 }
-.submit-btn:hover { background: #8A0504; }
-.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.send-btn:hover { background: #8A0504; }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Progress */
 .progress-wrap {
   display: none;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .progress-label {
-  font-size: 13px;
+  font-size: 12px;
   color: #5A5A5A;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-align: center;
 }
 .progress-track {
@@ -202,50 +313,31 @@ body {
   width: 0%;
 }
 
-/* Success state */
-.success-card {
-  display: none;
-  text-align: center;
-  padding: 20px 0;
-}
-.success-icon {
-  font-size: 56px;
-  margin-bottom: 16px;
-  display: block;
-}
-.success-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #414141;
-  margin-bottom: 8px;
-}
-.success-sub {
-  font-size: 14px;
-  color: #5A5A5A;
-  line-height: 1.7;
-  margin-bottom: 20px;
-}
-.submit-another {
-  font-size: 13px;
-  color: #A00605;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-family: Georgia, serif;
-  text-decoration: underline;
-}
-
 /* Error */
 .error-msg {
   display: none;
   background: #FFF5F5;
   border: 1px solid rgba(160,6,5,0.3);
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   color: #A00605;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.6;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+}
+
+/* Success */
+.success-card {
+  display: none;
+  text-align: center;
+  padding: 16px 0;
+}
+.success-icon { font-size: 56px; margin-bottom: 14px; display: block; }
+.success-title { font-size: 24px; font-weight: 700; color: #414141; margin-bottom: 8px; }
+.success-sub { font-size: 14px; color: #5A5A5A; line-height: 1.7; margin-bottom: 18px; }
+.submit-another {
+  font-size: 13px; color: #A00605; background: transparent;
+  border: none; cursor: pointer; font-family: Georgia, serif; text-decoration: underline;
 }
 
 .footer-note {
@@ -259,14 +351,12 @@ body {
 </style>
 </head>
 <body>
-
 <div class="card">
 
   <div class="brand">Tiffany Haynes &amp; Co.</div>
   <div class="title">Submit Your Voiceover</div>
   <div class="math">1 + 1 = 10,000</div>
 
-  <!-- TOPIC -->
   <div id="topic-section">
     <div class="topic-label">Topic</div>
     <div class="topic-box">
@@ -274,193 +364,343 @@ body {
     </div>
   </div>
 
-  <!-- INSTRUCTIONS -->
-  <div class="instructions" id="main-instructions">
-    Record your voiceover in your <strong>Voice Memos</strong> app, then tap below to select the file and submit it directly to your media team.
+  <!-- MODE TOGGLE -->
+  <div class="mode-toggle" id="mode-toggle">
+    <button class="mode-btn active" id="btn-record" onclick="switchMode('record')">&#127908; Record Now</button>
+    <button class="mode-btn" id="btn-upload" onclick="switchMode('upload')">&#128193; Upload File</button>
   </div>
 
-  <!-- UPLOAD ZONE -->
+  <!-- RECORD MODE -->
+  <div id="record-section">
+    <div class="record-status" id="record-status">Tap the button to start recording</div>
+    <div class="timer" id="timer">0:00</div>
+
+    <div class="waveform-wrap" id="waveform"></div>
+
+    <div class="record-btn-wrap">
+      <button class="record-btn" id="record-btn" onclick="toggleRecord()">&#127908;</button>
+    </div>
+    <div class="record-hint" id="record-hint">Tap to record &bull; Tap again to stop</div>
+
+    <div class="playback-section" id="playback-section">
+      <div class="playback-label">&#9654; Preview your recording</div>
+      <audio id="playback-audio" controls></audio>
+      <button class="re-record-btn" onclick="reRecord()">Record again</button>
+    </div>
+  </div>
+
+  <!-- UPLOAD MODE -->
   <div id="upload-section">
     <div class="upload-zone" id="upload-zone">
       <input type="file" id="file-input" accept=".m4a,.mp3,.wav,.aac,audio/*" />
       <span class="upload-icon">&#127908;</span>
-      <div class="upload-main-text">Tap to select your recording</div>
-      <div class="upload-sub-text">.m4a from Voice Memos &bull; Any audio file</div>
+      <div class="upload-main">Tap to select your recording</div>
+      <div class="upload-sub">.m4a from Voice Memos &bull; Any audio file</div>
     </div>
-
     <div class="file-selected" id="file-selected">
-      <span class="file-icon">&#127925;</span>
+      <span style="font-size:26px;">&#127925;</span>
       <div class="file-info">
         <div class="file-name" id="selected-name"></div>
         <div class="file-size" id="selected-size"></div>
       </div>
       <button class="change-btn" onclick="changeFile()">Change</button>
     </div>
-
-    <div class="error-msg" id="error-msg"></div>
-
-    <div class="progress-wrap" id="progress-wrap">
-      <div class="progress-label" id="progress-label">Uploading...</div>
-      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-    </div>
-
-    <button class="submit-btn" id="submit-btn" onclick="submitVoiceover()">
-      Send to Media Team
-    </button>
   </div>
+
+  <!-- SHARED -->
+  <div class="error-msg" id="error-msg"></div>
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-label" id="progress-label">Uploading...</div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+  <button class="send-btn" id="send-btn" onclick="submitVoiceover()">Send to Media Team</button>
 
   <!-- SUCCESS -->
   <div class="success-card" id="success-card">
     <span class="success-icon">&#10003;</span>
     <div class="success-title">Got it, Tiffany!</div>
-    <div class="success-sub">
-      Your voiceover has been received by the media team.<br>
-      They will begin editing next week.
-    </div>
-    <button class="submit-another" onclick="submitAnother()">Submit another recording</button>
+    <div class="success-sub">Your voiceover has been received.<br>The team will begin editing next week.</div>
+    <a href="https://ebeprstudios.github.io/THCO-Social-Media-Manager/topics.html" style="display:block;width:100%;background:#A00605;color:white;font-family:Georgia,serif;font-size:16px;font-weight:700;padding:15px;border-radius:10px;text-decoration:none;text-align:center;margin-bottom:12px;">Submit Another Voiceover</a>
+    <button class="submit-another" onclick="resetPage()">Record a different topic on this page</button>
   </div>
 
   <div class="footer-note">The Creative Theologian Media Group</div>
-
 </div>
 
 <script>
-var params = new URLSearchParams(window.location.search);
-var topicTitle = params.get('topic') || 'Voiceover Recording';
-var cloudName  = params.get('cloud') || 'dgq3ahq1m';
-var uploadPreset = params.get('preset') || 'tiffany_voiceovers';
-
-var selectedFile = null;
+var params      = new URLSearchParams(window.location.search);
+var topicTitle  = params.get('topic')  || 'Voiceover Recording';
+var cloudName   = params.get('cloud')  || 'dgq3ahq1m';
+var uploadPreset= params.get('preset') || 'tiffany_voiceovers';
 
 document.getElementById('topic-display').textContent = topicTitle;
+
+// ── MODE TOGGLE ──────────────────────────────────────────────────
+var currentMode = 'record';
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('record-section').style.display = mode === 'record' ? 'block' : 'none';
+  document.getElementById('upload-section').style.display = mode === 'upload' ? 'block' : 'none';
+  document.getElementById('btn-record').classList.toggle('active', mode === 'record');
+  document.getElementById('btn-upload').classList.toggle('active', mode === 'upload');
+  recordedBlob = null;
+  selectedFile = null;
+  document.getElementById('send-btn').style.display = 'none';
+  document.getElementById('error-msg').style.display = 'none';
+}
+
+// ── RECORDING ────────────────────────────────────────────────────
+var mediaRecorder = null;
+var audioChunks   = [];
+var recordedBlob  = null;
+var isRecording   = false;
+var timerInterval = null;
+var secondsElapsed= 0;
+var analyser      = null;
+var animFrame     = null;
+var bars          = [];
+
+// Build waveform bars
+var waveEl = document.getElementById('waveform');
+for (var i = 0; i < 36; i++) {
+  var b = document.createElement('div');
+  b.className = 'bar';
+  waveEl.appendChild(b);
+  bars.push(b);
+}
+
+function updateTimer() {
+  secondsElapsed++;
+  var m = Math.floor(secondsElapsed / 60);
+  var s = (secondsElapsed % 60).toString().padStart(2, '0');
+  document.getElementById('timer').textContent = m + ':' + s;
+}
+
+function animateWave() {
+  if (!analyser) return;
+  var data = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(data);
+  var step = Math.floor(data.length / bars.length);
+  bars.forEach(function(bar, i) {
+    var val = data[i * step] || 0;
+    var h = Math.max(4, Math.min(40, (val / 255) * 44));
+    bar.style.height = h + 'px';
+    bar.classList.toggle('active', isRecording);
+  });
+  animFrame = requestAnimationFrame(animateWave);
+}
+
+async function toggleRecord() {
+  if (!isRecording) {
+    await startRecording();
+  } else {
+    stopRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+
+    // Set up analyser for waveform
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var source = ctx.createMediaStreamSource(stream);
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 128;
+    source.connect(analyser);
+
+    // Pick best supported format
+    var mimeType = 'audio/webm';
+    if (!MediaRecorder.isTypeSupported('audio/webm')) {
+      mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
+    }
+
+    var options = mimeType ? { mimeType: mimeType } : {};
+    mediaRecorder = new MediaRecorder(stream, options);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data && e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = function() {
+      var type = mimeType || 'audio/webm';
+      recordedBlob = new Blob(audioChunks, { type: type });
+      var url = URL.createObjectURL(recordedBlob);
+      var audio = document.getElementById('playback-audio');
+      audio.src = url;
+      document.getElementById('playback-section').style.display = 'block';
+      document.getElementById('send-btn').style.display = 'block';
+      stream.getTracks().forEach(function(t) { t.stop(); });
+      cancelAnimationFrame(animFrame);
+      bars.forEach(function(b) { b.style.height = '8px'; b.classList.remove('active'); });
+    };
+
+    mediaRecorder.start(100);
+    isRecording = true;
+    secondsElapsed = 0;
+    timerInterval = setInterval(updateTimer, 1000);
+    animateWave();
+
+    var btn = document.getElementById('record-btn');
+    btn.classList.add('recording');
+    btn.textContent = '\u23F9'; // stop icon
+    document.getElementById('record-status').textContent = 'Recording...';
+    document.getElementById('record-status').className = 'record-status recording';
+    document.getElementById('timer').className = 'timer recording';
+    document.getElementById('record-hint').textContent = 'Tap to stop recording';
+    document.getElementById('playback-section').style.display = 'none';
+    document.getElementById('send-btn').style.display = 'none';
+
+  } catch(e) {
+    if (e.name === 'NotAllowedError') {
+      showError('Microphone access denied. Please allow microphone access and try again.');
+    } else {
+      showError('Could not start recording: ' + e.message + '. Try the Upload File option instead.');
+    }
+  }
+}
+
+function stopRecording() {
+  if (!mediaRecorder) return;
+  clearInterval(timerInterval);
+  isRecording = false;
+  mediaRecorder.stop();
+
+  var btn = document.getElementById('record-btn');
+  btn.classList.remove('recording');
+  btn.textContent = '\u127908';
+  document.getElementById('record-status').textContent = 'Recording complete. Preview below.';
+  document.getElementById('record-status').className = 'record-status ready';
+  document.getElementById('timer').className = 'timer';
+  document.getElementById('record-hint').textContent = 'Tap to record again';
+}
+
+function reRecord() {
+  recordedBlob = null;
+  document.getElementById('playback-section').style.display = 'none';
+  document.getElementById('send-btn').style.display = 'none';
+  document.getElementById('record-status').textContent = 'Tap the button to start recording';
+  document.getElementById('record-status').className = 'record-status';
+  document.getElementById('timer').textContent = '0:00';
+  document.getElementById('timer').className = 'timer';
+  document.getElementById('record-hint').textContent = 'Tap to record \u2022 Tap again to stop';
+}
+
+// ── FILE UPLOAD MODE ─────────────────────────────────────────────
+var selectedFile = null;
 
 document.getElementById('file-input').addEventListener('change', function(e) {
   var file = e.target.files[0];
   if (!file) return;
   selectedFile = file;
-  showFileSelected(file);
-});
-
-var zone = document.getElementById('upload-zone');
-zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('dragover'); });
-zone.addEventListener('dragleave', function() { zone.classList.remove('dragover'); });
-zone.addEventListener('drop', function(e) {
-  e.preventDefault(); zone.classList.remove('dragover');
-  var file = e.dataTransfer.files[0];
-  if (file) { selectedFile = file; showFileSelected(file); }
-});
-
-function showFileSelected(file) {
   document.getElementById('upload-zone').style.display = 'none';
-  var sel = document.getElementById('file-selected');
-  sel.style.display = 'flex';
+  document.getElementById('file-selected').style.display = 'flex';
   document.getElementById('selected-name').textContent = file.name;
   document.getElementById('selected-size').textContent = formatSize(file.size);
-  document.getElementById('submit-btn').style.display = 'block';
+  document.getElementById('send-btn').style.display = 'block';
   document.getElementById('error-msg').style.display = 'none';
-}
+});
 
 function changeFile() {
   selectedFile = null;
   document.getElementById('file-input').value = '';
   document.getElementById('upload-zone').style.display = 'block';
   document.getElementById('file-selected').style.display = 'none';
-  document.getElementById('submit-btn').style.display = 'none';
+  document.getElementById('send-btn').style.display = 'none';
 }
 
 function formatSize(bytes) {
-  if (bytes > 1048576) return (bytes/1048576).toFixed(1) + ' MB';
-  return (bytes/1024).toFixed(0) + ' KB';
+  return bytes > 1048576 ? (bytes/1048576).toFixed(1)+' MB' : (bytes/1024).toFixed(0)+' KB';
 }
 
-function sanitizeFilename(str) {
-  return str.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 60);
+// ── SUBMIT ───────────────────────────────────────────────────────
+function sanitize(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,60);
 }
 
 function submitVoiceover() {
-  if (!selectedFile) return;
-  var btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'Uploading...';
+  var blob = currentMode === 'record' ? recordedBlob : (selectedFile ? selectedFile : null);
+  if (!blob) return;
+
+  var btn = document.getElementById('send-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
   document.getElementById('error-msg').style.display = 'none';
   document.getElementById('progress-wrap').style.display = 'block';
 
   var date = new Date().toISOString().split('T')[0];
-  var topicSlug = sanitizeFilename(topicTitle);
+  var topicSlug = sanitize(topicTitle);
+  var ext = currentMode === 'record' ? 'webm' : (selectedFile.name.split('.').pop() || 'm4a');
+  var filename = topicSlug + '_' + date + '.' + ext;
   var publicId = 'tiffany_voiceovers/' + topicSlug + '_' + date;
 
+  var file = currentMode === 'record'
+    ? new File([blob], filename, { type: blob.type })
+    : selectedFile;
+
   var formData = new FormData();
-  formData.append('file', selectedFile);
+  formData.append('file', file);
   formData.append('upload_preset', uploadPreset);
   formData.append('public_id', publicId);
   formData.append('resource_type', 'video');
-  formData.append('context', 'topic=' + topicTitle + '|submitted_date=' + date);
+  formData.append('context', 'topic=' + topicTitle + '|date=' + date + '|source=' + (currentMode === 'record' ? 'recorded' : 'uploaded'));
 
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + cloudName + '/video/upload');
 
   xhr.upload.onprogress = function(e) {
     if (e.lengthComputable) {
-      var pct = Math.round((e.loaded / e.total) * 100);
-      document.getElementById('progress-fill').style.width = pct + '%';
-      document.getElementById('progress-label').textContent = 'Uploading... ' + pct + '%';
+      var pct = Math.round((e.loaded/e.total)*100);
+      document.getElementById('progress-fill').style.width = pct+'%';
+      document.getElementById('progress-label').textContent = 'Sending... '+pct+'%';
     }
   };
 
   xhr.onload = function() {
     if (xhr.status === 200) {
       document.getElementById('progress-fill').style.width = '100%';
-      document.getElementById('progress-label').textContent = 'Upload complete!';
-      setTimeout(showSuccess, 600);
+      setTimeout(showSuccess, 500);
     } else {
-      var errData = {};
-      try { errData = JSON.parse(xhr.responseText); } catch(e) {}
-      showError('Upload failed: ' + (errData.error && errData.error.message ? errData.error.message : 'Please try again.'));
-      btn.disabled = false;
-      btn.textContent = 'Send to Media Team';
+      var j = {}; try { j = JSON.parse(xhr.responseText); } catch(x) {}
+      showError('Send failed: ' + (j.error && j.error.message ? j.error.message : 'Please try again.'));
+      btn.disabled = false; btn.textContent = 'Send to Media Team';
     }
   };
 
   xhr.onerror = function() {
-    showError('Network error. Please check your connection and try again.');
-    btn.disabled = false;
-    btn.textContent = 'Send to Media Team';
+    showError('Network error. Check your connection and try again.');
+    btn.disabled = false; btn.textContent = 'Send to Media Team';
   };
 
   xhr.send(formData);
 }
 
 function showSuccess() {
+  document.getElementById('topic-section').style.display = 'none';
+  document.getElementById('mode-toggle').style.display = 'none';
+  document.getElementById('record-section').style.display = 'none';
   document.getElementById('upload-section').style.display = 'none';
   document.getElementById('progress-wrap').style.display = 'none';
-  document.getElementById('topic-section').style.display = 'none';
-  document.getElementById('main-instructions').style.display = 'none';
+  document.getElementById('send-btn').style.display = 'none';
   document.getElementById('success-card').style.display = 'block';
 }
 
 function showError(msg) {
   var el = document.getElementById('error-msg');
-  el.textContent = msg;
-  el.style.display = 'block';
+  el.textContent = msg; el.style.display = 'block';
   document.getElementById('progress-wrap').style.display = 'none';
   document.getElementById('progress-fill').style.width = '0%';
 }
 
-function submitAnother() {
-  selectedFile = null;
-  document.getElementById('file-input').value = '';
-  document.getElementById('success-card').style.display = 'none';
-  document.getElementById('upload-section').style.display = 'block';
+function resetPage() {
+  recordedBlob = null; selectedFile = null;
   document.getElementById('topic-section').style.display = 'block';
-  document.getElementById('main-instructions').style.display = 'block';
-  document.getElementById('upload-zone').style.display = 'block';
-  document.getElementById('file-selected').style.display = 'none';
-  document.getElementById('submit-btn').style.display = 'none';
-  document.getElementById('submit-btn').disabled = false;
-  document.getElementById('submit-btn').textContent = 'Send to Media Team';
+  document.getElementById('mode-toggle').style.display = 'flex';
+  document.getElementById('success-card').style.display = 'none';
   document.getElementById('error-msg').style.display = 'none';
+  switchMode('record');
+  reRecord();
 }
 </script>
-
 </body>
 </html>
