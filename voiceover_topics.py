@@ -169,11 +169,69 @@ def build_html(data, rec_week, pub_week, is_test=False):
     <a href="https://media.ebeprstudios.com/topics.html" style="display:inline-block;background:#C49E3C;color:#414141;font-family:Georgia,serif;font-size:13px;font-weight:700;padding:9px 20px;border-radius:8px;text-decoration:none;">View All Topics &amp; Submit Voiceovers</a>
   </div>
 </td></tr>
-<tr><td style="background:#FFFDF5;padding:18px 28px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">
+<tr><td style="background:#FFFDF5;padding:20px 28px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">
   {note_html}
-  <div style="background:#F4F0EB;border-radius:6px;padding:12px 16px;font-size:12px;color:#5A5A5A;line-height:1.7;">
-    <strong>How to use:</strong> Choose the topics that resonate with your authentic voice. Record at your own pace. Aim for up to 5. The team begins editing the following week for publishing the week of {pub_week}.
+
+  <!-- HOW IT WORKS -->
+  <div style="font-size:10px;font-weight:700;color:#A00605;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;text-align:center;">How This Works</div>
+
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px;">
+    <tr>
+      <td width="36" valign="top">
+        <div style="width:30px;height:30px;background:#414141;border-radius:15px;text-align:center;line-height:30px;color:#C49E3C;font-size:12px;font-weight:700;font-family:Georgia,serif;">1</div>
+      </td>
+      <td valign="top" style="padding-left:10px;padding-bottom:14px;">
+        <div style="font-size:13px;font-weight:700;color:#414141;margin-bottom:3px;">Browse the 12 topics</div>
+        <div style="font-size:12px;color:#5A5A5A;line-height:1.6;">Read through all the options below. Each one includes a hook, what to cover, and a scripture angle. Take your time and see what speaks to you.</div>
+      </td>
+    </tr>
+    <tr>
+      <td width="36" valign="top">
+        <div style="width:30px;height:30px;background:#414141;border-radius:15px;text-align:center;line-height:30px;color:#C49E3C;font-size:12px;font-weight:700;font-family:Georgia,serif;">2</div>
+      </td>
+      <td valign="top" style="padding-left:10px;padding-bottom:14px;">
+        <div style="font-size:13px;font-weight:700;color:#414141;margin-bottom:3px;">Only record what sounds like YOU</div>
+        <div style="font-size:12px;color:#5A5A5A;line-height:1.6;">Not every topic will resonate and that is completely okay. We recommend recording up to 5, but only choose the ones that feel natural and authentic to your voice and your story. If only 2 resonate this week, record those 2. Authenticity always wins over volume.</div>
+      </td>
+    </tr>
+    <tr>
+      <td width="36" valign="top">
+        <div style="width:30px;height:30px;background:#414141;border-radius:15px;text-align:center;line-height:30px;color:#C49E3C;font-size:12px;font-weight:700;font-family:Georgia,serif;">3</div>
+      </td>
+      <td valign="top" style="padding-left:10px;padding-bottom:14px;">
+        <div style="font-size:13px;font-weight:700;color:#414141;margin-bottom:3px;">Record on your phone</div>
+        <div style="font-size:12px;color:#5A5A5A;line-height:1.6;">Use your Voice Memos app or record directly in the browser. Speak naturally, like you are talking to a friend. You do not need a script. Just talk from your heart the way you always do.</div>
+      </td>
+    </tr>
+    <tr>
+      <td width="36" valign="top">
+        <div style="width:30px;height:30px;background:#414141;border-radius:15px;text-align:center;line-height:30px;color:#C49E3C;font-size:12px;font-weight:700;font-family:Georgia,serif;">4</div>
+      </td>
+      <td valign="top" style="padding-left:10px;padding-bottom:14px;">
+        <div style="font-size:13px;font-weight:700;color:#414141;margin-bottom:3px;">Tap Submit Voiceover</div>
+        <div style="font-size:12px;color:#5A5A5A;line-height:1.6;">Each topic card has a Submit Voiceover button. Tap it and your recording goes straight to the media team. No texting, no emailing, no extra steps.</div>
+      </td>
+    </tr>
+    <tr>
+      <td width="36" valign="top">
+        <div style="width:30px;height:30px;background:#414141;border-radius:15px;text-align:center;line-height:30px;color:#C49E3C;font-size:12px;font-weight:700;font-family:Georgia,serif;">5</div>
+      </td>
+      <td valign="top" style="padding-left:10px;">
+        <div style="font-size:13px;font-weight:700;color:#414141;margin-bottom:3px;">The team handles the rest</div>
+        <div style="font-size:12px;color:#5A5A5A;line-height:1.6;">The Creative Theologian Media Group will begin editing your recordings the following week. Your content will be ready for publishing the week of {pub_week}. All you have to do is record and submit.</div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- DIVIDER -->
+  <div style="border-top:1px solid #E3D3C8;margin-bottom:18px;"></div>
+
+  <!-- REMINDER BOX -->
+  <div style="background:#F4F0EB;border-radius:8px;padding:14px 18px;border-left:4px solid #A00605;margin-bottom:4px;">
+    <div style="font-size:12px;font-weight:700;color:#414141;margin-bottom:4px;">A note from your media team</div>
+    <div style="font-size:12px;color:#5A5A5A;line-height:1.7;">These topics are suggestions, not assignments. They were created to serve your message, not the other way around. Trust your instincts. If a topic does not feel like you, skip it. The content that performs best is always the content that comes from a real place. Speak your truth and we will handle the rest. 1 + 1 = 10,000.</div>
   </div>
+
 </td></tr>
 <tr><td style="background:#FFFDF5;padding:8px 28px 20px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">
   <table width="100%" cellpadding="0" cellspacing="0">{rows_html}</table>

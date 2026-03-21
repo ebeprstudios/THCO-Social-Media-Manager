@@ -868,10 +868,13 @@ body::before {
             <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Scheduled Send Time</div>
             <div style="display:flex;align-items:center;gap:8px;">
               <select id="ep-send-day" onchange="saveEmailSettings()" style="background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:7px 10px;border-radius:6px;outline:none;">
-                <option value="5">Friday</option>
-                <option value="4">Thursday</option>
-                <option value="3">Wednesday</option>
+                <option value="0">Sunday</option>
                 <option value="1">Monday</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thursday</option>
+                <option value="5" selected>Friday</option>
+                <option value="6">Saturday</option>
               </select>
               <select id="ep-send-hour" onchange="saveEmailSettings()" style="background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:7px 10px;border-radius:6px;outline:none;">
                 <option value="7">7:00 AM CST</option>
@@ -2598,11 +2601,33 @@ function buildHTMLEmailPreview(data) {
   html += '<div style="font-size:12px;color:#B8B8B8;">Recording: ' + recWeek + ' &nbsp;&bull;&nbsp; Publishing: ' + pubWeek + '</div>';
   html += '<div style="font-size:11px;color:#8A8A8A;margin-top:3px;">Sent: ' + today + '</div></div>';
 
-  // Planning note + instructions
-  html += '<div style="background:#FFFDF5;padding:18px 28px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">';
-  if (planningNote) html += '<p style="font-style:italic;color:#5A5A5A;font-size:13px;margin:0 0 12px;">' + planningNote + '</p>';
-  html += '<div style="background:#F4F0EB;border-radius:6px;padding:12px 16px;font-size:12px;color:#5A5A5A;line-height:1.7;">';
-  html += '<strong>How to use:</strong> Choose the topics that speak to you. Record at your own pace this week. You do not need to record all 12. The team begins editing the following week for publishing the week of ' + pubWeek + '.</div></div>';
+  // Planning note + How It Works
+  html += '<div style="background:#FFFDF5;padding:20px 28px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">';
+  if (planningNote) html += '<p style="font-style:italic;color:#5A5A5A;font-size:13px;margin:0 0 14px;">' + planningNote + '</p>';
+
+  html += '<div style="font-size:10px;font-weight:700;color:#A00605;letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;text-align:center;">How This Works</div>';
+
+  var steps = [
+    { title: 'Browse the 12 topics', body: 'Read through all the options below. Each one includes a hook, what to cover, and a scripture angle. Take your time and see what speaks to you.' },
+    { title: 'Only record what sounds like YOU', body: 'Not every topic will resonate and that is completely okay. We recommend recording up to 5, but only choose the ones that feel natural and authentic to your voice and your story. If only 2 resonate this week, record those 2. Authenticity always wins over volume.' },
+    { title: 'Record on your phone', body: 'Use your Voice Memos app or record directly in the browser. Speak naturally, like you are talking to a friend. You do not need a script. Just talk from your heart the way you always do.' },
+    { title: 'Tap Submit Voiceover', body: 'Each topic card has a Submit Voiceover button. Tap it and your recording goes straight to the media team. No texting, no emailing, no extra steps.' },
+    { title: 'The team handles the rest', body: 'The Creative Theologian Media Group will begin editing your recordings the following week. Your content will be ready for publishing the week of ' + pubWeek + '. All you have to do is record and submit.' }
+  ];
+
+  steps.forEach(function(s, i) {
+    html += '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;"><tr>';
+    html += '<td width="36" valign="top"><div style="width:30px;height:30px;background:#414141;border-radius:15px;text-align:center;line-height:30px;color:#C49E3C;font-size:12px;font-weight:700;font-family:Georgia,serif;">' + (i+1) + '</div></td>';
+    html += '<td valign="top" style="padding-left:10px;"><div style="font-size:13px;font-weight:700;color:#414141;margin-bottom:3px;">' + s.title + '</div>';
+    html += '<div style="font-size:12px;color:#5A5A5A;line-height:1.6;">' + s.body + '</div></td>';
+    html += '</tr></table>';
+  });
+
+  html += '<div style="border-top:1px solid #E3D3C8;margin:4px 0 16px;"></div>';
+  html += '<div style="background:#F4F0EB;border-radius:8px;padding:14px 18px;border-left:4px solid #A00605;">';
+  html += '<div style="font-size:12px;font-weight:700;color:#414141;margin-bottom:4px;">A note from your media team</div>';
+  html += '<div style="font-size:12px;color:#5A5A5A;line-height:1.7;">These topics are suggestions, not assignments. They were created to serve your message, not the other way around. Trust your instincts. If a topic does not feel like you, skip it. The content that performs best is always the content that comes from a real place. Speak your truth and we will handle the rest. 1 + 1 = 10,000.</div>';
+  html += '</div></div>';
 
   // Topics
   html += '<div style="background:#FFFDF5;padding:8px 28px 20px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">' + topicsHtml + '</div>';
