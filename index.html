@@ -1977,19 +1977,21 @@ function approveAndGeneratePDF() {
 }
 
 function generatePDF(data) {
+  loadJsPDF(function(jsPDF) {
+    if (!jsPDF) {
+      console.warn('jsPDF not available, using fallback');
+      generatePDFFallback(data);
+      return;
+    }
+    buildPDFWithLib(jsPDF, data);
+  });
+}
+
+function buildPDFWithLib(jsPDF, data) {
   var topics = data.topics || [];
   var recWeek = data.recording_week || getRecordingWeek();
   var pubWeek = data.publishing_week || getPublishingWeek();
   var dateStr = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
-
-  // Use jsPDF loaded from CDN
-  var jsPDF = window.jspdf && window.jspdf.jsPDF;
-  if (!jsPDF) {
-    // Fallback: generate HTML and print
-    generatePDFFallback(data);
-    return;
-  }
-
   var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   var pageW = 210; var pageH = 297;
   var margin = 18; var contentW = pageW - margin * 2;
@@ -2891,6 +2893,16 @@ function renderKnowledgeBase() {
   container.innerHTML = h;
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// Load jsPDF dynamically only when needed
+function loadJsPDF(callback) {
+  if (window.jspdf && window.jspdf.jsPDF) { callback(window.jspdf.jsPDF); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  s.onload = function() { callback(window.jspdf && window.jspdf.jsPDF); };
+  s.onerror = function() { callback(null); };
+  document.head.appendChild(s);
+}
+</script>
 </body>
 </html>
