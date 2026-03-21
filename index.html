@@ -465,6 +465,7 @@ body::before {
   <button class="tab-btn" onclick="switchTab('studio')">Transcript to Content</button>
   <button class="tab-btn" onclick="switchTab('planner')">Weekly Planner</button>
   <button class="tab-btn" onclick="switchTab('knowledge')">Knowledge Base</button>
+  <button class="tab-btn" onclick="switchTab('emailpreview')">Email Preview</button>
 </div>
 
 <!-- MAIN -->
@@ -774,6 +775,71 @@ body::before {
       <div id="kb-entries"></div>
     </div>
 
+    <!-- TAB: EMAIL PREVIEW -->
+    <div id="tab-emailpreview" class="tab-pane">
+
+      <!-- STATUS BAR -->
+      <div id="ep-status-bar" style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Weekly Voiceover Topics</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--charcoal);" id="ep-week-label">Loading...</div>
+          <div style="font-size:11px;color:var(--charcoal3);margin-top:3px;" id="ep-status-note"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div id="ep-approved-badge" style="display:none;background:rgba(58,158,110,0.1);border:1px solid rgba(58,158,110,0.25);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;">Approved</div>
+          <button class="btn-secondary" id="ep-retry-btn" onclick="generateEmailPreview(true)">Retry</button>
+          <button class="btn-primary" id="ep-approve-btn" onclick="approveTopics()" style="background:var(--green);border:none;">Approve + Copy Email</button>
+        </div>
+      </div>
+
+      <!-- PLANNING HORIZON BANNER -->
+      <div style="background:var(--blue-bg);border:1px solid rgba(58,110,168,0.2);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;gap:14px;align-items:flex-start;">
+        <div style="font-size:22px;flex-shrink:0;">&#128197;</div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">2-Week Planning Horizon</div>
+          <div style="font-size:12px;color:var(--charcoal2);line-height:1.65;" id="ep-horizon-note">
+            Topics sent this Friday are for recording next week. Editing happens the week after. Publishing begins 2 weeks from now.
+          </div>
+        </div>
+      </div>
+
+      <!-- LOADING -->
+      <div id="ep-loading" style="display:none;text-align:center;padding:60px 20px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--charcoal);margin-bottom:18px;">Generating this week's topics...</div>
+        <div class="gen-track" style="margin:0 auto 16px;"></div>
+        <div style="font-size:11px;color:var(--charcoal3);letter-spacing:1px;animation:blink 1s step-end infinite;" id="ep-loading-msg">Reading Tiffany's content profile...</div>
+      </div>
+
+      <!-- ERROR -->
+      <div class="gen-error" id="ep-error"></div>
+
+      <!-- TOPICS GRID -->
+      <div id="ep-topics-grid" style="display:none;">
+
+        <!-- PILLAR SUMMARY -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;" id="ep-pillar-summary"></div>
+
+        <!-- 12 TOPIC CARDS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px;" id="ep-cards-grid"></div>
+
+        <!-- EMAIL COPY BLOCK -->
+        <div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);">
+          <div style="background:var(--cream-2);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Email Copy</div>
+              <div style="font-size:10px;color:var(--charcoal3);margin-top:1px;">Ready to paste into Gmail or any email client</div>
+            </div>
+            <button class="copy-btn" id="ep-copy-btn" onclick="copyEmailText()">Copy Email</button>
+          </div>
+          <div id="ep-email-text" style="padding:18px 20px;font-size:12px;color:var(--charcoal2);line-height:1.8;white-space:pre-wrap;font-family:'Inter',sans-serif;max-height:400px;overflow-y:auto;"></div>
+        </div>
+
+        <div style="text-align:center;margin-top:20px;font-size:10px;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Not Financial Advice &bull; Internal Use Only &bull; Tiffany Haynes &amp; Co. Media Team</div>
+
+      </div>
+
+    </div>
+
   </div>
 </div>
 
@@ -873,10 +939,11 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
   document.getElementById('tab-' + tab).classList.add('active');
-  var tabs = ['dashboard','studio','planner','knowledge'];
+  var tabs = ['dashboard','studio','planner','knowledge','emailpreview'];
   var idx = tabs.indexOf(tab);
   if (idx >= 0) document.querySelectorAll('.tab-btn')[idx].classList.add('active');
   if (tab === 'knowledge') renderKnowledgeBase();
+  if (tab === 'emailpreview') initEmailPreview();
 }
 
 // ================================================================
@@ -1681,8 +1748,328 @@ function getNextMonday() {
 }
 
 // ================================================================
-// KNOWLEDGE BASE
+// EMAIL PREVIEW TAB
 // ================================================================
+var epLoaderMsgs = [
+  'Reading the content profile...',
+  'Reviewing all past scripts and topics...',
+  'Identifying content gaps...',
+  'Developing fresh voiceover angles...',
+  'Balancing content pillars...',
+  'Writing topic directions...',
+  'Almost ready...'
+];
+
+function getEPCache() {
+  var raw = localStorage.getItem('tiffany_ep_cache');
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch(e) { return null; }
+}
+
+function saveEPCache(data) {
+  data.generated_at = Date.now();
+  data.week_key = getEPWeekKey();
+  localStorage.setItem('tiffany_ep_cache', JSON.stringify(data));
+}
+
+function getEPWeekKey() {
+  var monday = getNextMonday();
+  return monday.toISOString().split('T')[0];
+}
+
+function isThursday() {
+  var et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+  return et.getDay() === 4;
+}
+
+function getRecordingWeek() {
+  var monday = getNextMonday();
+  var sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+  return monday.toLocaleDateString('en-US', {month:'long', day:'numeric'}) + ' - ' +
+    sunday.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+}
+
+function getPublishingWeek() {
+  var monday = getNextMonday();
+  var pubMonday = new Date(monday); pubMonday.setDate(monday.getDate() + 14);
+  var pubSunday = new Date(pubMonday); pubSunday.setDate(pubMonday.getDate() + 6);
+  return pubMonday.toLocaleDateString('en-US', {month:'long', day:'numeric'}) + ' - ' +
+    pubSunday.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+}
+
+function initEmailPreview() {
+  var cache = getEPCache();
+  var weekKey = getEPWeekKey();
+  var approved = localStorage.getItem('tiffany_ep_approved_' + weekKey) === '1';
+
+  updateEPHorizonNote();
+
+  if (approved && cache && cache.week_key === weekKey) {
+    renderEmailPreview(cache, true);
+    return;
+  }
+
+  if (cache && cache.week_key === weekKey) {
+    renderEmailPreview(cache, false);
+    return;
+  }
+
+  if (isThursday()) {
+    generateEmailPreview(false);
+  } else {
+    document.getElementById('ep-week-label').textContent = 'Topics for ' + getRecordingWeek();
+    document.getElementById('ep-status-note').textContent = 'Auto-generates on Thursday. Click Retry to generate now.';
+    document.getElementById('ep-loading').style.display = 'none';
+    document.getElementById('ep-topics-grid').style.display = 'none';
+  }
+}
+
+function updateEPHorizonNote() {
+  var recWeek = getRecordingWeek();
+  var pubWeek = getPublishingWeek();
+  var note = document.getElementById('ep-horizon-note');
+  if (note) note.textContent = 'Topics sent this Friday are for recording the week of ' + recWeek + '. Editing happens the following week. Publishing begins the week of ' + pubWeek + '.';
+}
+
+async function generateEmailPreview(isRetry) {
+  if (!checkApiKey()) return;
+
+  var weekKey = getEPWeekKey();
+  localStorage.removeItem('tiffany_ep_approved_' + weekKey);
+
+  document.getElementById('ep-loading').style.display = 'block';
+  document.getElementById('ep-topics-grid').style.display = 'none';
+  document.getElementById('ep-error').style.display = 'none';
+  document.getElementById('ep-approved-badge').style.display = 'none';
+  document.getElementById('ep-week-label').textContent = 'Generating topics...';
+  document.getElementById('ep-status-note').textContent = '';
+  document.getElementById('ep-retry-btn').disabled = true;
+  document.getElementById('ep-approve-btn').disabled = true;
+  startLoader('ep-loading-msg', epLoaderMsgs);
+
+  var profile = getProfile();
+  var kb = getKnowledgeBase();
+  var recWeek = getRecordingWeek();
+  var pubWeek = getPublishingWeek();
+
+  var profileCtx = '';
+  if (profile.transcript_count > 0) {
+    profileCtx = 'TIFFANY\'S CONTENT HISTORY (do not repeat any of these topics or angles):\n' +
+      'Topics already covered: ' + (profile.topics.slice(-30).join(', ') || 'none yet') + '\n' +
+      'Her recurring phrases and voice patterns: ' + (profile.phrases.slice(-10).join(', ') || 'building') + '\n' +
+      'Core themes she returns to: ' + (profile.themes.slice(-10).join(', ') || 'building') + '\n' +
+      'Pillar history (how many times each pillar has been used): ' + JSON.stringify(profile.pillars) + '\n' +
+      'Total scripts analyzed: ' + profile.transcript_count + '\n\n';
+  }
+
+  var kbCtx = '';
+  if (kb.length > 0) {
+    var latest = kb[0].data || {};
+    kbCtx = 'PERFORMANCE DATA FROM KNOWLEDGE BASE:\n' +
+      'What is resonating with her audience: ' + (latest.what_is_working || []).slice(0, 3).join(', ') + '\n' +
+      'Top performing content types: ' + (latest.top_performing_content || []).slice(0, 3).join(', ') + '\n' +
+      'Audience insights: ' + (latest.audience_insights || []).slice(0, 3).join(', ') + '\n' +
+      'Strategic priorities right now: ' + (latest.strategic_priorities || []).slice(0, 3).join(', ') + '\n\n';
+  }
+
+  var underusedPillars = BRAND.pillars.filter(function(p) {
+    return (profile.pillars[p] || 0) < 3;
+  });
+
+  var prompt = 'You are the lead content strategist for Tiffany Haynes and Co.\n\n' +
+    'BRAND VOICE: ' + BRAND.voice + '\n' +
+    'STRICT AVOID: ' + BRAND.avoid + '\n' +
+    'ALL CONTENT PILLARS: ' + BRAND.pillars.join(', ') + '\n\n' +
+    profileCtx +
+    kbCtx +
+    'UNDERUSED PILLARS (prioritize these): ' + (underusedPillars.join(', ') || 'all pillars are balanced') + '\n\n' +
+    'PLANNING CONTEXT:\n' +
+    'Recording window: Week of ' + recWeek + '\n' +
+    'Publishing window: Week of ' + pubWeek + '\n' +
+    'This is a 2-week ahead planning system.\n\n' +
+    'TASK: Generate exactly 12 voiceover topic ideas for Tiffany to choose from.\n' +
+    'Rules:\n' +
+    '- Every topic must be FRESH and ORIGINAL. Not a repeat or variation of anything in her content history.\n' +
+    '- Cover all 5 content pillars across the 12 topics. Rotate through them.\n' +
+    '- Topics should feel like something Tiffany would genuinely want to talk about, not a content brief assignment.\n' +
+    '- Specific enough that she knows exactly what to record. Open enough that she speaks from her own experience.\n' +
+    '- Vary the content type: mix Talking Head, B-Roll with text, Teaching, Testimony, Lifestyle, Shenanigans.\n' +
+    '- Every hook must stop the scroll in the first 3 seconds.\n\n' +
+    'Return ONLY valid JSON. No markdown. No backticks. Start with {.\n\n' +
+    '{"recording_week":"' + recWeek + '",' +
+    '"publishing_week":"' + pubWeek + '",' +
+    '"planning_note":"One sentence on the strategic mix and why these 12 topics serve Tiffany right now.",' +
+    '"topics":[' +
+    '{"number":1,"title":"Short compelling title 5-8 words","pillar":"pillar name","content_type":"Talking Head or B-Roll with Text or Teaching or Testimony or Lifestyle or Shenanigans",' +
+    '"hook":"Exact first 3 seconds. What she says or what appears on screen. Stops the scroll.",' +
+    '"what_to_cover":["specific point 1","specific point 2","specific point 3"],' +
+    '"why_this_works":"One sentence on why this resonates with her audience right now.",' +
+    '"scripture_angle":"Relevant scripture if applicable. Empty string if not.",' +
+    '"estimated_length":"15 sec or 30 sec or 60 sec"}' +
+    ']}';
+
+  try {
+    var result = await callAPI(prompt, 4000);
+
+    if (result.topics) {
+      var pl = { topics_covered: [], recurring_phrases: [], themes: [], pillar_hits: {}, transcript_count: 0 };
+      result.topics.forEach(function(t) {
+        if (t.title) pl.topics_covered.push(t.title);
+        if (t.pillar) { pl.pillar_hits[t.pillar] = (pl.pillar_hits[t.pillar] || 0) + 1; }
+      });
+      updateProfileFromLearning(pl);
+    }
+
+    saveEPCache(result);
+    stopLoader('ep-loading-msg');
+    document.getElementById('ep-loading').style.display = 'none';
+    renderEmailPreview(result, false);
+
+  } catch(e) {
+    stopLoader('ep-loading-msg');
+    document.getElementById('ep-loading').style.display = 'none';
+    var el = document.getElementById('ep-error');
+    el.style.display = 'block';
+    el.innerHTML = '<strong>Error generating topics:</strong> ' + escRaw(e.message);
+    document.getElementById('ep-week-label').textContent = 'Generation failed';
+    console.error(e);
+  }
+
+  document.getElementById('ep-retry-btn').disabled = false;
+  document.getElementById('ep-approve-btn').disabled = false;
+}
+
+function approveTopics() {
+  var weekKey = getEPWeekKey();
+  localStorage.setItem('tiffany_ep_approved_' + weekKey, '1');
+  var cache = getEPCache();
+  if (cache) renderEmailPreview(cache, true);
+  copyEmailText();
+}
+
+function copyEmailText() {
+  var el = document.getElementById('ep-email-text');
+  if (!el) return;
+  var text = el.textContent || el.innerText;
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.getElementById('ep-copy-btn');
+    if (btn) { btn.textContent = 'Copied'; btn.classList.add('copied'); setTimeout(function() { btn.textContent = 'Copy Email'; btn.classList.remove('copied'); }, 2500); }
+  });
+}
+
+function renderEmailPreview(data, approved) {
+  var weekKey = getEPWeekKey();
+
+  document.getElementById('ep-week-label').textContent = 'Topics for ' + (data.recording_week || getRecordingWeek());
+  document.getElementById('ep-status-note').textContent = approved ? 'Approved and ready to send.' : 'Review topics and approve when ready.';
+
+  if (approved) {
+    document.getElementById('ep-approved-badge').style.display = 'inline-block';
+    document.getElementById('ep-approve-btn').textContent = 'Approved - Copy Again';
+    document.getElementById('ep-approve-btn').style.background = 'var(--green)';
+  } else {
+    document.getElementById('ep-approved-badge').style.display = 'none';
+    document.getElementById('ep-approve-btn').textContent = 'Approve + Copy Email';
+    document.getElementById('ep-approve-btn').style.background = 'var(--green)';
+  }
+
+  var topics = data.topics || [];
+
+  // PILLAR SUMMARY CHIPS
+  var pillarCounts = {};
+  topics.forEach(function(t) { pillarCounts[t.pillar] = (pillarCounts[t.pillar] || 0) + 1; });
+  var psHtml = '';
+  Object.keys(pillarCounts).forEach(function(p) {
+    var pc = BRAND.pillarColors[p] || { color: '#888', bg: 'rgba(136,136,136,0.1)' };
+    psHtml += '<span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:12px;background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(p) + ' (' + pillarCounts[p] + ')</span>';
+  });
+  if (data.planning_note) psHtml += '<span style="font-size:11px;color:var(--charcoal2);font-style:italic;padding:3px 6px;">' + escRaw(data.planning_note) + '</span>';
+  document.getElementById('ep-pillar-summary').innerHTML = psHtml;
+
+  // TOPIC CARDS
+  var cardsHtml = '';
+  topics.forEach(function(t) {
+    var pc = BRAND.pillarColors[t.pillar] || { color: '#888', bg: 'rgba(136,136,136,0.1)' };
+    var coverPoints = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover || '').split('\n').filter(Boolean);
+
+    cardsHtml += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
+
+    // card header
+    cardsHtml += '<div style="background:' + pc.bg + ';padding:11px 14px;border-bottom:1px solid rgba(65,65,65,0.08);display:flex;align-items:flex-start;gap:10px;">';
+    cardsHtml += '<div style="width:24px;height:24px;border-radius:50%;background:' + pc.color + ';color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">' + (t.number || '') + '</div>';
+    cardsHtml += '<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--charcoal);line-height:1.3;margin-bottom:3px;">' + escRaw(t.title || '') + '</div>';
+    cardsHtml += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
+    cardsHtml += '<span style="font-size:9px;font-weight:600;color:' + pc.color + ';letter-spacing:1px;text-transform:uppercase;">' + escRaw(t.pillar || '') + '</span>';
+    if (t.content_type) cardsHtml += '<span style="font-size:9px;color:var(--charcoal3);">&bull; ' + escRaw(t.content_type) + '</span>';
+    if (t.estimated_length) cardsHtml += '<span style="font-size:9px;color:var(--charcoal3);">&bull; ' + escRaw(t.estimated_length) + '</span>';
+    cardsHtml += '</div></div></div>';
+
+    // hook
+    cardsHtml += '<div style="padding:12px 14px;background:#FFFDF5;border-bottom:1px solid var(--border);">';
+    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Hook - First 3 Seconds</div>';
+    cardsHtml += '<div style="font-size:13px;font-weight:600;color:var(--charcoal);font-style:italic;line-height:1.4;">"' + escRaw(t.hook || '') + '"</div>';
+    cardsHtml += '</div>';
+
+    // what to cover
+    cardsHtml += '<div style="padding:12px 14px;border-bottom:1px solid var(--border);">';
+    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">What to Cover</div>';
+    cardsHtml += '<ul style="margin:0;padding-left:16px;color:var(--charcoal2);font-size:12px;line-height:1.7;">';
+    coverPoints.forEach(function(pt) { cardsHtml += '<li style="margin-bottom:3px;">' + escRaw(pt) + '</li>'; });
+    cardsHtml += '</ul>';
+    if (t.scripture_angle) cardsHtml += '<div style="margin-top:8px;padding:7px 10px;border-left:3px solid var(--red);background:var(--red-dim);font-size:11px;font-style:italic;color:var(--red);line-height:1.5;">' + escRaw(t.scripture_angle) + '</div>';
+    cardsHtml += '</div>';
+
+    // why this works
+    cardsHtml += '<div style="padding:9px 14px;background:var(--cream-2);">';
+    cardsHtml += '<span style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Why this works: </span>';
+    cardsHtml += '<span style="font-size:11px;color:var(--charcoal2);">' + escRaw(t.why_this_works || '') + '</span>';
+    cardsHtml += '</div>';
+
+    cardsHtml += '</div>';
+  });
+  document.getElementById('ep-cards-grid').innerHTML = cardsHtml;
+
+  // BUILD PLAIN TEXT EMAIL
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  var emailLines = [];
+  emailLines.push('TIFFANY HAYNES & CO. MEDIA TEAM');
+  emailLines.push('12 Voiceover Topics - Week of ' + (data.recording_week || ''));
+  emailLines.push('Sent: ' + dateStr);
+  emailLines.push('Publishing Window: ' + (data.publishing_week || getPublishingWeek()));
+  emailLines.push('');
+  if (data.planning_note) { emailLines.push(data.planning_note); emailLines.push(''); }
+  emailLines.push('HOW TO USE: Choose the topics that resonate. Record them this week at your own pace. The media team begins editing the following week for publishing the week of ' + (data.publishing_week || '') + '. You do not need to record all 12. Pick what speaks to you.');
+  emailLines.push('');
+  emailLines.push('+ + +');
+  emailLines.push('');
+
+  topics.forEach(function(t) {
+    var coverPoints = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover || '').split('\n').filter(Boolean);
+    emailLines.push(t.number + '. ' + (t.title || '').toUpperCase());
+    emailLines.push('Pillar: ' + (t.pillar || '') + '   Type: ' + (t.content_type || '') + '   Length: ' + (t.estimated_length || ''));
+    emailLines.push('');
+    emailLines.push('HOOK (First 3 seconds):');
+    emailLines.push('"' + (t.hook || '') + '"');
+    emailLines.push('');
+    emailLines.push('WHAT TO COVER:');
+    coverPoints.forEach(function(pt) { emailLines.push('- ' + pt); });
+    if (t.scripture_angle) { emailLines.push(''); emailLines.push('Scripture: ' + t.scripture_angle); }
+    emailLines.push('');
+    emailLines.push('Why this works: ' + (t.why_this_works || ''));
+    emailLines.push('');
+    emailLines.push('---');
+    emailLines.push('');
+  });
+
+  emailLines.push('1 + 1 = 10,000');
+  emailLines.push('Tiffany Haynes & Co. Media Team');
+  emailLines.push('Not for distribution outside the media team.');
+
+  document.getElementById('ep-email-text').textContent = emailLines.join('\n');
+  document.getElementById('ep-topics-grid').style.display = 'block';
+}
+
 var kbMsgsList = ['Reading the document...','Extracting key insights...','Identifying performance data...','Updating client profile...','Almost done...'];
 
 function getKnowledgeBase() {
