@@ -2105,10 +2105,10 @@ async function saveToGitHub(token, payload) {
 
     var sha = null;
     var checkRes = await fetch(apiUrl, { headers: headers });
-    if (checkRes.status === 401) return { ok: false, error: 'Token rejected (401). Your token may be expired or missing repo scope. Go to github.com/settings/tokens, regenerate your token, check the repo box, and paste the new token in the GitHub Token field.' };
-    if (checkRes.status === 403) return { ok: false, error: 'Access denied (403). Token does not have repo scope. Go to github.com/settings/tokens and regenerate with repo + workflow scopes checked.' };
-    if (checkRes.status === 404) return { ok: false, error: 'Repo not found (404). Check your GitHub Repo field. It should be: ' + repoFull + '. Make sure the spelling matches exactly.' };
+    if (checkRes.status === 401) return { ok: false, error: 'Token rejected (401). Your token may be expired or missing repo scope. Go to github.com/settings/tokens and regenerate with repo + workflow scopes.' };
+    if (checkRes.status === 403) return { ok: false, error: 'Access denied (403). Token is missing repo scope. Go to github.com/settings/tokens and regenerate with repo + workflow scopes checked.' };
     if (checkRes.ok) { var ex = await checkRes.json(); sha = ex.sha; }
+    // 404 on the file is normal if it doesn't exist yet - proceed with sha = null
 
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
     var body = { message: 'Approved voiceover topics', content: content };
