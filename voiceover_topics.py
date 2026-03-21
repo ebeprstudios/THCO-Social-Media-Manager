@@ -118,7 +118,7 @@ def build_html(data, rec_week, pub_week, is_test=False):
         scr = t.get("scripture_angle","")
         scr_html = f'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid {p["border"]};background:{p["bg"]};font-style:italic;font-size:11px;color:{p["text"]};">{scr}</div>' if scr else ""
         upload_topic = quote(t.get("title",""), safe="")
-        upload_url = f"https://ebeprstudios.github.io/THCO-Social-Media-Manager/upload.html?topic={upload_topic}&cloud=dgq3ahq1m&preset=tiffany_voiceovers"
+        upload_url = f"https://media.ebeprstudios.com/upload.html?topic={upload_topic}&cloud=dgq3ahq1m&preset=tiffany_voiceovers"
 
         card = f'''
 <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #E3D3C8;border-radius:8px;overflow:hidden;background:#FFFDF5;">
@@ -164,7 +164,7 @@ def build_html(data, rec_week, pub_week, is_test=False):
   <div style="font-size:12px;color:#B8B8B8;">Recording: {rec_week} &bull; Publishing: {pub_week}</div>
   <div style="font-size:11px;color:#8A8A8A;margin-top:3px;">Sent: {today}</div>
   <div style="margin-top:14px;">
-    <a href="https://ebeprstudios.github.io/THCO-Social-Media-Manager/topics.html" style="display:inline-block;background:#C49E3C;color:#414141;font-family:Georgia,serif;font-size:13px;font-weight:700;padding:9px 20px;border-radius:8px;text-decoration:none;">View All Topics &amp; Submit Voiceovers</a>
+    <a href="https://media.ebeprstudios.com/topics.html" style="display:inline-block;background:#C49E3C;color:#414141;font-family:Georgia,serif;font-size:13px;font-weight:700;padding:9px 20px;border-radius:8px;text-decoration:none;">View All Topics &amp; Submit Voiceovers</a>
   </div>
 </td></tr>
 <tr><td style="background:#FFFDF5;padding:18px 28px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">

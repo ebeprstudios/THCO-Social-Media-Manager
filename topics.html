@@ -375,7 +375,7 @@ function renderTopics() {
     var liHtml = pts.map(function(pt){ return '<li>' + pt + '</li>'; }).join('');
     var scr = t.scripture_angle || '';
     var scrHtml = scr ? '<div class="scripture" style="background:' + p.bg + ';border-left:3px solid ' + p.border + ';color:' + p.text + ';">' + scr + '</div>' : '';
-    var uploadUrl = 'https://ebeprstudios.github.io/THCO-Social-Media-Manager/upload.html?topic=' + encodeURIComponent(t.title||'') + '&cloud=' + CLOUD + '&preset=' + PRESET;
+    var uploadUrl = 'https://media.ebeprstudios.com/upload.html?topic=' + encodeURIComponent(t.title||'') + '&cloud=' + CLOUD + '&preset=' + PRESET;
     var isSubmitted = submittedTopics.indexOf(String(t.number)) !== -1;
     var btnClass = isSubmitted ? 'submit-vo-btn submitted' : 'submit-vo-btn';
     var btnText = isSubmitted ? '&#10003; Submitted' : 'Submit Voiceover';
