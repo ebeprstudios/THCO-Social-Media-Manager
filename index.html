@@ -1101,19 +1101,28 @@ async function callAPI(prompt, tokens) {
       })
     });
   } catch(fetchErr) {
-    throw new Error('Network error: ' + fetchErr.message + '. If using Safari, switch to Chrome - Safari blocks direct API calls.');
+    throw new Error('Network error: ' + fetchErr.message + '. If using Safari, switch to Chrome.');
   }
   var bodyText = await res.text();
   if (!res.ok) {
     var errMsg = 'API error ' + res.status;
-    try { var j = JSON.parse(bodyText); errMsg += ': ' + (j.error && j.error.message ? j.error.message : bodyText.slice(0,200)); } catch(x) { errMsg += ': ' + bodyText.slice(0,150); }
+    try { var j = JSON.parse(bodyText); errMsg += ': ' + (j.error && j.error.message ? j.error.message : bodyText.slice(0,300)); } catch(x) { errMsg += ': ' + bodyText.slice(0,300); }
     throw new Error(errMsg);
   }
   var data;
-  try { data = JSON.parse(bodyText); } catch(e) { throw new Error('Could not parse API response: ' + bodyText.slice(0,150)); }
+  try { data = JSON.parse(bodyText); } catch(e) {
+    throw new Error('Could not parse HTTP response. Raw: ' + bodyText.slice(0,300));
+  }
   var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
-  if (!raw || !raw.text) throw new Error('No text in API response.');
-  return safeParseJSON(raw.text);
+  if (!raw || !raw.text) throw new Error('No text content in API response. Full response: ' + JSON.stringify(data).slice(0,300));
+
+  // For email preview topics we expect JSON but model sometimes adds preamble
+  // Try safeParseJSON first, if it fails return the raw text so caller can handle it
+  try {
+    return safeParseJSON(raw.text);
+  } catch(parseErr) {
+    throw new Error('JSON parse failed. Model said: ' + raw.text.slice(0,400));
+  }
 }
 
 // ================================================================
@@ -2104,25 +2113,61 @@ async function generateEmailPreview(isRetry) {
 
   var underusedPillars = BRAND.pillars.filter(function(p) { return (profile.pillars[p] || 0) < 3; });
 
-  var prompt = 'You are lead content strategist for Tiffany Haynes and Co.\n\n' +
+  var systemPrompt = 'You are a content strategist. You ONLY respond with raw valid JSON. No explanation, no markdown, no backticks, no preamble. Your entire response must start with { and end with }.';
+
+  var userPrompt = 'Generate 12 voiceover topic ideas for Tiffany Haynes and Co.\n\n' +
     'BRAND: ' + BRAND.voice + '\nAVOID: ' + BRAND.avoid + '\nPILLARS: ' + BRAND.pillars.join(', ') + '\n\n' +
-    profileCtx + kbCtx +
-    'PRIORITIZE UNDERUSED PILLARS: ' + (underusedPillars.join(', ') || 'all balanced') + '\n\n' +
+    (profileCtx || '') + (kbCtx || '') +
+    'Prioritize underused pillars: ' + (underusedPillars.join(', ') || 'all balanced') + '\n' +
     'Recording window: ' + recWeek + '\nPublishing window: ' + pubWeek + '\n\n' +
-    'Generate exactly 12 FRESH ORIGINAL voiceover topics. Never repeat history. Cover all 5 pillars. Vary content types.\n\n' +
-    'Return ONLY valid JSON. No markdown. Start with {.\n\n' +
+    'Rules: Fresh and original. Never repeat history. Cover all 5 pillars. Vary content types. Hooks stop the scroll.\n\n' +
+    'Return this exact JSON structure with all 12 topics filled in:\n' +
     '{"recording_week":"' + recWeek + '","publishing_week":"' + pubWeek + '",' +
-    '"planning_note":"One sentence on why this mix serves Tiffany right now.",' +
-    '"topics":[{"number":1,"title":"5-8 word title","pillar":"pillar",' +
-    '"content_type":"Talking Head or B-Roll with Text or Teaching or Testimony or Lifestyle or Shenanigans",' +
-    '"hook":"Exact first 3 seconds in her voice. Stops the scroll.",' +
-    '"what_to_cover":["point 1","point 2","point 3"],' +
-    '"why_this_works":"One sentence on why this resonates.",' +
-    '"scripture_angle":"scripture if applicable else empty",' +
-    '"estimated_length":"15 sec or 30 sec or 60 sec"}]}';
+    '"planning_note":"one sentence on this week\'s strategic mix",' +
+    '"topics":[' +
+    '{"number":1,"title":"5-8 word title","pillar":"pillar name","content_type":"Talking Head or Teaching or Testimony or Lifestyle or Shenanigans or B-Roll with Text","hook":"exact first 3 seconds","what_to_cover":["point 1","point 2","point 3"],"why_this_works":"one sentence","scripture_angle":"scripture or empty","estimated_length":"30 sec"},' +
+    '{"number":2,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":3,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":4,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":5,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":6,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":7,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":8,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":9,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":10,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":11,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
+    '{"number":12,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"}' +
+    ']}';
 
   try {
-    var result = await callAPI(prompt, 4000);
+    if (!getApiKey()) throw new Error('No API key. Enter and save your key first.');
+    var epRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': getApiKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 6000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+
+    var epBody = await epRes.text();
+    if (!epRes.ok) {
+      var epJ = {}; try { epJ = JSON.parse(epBody); } catch(x) {}
+      throw new Error('API error ' + epRes.status + ': ' + (epJ.error && epJ.error.message ? epJ.error.message : epBody.slice(0,300)));
+    }
+
+    var epData = JSON.parse(epBody);
+    var epRaw = (epData.content || []).find(function(b) { return b.type === 'text'; });
+    if (!epRaw || !epRaw.text) throw new Error('No text in API response.');
+
+    var result = safeParseJSON(epRaw.text);
 
     if (result.topics) {
       var pl = { topics_covered:[], recurring_phrases:[], themes:[], pillar_hits:{}, transcript_count:0 };
@@ -2151,6 +2196,82 @@ async function generateEmailPreview(isRetry) {
 
   document.getElementById('ep-retry-btn').disabled = false;
   document.getElementById('ep-approve-btn').disabled = false;
+}
+
+function renderEmailPreview(data, approved) {
+  epCurrentData = data;
+  document.getElementById('ep-week-label').textContent = 'Topics for ' + (data.recording_week || getRecordingWeek());
+  document.getElementById('ep-status-note').textContent = approved ? 'Approved. Scheduled for Friday 1PM CST.' : 'Review topics then click Approve + Schedule.';
+
+  var approveBtn = document.getElementById('ep-approve-btn');
+  if (approved) {
+    document.getElementById('ep-approved-badge').style.display = 'inline-block';
+    approveBtn.textContent = 'Re-approve + Reschedule';
+    approveBtn.disabled = false;
+  } else {
+    document.getElementById('ep-approved-badge').style.display = 'none';
+    approveBtn.textContent = 'Approve + Schedule';
+    approveBtn.disabled = false;
+  }
+
+  var topics = data.topics || [];
+
+  // Pillar summary chips
+  var pillarCounts = {};
+  topics.forEach(function(t) { pillarCounts[t.pillar] = (pillarCounts[t.pillar] || 0) + 1; });
+  var psHtml = '';
+  Object.keys(pillarCounts).forEach(function(p) {
+    var pc = BRAND.pillarColors[p] || {color:'#888', bg:'rgba(136,136,136,0.1)'};
+    psHtml += '<span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:12px;background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(p) + ' (' + pillarCounts[p] + ')</span>';
+  });
+  if (data.planning_note) psHtml += '<span style="font-size:11px;color:var(--charcoal2);font-style:italic;padding:3px 6px;">' + escRaw(data.planning_note) + '</span>';
+  document.getElementById('ep-pillar-summary').innerHTML = psHtml;
+
+  // Topic cards
+  var cardsHtml = '';
+  topics.forEach(function(t) {
+    var pc = BRAND.pillarColors[t.pillar] || {color:'#888', bg:'rgba(136,136,136,0.1)'};
+    var coverPoints = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover || '').split('\n').filter(Boolean);
+
+    cardsHtml += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
+
+    // Header
+    cardsHtml += '<div style="background:' + pc.bg + ';padding:11px 14px;border-bottom:1px solid rgba(65,65,65,0.08);display:flex;align-items:flex-start;gap:10px;">';
+    cardsHtml += '<div style="width:24px;height:24px;border-radius:50%;background:' + pc.color + ';color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">' + (t.number || '') + '</div>';
+    cardsHtml += '<div style="flex:1;">';
+    cardsHtml += '<div style="font-size:13px;font-weight:700;color:var(--charcoal);line-height:1.3;margin-bottom:3px;">' + escRaw(t.title || '') + '</div>';
+    cardsHtml += '<div style="font-size:9px;font-weight:700;color:' + pc.color + ';letter-spacing:1px;text-transform:uppercase;">' + escRaw(t.pillar || '') + '</div>';
+    if (t.content_type || t.estimated_length) {
+      cardsHtml += '<div style="font-size:9px;color:var(--charcoal3);margin-top:1px;">' + escRaw(t.content_type || '') + (t.estimated_length ? ' &bull; ' + escRaw(t.estimated_length) : '') + '</div>';
+    }
+    cardsHtml += '</div></div>';
+
+    // Hook
+    cardsHtml += '<div style="padding:11px 14px;background:#FFFDF5;border-bottom:1px solid var(--border);">';
+    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Hook - First 3 Seconds</div>';
+    cardsHtml += '<div style="font-size:12px;font-weight:600;color:var(--charcoal);font-style:italic;line-height:1.4;">"' + escRaw(t.hook || '') + '"</div>';
+    cardsHtml += '</div>';
+
+    // What to cover
+    cardsHtml += '<div style="padding:11px 14px;border-bottom:1px solid var(--border);">';
+    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">What to Cover</div>';
+    cardsHtml += '<ul style="margin:0;padding-left:15px;color:var(--charcoal2);font-size:11px;line-height:1.7;">';
+    coverPoints.forEach(function(pt) { cardsHtml += '<li style="margin-bottom:2px;">' + escRaw(pt) + '</li>'; });
+    cardsHtml += '</ul>';
+    if (t.scripture_angle && t.scripture_angle.trim()) {
+      cardsHtml += '<div style="margin-top:7px;padding:7px 10px;border-left:3px solid var(--red);background:var(--red-dim);font-size:10px;font-style:italic;color:var(--red);line-height:1.5;">' + escRaw(t.scripture_angle) + '</div>';
+    }
+    cardsHtml += '</div>';
+
+    // Why this works
+    cardsHtml += '<div style="padding:8px 14px;background:var(--cream-2);">';
+    cardsHtml += '<span style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Why this works: </span>';
+    cardsHtml += '<span style="font-size:11px;color:var(--charcoal2);">' + escRaw(t.why_this_works || '') + '</span>';
+    cardsHtml += '</div></div>';
+  });
+
+  document.getElementById('ep-cards-grid').innerHTML = cardsHtml;
+  document.getElementById('ep-topics-grid').style.display = 'block';
 }
 
 function generatePDF(data) {
