@@ -2152,6 +2152,8 @@ async function generateEmailPreview(isRetry) {
   document.getElementById('ep-retry-btn').disabled = false;
   document.getElementById('ep-approve-btn').disabled = false;
 }
+
+function generatePDF(data) {
   loadJsPDF(function(jsPDF) {
     if (!jsPDF) {
       console.warn('jsPDF not available, using fallback');
