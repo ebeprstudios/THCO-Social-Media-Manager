@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiffany Haynes &amp; Co. Content Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --cream-1: #FFFDF5;
+  --cream-2: #F4F0EB;
+  --cream-3: #E3D3C8;
+  --cream-4: #D4C0B0;
+  --red:      #A00605;
+  --red-dim:  rgba(160,6,5,0.07);
+  --red-mid:  rgba(160,6,5,0.18);
+  --charcoal: #414141;
+  --charcoal2:#5A5A5A;
+  --charcoal3:#8A8A8A;
+  --charcoal4:#B8B8B8;
+  --border:   rgba(65,65,65,0.10);
+  --border-md:rgba(65,65,65,0.18);
+  --shadow:   rgba(65,65,65,0.07);
+  --green:    #3A9E6E;
+  --green-bg: rgba(58,158,110,0.08);
+  --amber:    #B87830;
+  --amber-bg: rgba(184,120,48,0.08);
+  --blue:     #3A6EA8;
+  --blue-bg:  rgba(58,110,168,0.08);
+  --purple:   #6A50A8;
+  --purple-bg:rgba(106,80,168,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--cream-1);
+  color: var(--charcoal);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '+';
+  position: fixed;
+  bottom: -40px; right: 40px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 280px;
+  color: rgba(65,65,65,0.022);
+  pointer-events: none;
+  z-index: 0;
+  line-height: 1;
+}
+
+/* PASSWORD GATE */
+#password-gate {
+  position: fixed; inset: 0;
+  background: var(--cream-2);
+  z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+}
+.gate-box {
+  background: var(--cream-1);
+  border: 1px solid var(--border-md);
+  border-radius: 12px;
+  padding: 48px 40px;
+  width: 400px; max-width: 92vw;
+  text-align: center;
+  box-shadow: 0 4px 32px var(--shadow);
+}
+.gate-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px; font-weight: 500;
+  color: var(--charcoal3);
+  letter-spacing: 4px; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.gate-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 600;
+  color: var(--charcoal); margin-bottom: 4px; line-height: 1.2;
+}
+.gate-math {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px; color: var(--red);
+  letter-spacing: 2px; margin-bottom: 32px;
+}
+.gate-input {
+  width: 100%; background: var(--cream-2);
+  border: 1px solid var(--border-md);
+  color: var(--charcoal);
+  font-family: 'Inter', sans-serif; font-size: 14px;
+  padding: 12px 16px; border-radius: 6px;
+  margin-bottom: 10px; outline: none;
+  text-align: center; letter-spacing: 2px;
+  transition: border-color 0.2s;
+}
+.gate-input:focus { border-color: var(--red); }
+.gate-btn {
+  width: 100%; background: var(--red); color: white;
+  border: none; padding: 12px;
+  font-family: 'Inter', sans-serif; font-weight: 600;
+  font-size: 13px; cursor: pointer; border-radius: 6px;
+  transition: background 0.2s;
+}
+.gate-btn:hover { background: #8A0504; }
+.gate-error { color: var(--red); font-size: 11px; margin-top: 8px; display: none; }
+
+/* API MODAL */
+#api-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(244,240,235,0.92); z-index: 1000;
+  align-items: center; justify-content: center;
+}
+#api-modal.show { display: flex; }
+.modal-box {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 12px; padding: 36px;
+  width: 460px; max-width: 90vw;
+  box-shadow: 0 8px 40px var(--shadow);
+}
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 600;
+  color: var(--charcoal); margin-bottom: 10px;
+}
+.modal-sub { font-size: 13px; color: var(--charcoal2); line-height: 1.7; margin-bottom: 20px; }
+.modal-sub span { color: var(--red); }
+.modal-input {
+  width: 100%; background: var(--cream-2);
+  border: 1px solid var(--border-md);
+  color: var(--charcoal);
+  font-family: 'Inter', monospace; font-size: 12px;
+  padding: 10px 14px; border-radius: 6px;
+  margin-bottom: 10px; outline: none; transition: border-color 0.2s;
+}
+.modal-input:focus { border-color: var(--red); }
+.modal-btn {
+  width: 100%; background: var(--red); color: white;
+  border: none; padding: 11px;
+  font-family: 'Inter', sans-serif; font-weight: 600;
+  font-size: 13px; cursor: pointer; border-radius: 6px;
+  transition: background 0.2s;
+}
+.modal-btn:hover { background: #8A0504; }
+.modal-note { color: var(--charcoal3); font-size: 10px; margin-top: 10px; text-align: center; }
+
+/* TOP BAR */
+#topbar {
+  background: var(--cream-1);
+  border-bottom: 1px solid var(--border);
+  padding: 13px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo-area { display: flex; flex-direction: column; }
+.logo-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 9px; font-weight: 500;
+  color: var(--charcoal3); letter-spacing: 4px; text-transform: uppercase;
+}
+.logo-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px; font-weight: 600;
+  color: var(--charcoal); line-height: 1.1;
+}
+.logo-accent { color: var(--red); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.tb-btn {
+  background: transparent; border: 1px solid var(--border-md);
+  color: var(--charcoal2); padding: 6px 13px;
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+  cursor: pointer; border-radius: 5px; transition: all 0.15s;
+}
+.tb-btn:hover { border-color: var(--red); color: var(--red); }
+.tb-btn.primary { background: var(--red); border-color: var(--red); color: white; font-weight: 600; }
+.tb-btn.primary:hover { background: #8A0504; }
+.tb-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* TABS */
+#tab-bar {
+  background: var(--cream-1);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex; gap: 0;
+  position: sticky; top: 55px; z-index: 99;
+}
+.tab-btn {
+  background: transparent; border: none;
+  padding: 13px 22px;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--charcoal3); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--charcoal); }
+.tab-btn.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
+
+/* MAIN */
+#main { max-width: 1100px; margin: 0 auto; padding: 36px 32px; position: relative; z-index: 1; }
+
+/* LANDING */
+#landing {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 72vh;
+  text-align: center; padding: 40px 24px;
+}
+.landing-eyebrow {
+  font-size: 10px; font-weight: 600; color: var(--red);
+  letter-spacing: 4px; text-transform: uppercase; margin-bottom: 16px;
+}
+.landing-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 40px; font-weight: 600; color: var(--charcoal);
+  letter-spacing: -0.5px; margin-bottom: 12px; line-height: 1.15;
+}
+.landing-math {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px; color: var(--red); letter-spacing: 3px; margin-bottom: 12px;
+}
+.landing-sub {
+  font-size: 14px; color: var(--charcoal2);
+  margin-bottom: 40px; max-width: 500px; line-height: 1.7;
+}
+.landing-btn {
+  background: var(--red); color: white; border: none;
+  padding: 14px 40px;
+  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
+  cursor: pointer; border-radius: 6px;
+  transition: all 0.2s; margin-bottom: 10px;
+}
+.landing-btn:hover { background: #8A0504; transform: translateY(-1px); }
+.key-btn-land {
+  background: transparent; border: 1px solid var(--border-md);
+  color: var(--charcoal3); padding: 8px 18px;
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  cursor: pointer; border-radius: 6px; transition: all 0.15s;
+}
+.key-btn-land:hover { border-color: var(--red); color: var(--red); }
+.tool-chips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  justify-content: center; margin-top: 40px; max-width: 600px;
+}
+.tool-chip {
+  background: var(--cream-2); border: 1px solid var(--border);
+  padding: 5px 14px; border-radius: 20px;
+  font-size: 10px; color: var(--charcoal3); letter-spacing: 0.5px;
+}
+
+/* CLIENT PROFILE PANEL */
+#profile-panel {
+  background: var(--cream-2);
+  border: 1px solid var(--border-md);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+}
+.profile-header {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 16px;
+}
+.profile-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px; font-weight: 600; color: var(--charcoal);
+}
+.profile-actions { display: flex; gap: 8px; }
+.profile-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 16px;
+}
+.profile-stat {
+  background: var(--cream-1); border: 1px solid var(--border);
+  border-radius: 7px; padding: 12px 14px; text-align: center;
+}
+.profile-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 700; color: var(--red); line-height: 1;
+}
+.profile-stat-label {
+  font-size: 10px; color: var(--charcoal3);
+  letter-spacing: 1px; text-transform: uppercase; margin-top: 3px;
+}
+.pillar-bars { display: flex; flex-direction: column; gap: 7px; }
+.pillar-bar-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.pillar-bar-label { font-size: 11px; color: var(--charcoal2); width: 220px; flex-shrink: 0; }
+.pillar-bar-track {
+  flex: 1; height: 6px; background: var(--cream-3);
+  border-radius: 3px; overflow: hidden;
+}
+.pillar-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+.pillar-bar-count { font-size: 10px; color: var(--charcoal3); width: 30px; text-align: right; flex-shrink: 0; }
+.profile-empty {
+  text-align: center; padding: 24px;
+  color: var(--charcoal3); font-size: 13px; line-height: 1.7;
+}
+
+/* TAB PANES */
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* INPUT PANEL */
+.input-panel {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 12px; padding: 26px 30px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.input-eyebrow {
+  font-size: 10px; font-weight: 600; color: var(--red);
+  letter-spacing: 3px; text-transform: uppercase; margin-bottom: 5px;
+}
+.input-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 600; color: var(--charcoal); margin-bottom: 14px;
+}
+.transcript-area {
+  width: 100%; background: var(--cream-2);
+  border: 1px solid var(--border-md); color: var(--charcoal);
+  font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.7;
+  padding: 14px 16px; border-radius: 8px;
+  resize: vertical; min-height: 140px; outline: none;
+  transition: border-color 0.2s; margin-bottom: 12px;
+}
+.transcript-area:focus { border-color: var(--red); }
+.transcript-area::placeholder { color: var(--charcoal4); }
+.input-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.content-type-select {
+  background: var(--cream-2); border: 1px solid var(--border-md);
+  color: var(--charcoal); font-family: 'Inter', sans-serif;
+  font-size: 12px; padding: 8px 12px; border-radius: 6px;
+  outline: none; cursor: pointer; flex: 1; min-width: 180px;
+}
+.generate-btn {
+  background: var(--red); color: white; border: none;
+  padding: 10px 26px;
+  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px;
+  cursor: pointer; border-radius: 6px;
+  transition: all 0.15s; white-space: nowrap;
+}
+.generate-btn:hover { background: #8A0504; }
+.generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* LOADING */
+.gen-loading { display: none; text-align: center; padding: 56px 20px; }
+.gen-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 500; color: var(--charcoal); margin-bottom: 20px;
+}
+.gen-track {
+  width: 180px; height: 1px; background: var(--border-md);
+  margin: 0 auto 18px; overflow: hidden;
+}
+.gen-track::after {
+  content: ''; display: block; height: 100%; width: 30%;
+  background: var(--red); animation: scan 1.6s ease-in-out infinite;
+}
+@keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(430%); } }
+.gen-msg { font-size: 11px; color: var(--charcoal3); letter-spacing: 1px; animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0.2; } }
+
+/* ERROR */
+.gen-error {
+  display: none; background: var(--red-dim);
+  border: 1px solid var(--red-mid); color: var(--red);
+  padding: 16px; border-radius: 8px;
+  font-size: 13px; line-height: 1.6; margin-bottom: 22px;
+}
+
+/* RESULTS */
+.results-wrap { display: none; animation: appear 0.35s ease; }
+@keyframes appear { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; } }
+
+/* SECTION */
+.out-section { margin-bottom: 44px; }
+.out-eyebrow {
+  font-size: 9px; font-weight: 700; color: var(--red);
+  letter-spacing: 4px; text-transform: uppercase; margin-bottom: 5px;
+}
+.out-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 600; color: var(--charcoal);
+  margin-bottom: 18px; line-height: 1.2;
+}
+.out-sub {
+  font-size: 12px; color: var(--charcoal3);
+  margin-bottom: 18px; margin-top: -12px; line-height: 1.5;
+}
+
+/* MATH DIVIDER */
+.math-div {
+  text-align: center; padding: 12px 0;
+  color: var(--cream-3);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; letter-spacing: 10px;
+  margin: 8px 0 36px;
+}
+
+/* CAPTION CARD */
+.caption-card {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 2px 10px var(--shadow); margin-bottom: 14px;
+}
+.caption-card-header {
+  background: var(--cream-2); padding: 11px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.cap-platform { font-size: 10px; font-weight: 700; color: var(--charcoal2); letter-spacing: 1.5px; text-transform: uppercase; }
+.caption-body { padding: 18px 22px; }
+.caption-text {
+  font-size: 14px; color: var(--charcoal); line-height: 1.85;
+  white-space: pre-wrap; margin-bottom: 14px;
+}
+.caption-hashtags { font-size: 12px; color: var(--red); line-height: 1.6; opacity: 0.75; }
+.cap-cta-label {
+  font-size: 9px; font-weight: 700; color: var(--charcoal3);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 4px; margin-top: 12px;
+}
+.cap-cta-text { font-size: 12px; color: var(--charcoal2); font-style: italic; }
+
+/* COPY BUTTON */
+.copy-btn {
+  background: transparent; border: 1px solid var(--border-md);
+  color: var(--charcoal3); padding: 4px 11px;
+  font-size: 10px; font-family: 'Inter', sans-serif;
+  cursor: pointer; border-radius: 4px; transition: all 0.15s;
+}
+.copy-btn:hover { border-color: var(--red); color: var(--red); }
+.copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+/* DESIGNER CARDS */
+.designer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.designer-card {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.designer-card-header {
+  padding: 13px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.designer-role {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+.designer-name { font-size: 12px; color: var(--charcoal2); margin-top: 2px; }
+.designer-body { padding: 16px 18px; }
+.designer-copy-block {
+  background: var(--cream-2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 12px 14px;
+  font-size: 12px; color: var(--charcoal2);
+  line-height: 1.7; white-space: pre-wrap;
+  margin-bottom: 10px; font-family: 'Inter', sans-serif;
+}
+.designer-label {
+  font-size: 9px; font-weight: 700; color: var(--charcoal3);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;
+}
+
+/* THUMBNAIL CARD (Designer 1) */
+.thumb-card {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.thumb-header {
+  background: var(--charcoal); padding: 13px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.thumb-header-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px; font-weight: 500; color: var(--cream-1);
+}
+.thumb-body { padding: 18px; }
+.hook-display {
+  background: var(--charcoal);
+  border-radius: 8px; padding: 20px;
+  text-align: center; margin-bottom: 14px;
+  position: relative; overflow: hidden;
+}
+.hook-display::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(160,6,5,0.3) 0%, rgba(0,0,0,0.6) 100%);
+}
+.hook-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 700; color: white;
+  line-height: 1.3; position: relative; z-index: 1;
+  font-style: italic;
+}
+.hook-sub { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 6px; position: relative; z-index: 1; letter-spacing: 2px; text-transform: uppercase; }
+
+/* CAROUSEL CARDS */
+.carousel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.carousel-card {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.carousel-card-header {
+  background: var(--charcoal); padding: 13px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.carousel-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px; font-weight: 500; color: var(--cream-1); line-height: 1.3;
+}
+.slide-count { font-size: 10px; color: var(--cream-3); letter-spacing: 1px; flex-shrink: 0; margin-left: 12px; }
+.slide-item {
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.slide-item:last-child { border-bottom: none; }
+.slide-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--cream-2); border: 1px solid var(--border-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--charcoal2); flex-shrink: 0;
+}
+.slide-num.hook { background: var(--red); border-color: var(--red); color: white; }
+.slide-num.cta { background: var(--charcoal); border-color: var(--charcoal); color: white; }
+.slide-content { flex: 1; }
+.slide-role {
+  font-size: 9px; font-weight: 700; color: var(--red);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 3px;
+}
+.slide-headline { font-size: 13px; font-weight: 600; color: var(--charcoal); margin-bottom: 3px; }
+.slide-body { font-size: 12px; color: var(--charcoal2); line-height: 1.55; }
+.carousel-design {
+  background: var(--cream-2); padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 11px; color: var(--charcoal2); line-height: 1.6;
+}
+.design-label {
+  font-size: 9px; font-weight: 700; color: var(--charcoal3);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;
+}
+
+/* QUOTE CARDS */
+.quotes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.quote-card {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 10px; padding: 22px; position: relative; overflow: hidden;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.quote-card::before {
+  content: '"';
+  position: absolute; top: -10px; left: 14px;
+  font-family: 'Cormorant Garamond', serif; font-size: 80px;
+  color: rgba(160,6,5,0.05); line-height: 1; pointer-events: none;
+}
+.quote-tag {
+  font-size: 9px; font-weight: 700; color: var(--red);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+}
+.quote-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px; font-weight: 500; color: var(--charcoal);
+  line-height: 1.5; margin-bottom: 14px;
+  position: relative; z-index: 1; font-style: italic;
+}
+.quote-design-note {
+  font-size: 11px; color: var(--charcoal3); line-height: 1.5;
+  border-top: 1px solid var(--border); padding-top: 10px;
+}
+
+/* ================================================================
+   WEEKLY PLANNER TAB
+================================================================ */
+.week-input-panel {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 12px; padding: 26px 30px;
+  margin-bottom: 22px; box-shadow: 0 2px 12px var(--shadow);
+}
+.transcript-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.transcript-entry { position: relative; }
+.transcript-entry-label {
+  font-size: 10px; font-weight: 600; color: var(--charcoal3);
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px;
+}
+.remove-transcript {
+  position: absolute; top: 0; right: 0;
+  background: transparent; border: none;
+  color: var(--charcoal3); font-size: 16px; cursor: pointer;
+  padding: 0 4px; line-height: 1;
+}
+.remove-transcript:hover { color: var(--red); }
+.add-transcript-btn {
+  background: transparent; border: 1px dashed var(--border-md);
+  color: var(--charcoal3); padding: 10px;
+  font-family: 'Inter', sans-serif; font-size: 12px;
+  cursor: pointer; border-radius: 8px; width: 100%;
+  transition: all 0.15s; text-align: center;
+}
+.add-transcript-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* PROFILE PREVIEW */
+.profile-preview {
+  display: none; background: var(--cream-2);
+  border: 1px solid var(--border-md); border-radius: 10px;
+  padding: 22px 26px; margin-bottom: 22px;
+  animation: appear 0.3s ease;
+}
+.profile-preview-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 600; color: var(--charcoal); margin-bottom: 14px;
+}
+.learned-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.learned-cell { background: var(--cream-1); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.learned-cell-label {
+  font-size: 9px; font-weight: 700; color: var(--red);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;
+}
+.learned-item { font-size: 12px; color: var(--charcoal2); line-height: 1.6; }
+.learned-tag {
+  display: inline-block; font-size: 10px; color: var(--charcoal2);
+  background: var(--cream-2); border: 1px solid var(--border);
+  padding: 2px 9px; border-radius: 12px; margin: 2px 3px 2px 0;
+}
+.profile-confirm-row { display: flex; gap: 10px; align-items: center; }
+
+/* CALENDAR */
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 10px; margin-bottom: 36px;
+}
+.cal-day {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.cal-day-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.cal-day-name {
+  font-size: 10px; font-weight: 700; color: var(--charcoal3);
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.cal-day-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 600; color: var(--charcoal); line-height: 1;
+}
+.cal-day-body { padding: 10px 12px; }
+.cal-post-type {
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 5px;
+}
+.cal-post-title { font-size: 11px; font-weight: 600; color: var(--charcoal); line-height: 1.4; margin-bottom: 5px; }
+.cal-pillar-tag {
+  font-size: 9px; padding: 2px 7px; border-radius: 10px;
+  font-weight: 500; display: inline-block;
+}
+.cal-time { font-size: 9px; color: var(--charcoal3); margin-top: 5px; }
+
+/* PILLAR TRACKER */
+.pillar-tracker {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 10px; padding: 20px 24px;
+  margin-bottom: 28px; box-shadow: 0 2px 8px var(--shadow);
+}
+.pillar-tracker-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 600; color: var(--charcoal); margin-bottom: 16px;
+}
+.pillar-row {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+}
+.pillar-name { font-size: 12px; color: var(--charcoal2); width: 240px; flex-shrink: 0; }
+.pillar-track {
+  flex: 1; height: 8px; background: var(--cream-2);
+  border-radius: 4px; overflow: hidden;
+}
+.pillar-fill { height: 100%; border-radius: 4px; }
+.pillar-pct { font-size: 11px; color: var(--charcoal3); width: 36px; text-align: right; flex-shrink: 0; }
+.gap-warning {
+  background: var(--amber-bg); border: 1px solid rgba(184,120,48,0.25);
+  border-radius: 6px; padding: 10px 14px;
+  font-size: 12px; color: var(--amber); margin-top: 12px;
+}
+
+/* DELIVERY SECTION */
+.delivery-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.delivery-card {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.delivery-header {
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.delivery-role {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+.delivery-person { font-size: 13px; font-weight: 600; color: var(--charcoal); margin-top: 2px; }
+.delivery-body { padding: 14px 16px; }
+.delivery-block {
+  background: var(--cream-2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 11px 13px;
+  font-size: 12px; color: var(--charcoal2);
+  line-height: 1.7; white-space: pre-wrap;
+  margin-bottom: 8px;
+}
+.delivery-label {
+  font-size: 9px; font-weight: 700; color: var(--charcoal3);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px;
+}
+
+/* PRINT */
+@media print {
+  #topbar, #tab-bar, .generate-btn, .tb-btn, .copy-btn, .add-transcript-btn, #profile-panel { display: none !important; }
+  body { background: white; }
+  .cal-day, .carousel-card, .quote-card, .delivery-card { break-inside: avoid; }
+}
+
+/* FOOTER */
+.studio-footer {
+  text-align: center; padding: 28px;
+  color: var(--charcoal4); font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; border-top: 1px solid var(--border); margin-top: 48px;
+}
+
+@media (max-width: 900px) {
+  .calendar-grid { grid-template-columns: repeat(4, 1fr); }
+  .carousel-grid, .quotes-grid, .designer-grid, .delivery-grid, .learned-grid { grid-template-columns: 1fr; }
+  .profile-stats { grid-template-columns: 1fr 1fr; }
+  #main { padding: 24px 16px; }
+  #tab-bar { padding: 0 16px; overflow-x: auto; }
+}
+@media (max-width: 600px) {
+  .calendar-grid { grid-template-columns: 1fr 1fr; }
+  .delivery-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="password-gate">
+  <div class="gate-box">
+    <div class="gate-brand">Tiffany Haynes &amp; Co.</div>
+    <div class="gate-title">Content Studio</div>
+    <div class="gate-math">1 + 1 = 10,000</div>
+    <input class="gate-input" id="gate-input" type="password" placeholder="Enter password" />
+    <button class="gate-btn" onclick="checkPassword()">Enter</button>
+    <div class="gate-error" id="gate-error">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- API MODAL -->
+<div id="api-modal">
+  <div class="modal-box">
+    <div class="modal-title">Anthropic API Key</div>
+    <div class="modal-sub">Enter your Anthropic API key. Saved in your browser only. Get your key at <span>console.anthropic.com</span>.</div>
+    <input class="modal-input" id="api-key-input" type="password" placeholder="sk-ant-api03-..." />
+    <button class="modal-btn" onclick="saveApiKey()">Save Key</button>
+    <div class="modal-note">Stored in localStorage only</div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="logo-area">
+    <div class="logo-brand">Content Studio</div>
+    <div class="logo-title">Tiffany Haynes <span class="logo-accent">&amp;</span> Co.</div>
+  </div>
+  <div class="topbar-right">
+    <button class="tb-btn" onclick="exportProfile()">Export Profile</button>
+    <button class="tb-btn" onclick="importProfileClick()">Import Profile</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importProfile(event)" />
+    <button class="tb-btn" onclick="showKeyModal()">API Key</button>
+    <button class="tb-btn" onclick="window.print()">Print</button>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div id="tab-bar" style="display:none;">
+  <button class="tab-btn active" onclick="switchTab('studio')">Transcript to Content</button>
+  <button class="tab-btn" onclick="switchTab('planner')">Weekly Planner</button>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- LANDING -->
+  <div id="landing">
+    <div class="landing-eyebrow">Tiffany Haynes &amp; Co. Media Team</div>
+    <div class="landing-title">Content Studio</div>
+    <div class="landing-math">1 + 1 = 10,000</div>
+    <div class="landing-sub">Paste transcripts, generate captions, carousels, quote pulls, and thumbnail briefs. Build a weekly content calendar. All in Tiffany's voice.</div>
+    <button class="landing-btn" onclick="startStudio()">Open Studio</button>
+    <br><br>
+    <button class="key-btn-land" onclick="showKeyModal()">Enter API Key</button>
+    <div class="tool-chips">
+      <div class="tool-chip">Captions Ready to Post</div>
+      <div class="tool-chip">Thumbnail Briefs</div>
+      <div class="tool-chip">Carousel Copy</div>
+      <div class="tool-chip">Quote Pulls</div>
+      <div class="tool-chip">Weekly Planner</div>
+      <div class="tool-chip">Client Profile</div>
+      <div class="tool-chip">Designer Delivery Cards</div>
+    </div>
+  </div>
+
+  <!-- STUDIO TABS -->
+  <div id="studio-wrap" style="display:none;">
+
+    <!-- CLIENT PROFILE PANEL -->
+    <div id="profile-panel">
+      <div class="profile-header">
+        <div class="profile-title">Tiffany's Client Profile</div>
+        <div class="profile-actions">
+          <button class="tb-btn" onclick="clearProfile()">Clear Profile</button>
+        </div>
+      </div>
+      <div id="profile-content">
+        <div class="profile-empty">No profile built yet. Paste transcripts to start building Tiffany's content profile. The more transcripts you feed in, the smarter the suggestions become.</div>
+      </div>
+    </div>
+
+    <!-- TAB 1: CONTENT STUDIO -->
+    <div id="tab-studio" class="tab-pane active">
+
+      <div class="input-panel">
+        <div class="input-eyebrow">Step 1</div>
+        <div class="input-title">Paste the Video Transcript</div>
+        <textarea class="transcript-area" id="transcript" placeholder="Paste Tiffany's voiceover transcript here. Full sentences. Natural speech. Include everything she said."></textarea>
+        <div class="input-row">
+          <select class="content-type-select" id="content-type">
+            <option value="talking-head">Talking Head Reel</option>
+            <option value="broll">B-Roll with Text Overlay</option>
+            <option value="teaching">Teaching / God's Math</option>
+            <option value="testimony">Testimony / Community</option>
+            <option value="lifestyle">Lifestyle / Family</option>
+            <option value="shenanigans">Shenanigans / Humor</option>
+            <option value="business">Business + Entrepreneurship</option>
+          </select>
+          <button class="generate-btn" id="gen-btn-studio" onclick="generateStudioContent()">Generate Content</button>
+        </div>
+      </div>
+
+      <div class="gen-loading" id="loading-studio">
+        <div class="gen-label">Generating in Tiffany's voice...</div>
+        <div class="gen-track"></div>
+        <div class="gen-msg" id="gen-msg-studio">Reading the transcript...</div>
+      </div>
+
+      <div class="gen-error" id="error-studio"></div>
+      <div class="results-wrap" id="results-studio"></div>
+
+    </div>
+
+    <!-- TAB 2: WEEKLY PLANNER -->
+    <div id="tab-planner" class="tab-pane">
+
+      <div class="week-input-panel">
+        <div class="input-eyebrow">Step 1</div>
+        <div class="input-title">Paste This Week's Transcripts</div>
+        <div style="font-size:12px;color:var(--charcoal3);margin-bottom:16px;line-height:1.6;">Paste all available transcripts for the week. The AI will read all of them, learn from them, update the client profile, and build the weekly calendar.</div>
+        <div class="transcript-list" id="transcript-list">
+          <div class="transcript-entry" id="t-entry-0">
+            <div class="transcript-entry-label">Transcript 1</div>
+            <textarea class="transcript-area" id="t-0" placeholder="Paste first transcript here..." style="min-height:100px;"></textarea>
+          </div>
+        </div>
+        <button class="add-transcript-btn" onclick="addTranscript()">+ Add Another Transcript</button>
+        <div style="margin-top:14px;">
+          <button class="generate-btn" id="gen-btn-learn" onclick="learnFromTranscripts()">Analyze Transcripts</button>
+        </div>
+      </div>
+
+      <div class="gen-loading" id="loading-learn">
+        <div class="gen-label">Reading all transcripts...</div>
+        <div class="gen-track"></div>
+        <div class="gen-msg" id="gen-msg-learn">Building Tiffany's profile...</div>
+      </div>
+
+      <div class="gen-error" id="error-planner"></div>
+
+      <!-- PROFILE PREVIEW (shown after analysis) -->
+      <div class="profile-preview" id="profile-preview">
+        <div class="profile-preview-title">Here is what I learned from these transcripts</div>
+        <div class="learned-grid" id="learned-grid"></div>
+        <div class="profile-confirm-row">
+          <button class="generate-btn" id="gen-btn-week" onclick="generateWeeklyPlan()">Generate Weekly Plan</button>
+          <span style="font-size:12px;color:var(--charcoal3);">Review the profile above, then generate the full Mon-Sun calendar.</span>
+        </div>
+      </div>
+
+      <div class="gen-loading" id="loading-week">
+        <div class="gen-label">Building the weekly calendar...</div>
+        <div class="gen-track"></div>
+        <div class="gen-msg" id="gen-msg-week">Arranging content across the week...</div>
+      </div>
+
+      <div class="results-wrap" id="results-planner"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ================================================================
+// BRAND
+// ================================================================
+var BRAND = {
+  voice: "Conviction-based, rooted in testimony and scripture. Authoritative but warm. Spiritually mature but relatable. Compassionate big sister in Christ. She has lived both bankruptcy and breakthrough. She teaches with authority, not arrogance. Never condescending, never preachy, never performative. She is funny and real.",
+  framework: "God's Math: The supernatural formula where divine partnership creates results beyond natural limits. 1 + 1 = 10,000.",
+  avoid: "NEVER use: the words divine or activate, em dashes, emojis, generic Christian cliches, hustle culture language, self-reliance messaging, complex theological jargon without practical application, hype-based motivation, passive or apologetic language, fabricated quotes. No sales CTAs unless directed by leadership.",
+  captions: "Captions: No emojis. No em dashes. No filler. Hook in the first line. Story or teaching in the middle. Engagement CTA at the end. In Tiffany's exact voice.",
+  design: "Visual brand: Cream palette (#FFFDF5, #F4F0EB, #E3D3C8). Deep Red (#A00605) and Charcoal (#414141). Clean generous spacing. Mathematical symbols as design elements. Scripture always italicized or visually offset.",
+  pillars: ["Business and Entrepreneurship", "Spiritual Development and God's Math Teaching", "Family and Lifestyle", "Humor and Personality (Shenanigans)", "Community and Testimony"],
+  pillarColors: {
+    "Business and Entrepreneurship": {color:"#B87830", bg:"#FFF8F0"},
+    "Spiritual Development and God's Math Teaching": {color:"#A00605", bg:"#FFF5F5"},
+    "Family and Lifestyle": {color:"#3A9E6E", bg:"#F5FAF7"},
+    "Humor and Personality (Shenanigans)": {color:"#6A50A8", bg:"#F8F5FF"},
+    "Community and Testimony": {color:"#3A6EA8", bg:"#F0F5FF"}
+  }
+};
+
+// ================================================================
+// STATE
+// ================================================================
+var transcriptCount = 1;
+var learnedData = null;
+
+// ================================================================
+// PASSWORD
+// ================================================================
+(function() {
+  var HASH = '3766ec8ba93ed294163faf5799fd58e7ca0922bd73b65c6d15b5598e89e7cbc3';
+  function sha256(str) {
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function(buf) {
+      return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
+    });
+  }
+  window.checkPassword = function() {
+    var val = document.getElementById('gate-input').value;
+    sha256(val).then(function(h) {
+      if (h === HASH) {
+        sessionStorage.setItem('unlocked','1');
+        document.getElementById('password-gate').style.display = 'none';
+      } else {
+        document.getElementById('gate-error').style.display = 'block';
+        document.getElementById('gate-input').value = '';
+        document.getElementById('gate-input').focus();
+      }
+    });
+  };
+  window.addEventListener('DOMContentLoaded', function() {
+    if (sessionStorage.getItem('unlocked') === '1') {
+      document.getElementById('password-gate').style.display = 'none';
+    }
+    var g = document.getElementById('gate-input');
+    if (g) g.addEventListener('keydown', function(e) { if (e.key === 'Enter') window.checkPassword(); });
+    var a = document.getElementById('api-key-input');
+    if (a) a.addEventListener('keydown', function(e) { if (e.key === 'Enter') saveApiKey(); });
+  });
+})();
+
+// ================================================================
+// API KEY
+// ================================================================
+function getApiKey() { return localStorage.getItem('anthropic_api_key') || ''; }
+function showKeyModal() {
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('api-modal').classList.add('show');
+}
+function saveApiKey() {
+  var key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('sk-')) { alert('Key should start with sk-ant-...'); return; }
+  localStorage.setItem('anthropic_api_key', key);
+  document.getElementById('api-modal').classList.remove('show');
+}
+function checkApiKey() {
+  if (!getApiKey() || getApiKey().length < 20) { showKeyModal(); return false; }
+  return true;
+}
+
+// ================================================================
+// CLIENT PROFILE
+// ================================================================
+function getProfile() {
+  var raw = localStorage.getItem('tiffany_profile');
+  if (!raw) return { topics: [], pillars: {}, phrases: [], themes: [], transcript_count: 0, last_updated: null };
+  try { return JSON.parse(raw); } catch(e) { return { topics: [], pillars: {}, phrases: [], themes: [], transcript_count: 0, last_updated: null }; }
+}
+
+function saveProfile(p) {
+  localStorage.setItem('tiffany_profile', JSON.stringify(p));
+}
+
+function updateProfileFromLearning(learned) {
+  var p = getProfile();
+  p.transcript_count = (p.transcript_count || 0) + (learned.transcript_count || 1);
+  p.last_updated = new Date().toISOString();
+
+  if (learned.topics_covered) {
+    learned.topics_covered.forEach(function(t) {
+      if (p.topics.indexOf(t) === -1) p.topics.push(t);
+    });
+  }
+  if (learned.recurring_phrases) {
+    learned.recurring_phrases.forEach(function(ph) {
+      if (p.phrases.indexOf(ph) === -1) p.phrases.push(ph);
+    });
+  }
+  if (learned.themes) {
+    learned.themes.forEach(function(th) {
+      if (p.themes.indexOf(th) === -1) p.themes.push(th);
+    });
+  }
+  if (learned.pillar_hits) {
+    Object.keys(learned.pillar_hits).forEach(function(k) {
+      p.pillars[k] = (p.pillars[k] || 0) + (learned.pillar_hits[k] || 0);
+    });
+  }
+  saveProfile(p);
+  renderProfilePanel();
+}
+
+function renderProfilePanel() {
+  var p = getProfile();
+  if (!p.transcript_count) {
+    document.getElementById('profile-content').innerHTML = '<div class="profile-empty">No profile built yet. Paste transcripts to start building Tiffany\'s content profile.</div>';
+    return;
+  }
+
+  var totalPillar = Object.values(p.pillars).reduce(function(a,b) { return a+b; }, 0) || 1;
+  var pillarBars = BRAND.pillars.map(function(pname) {
+    var count = p.pillars[pname] || 0;
+    var pct = Math.round((count / totalPillar) * 100);
+    var col = (BRAND.pillarColors[pname] || {color:'#999'}).color;
+    return '<div class="pillar-bar-row">' +
+      '<div class="pillar-bar-label">' + pname + '</div>' +
+      '<div class="pillar-bar-track"><div class="pillar-bar-fill" style="width:' + pct + '%;background:' + col + ';"></div></div>' +
+      '<div class="pillar-bar-count">' + count + '</div>' +
+    '</div>';
+  }).join('');
+
+  var html = '<div class="profile-stats">' +
+    '<div class="profile-stat"><div class="profile-stat-num">' + p.transcript_count + '</div><div class="profile-stat-label">Transcripts</div></div>' +
+    '<div class="profile-stat"><div class="profile-stat-num">' + p.topics.length + '</div><div class="profile-stat-label">Topics Covered</div></div>' +
+    '<div class="profile-stat"><div class="profile-stat-num">' + p.phrases.length + '</div><div class="profile-stat-label">Her Phrases</div></div>' +
+    '<div class="profile-stat"><div class="profile-stat-num">' + p.themes.length + '</div><div class="profile-stat-label">Core Themes</div></div>' +
+  '</div>' +
+  '<div class="pillar-bars">' + pillarBars + '</div>';
+
+  if (p.last_updated) {
+    var d = new Date(p.last_updated);
+    html += '<div style="font-size:10px;color:var(--charcoal3);margin-top:12px;">Last updated: ' + d.toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'}) + '</div>';
+  }
+
+  document.getElementById('profile-content').innerHTML = html;
+}
+
+function clearProfile() {
+  if (!confirm('Clear the entire client profile? This cannot be undone.')) return;
+  localStorage.removeItem('tiffany_profile');
+  renderProfilePanel();
+}
+
+function exportProfile() {
+  var p = getProfile();
+  var blob = new Blob([JSON.stringify(p, null, 2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'tiffany-haynes-profile-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+}
+
+function importProfileClick() { document.getElementById('import-file').click(); }
+function importProfile(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var p = JSON.parse(ev.target.result);
+      saveProfile(p);
+      renderProfilePanel();
+      alert('Profile imported successfully.');
+    } catch(err) {
+      alert('Could not read profile file. Make sure it is a valid JSON export.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function startStudio() {
+  if (!checkApiKey()) return;
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('studio-wrap').style.display = 'block';
+  document.getElementById('tab-bar').style.display = 'flex';
+  renderProfilePanel();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('tab-' + tab).classList.add('active');
+  var idx = tab === 'studio' ? 0 : 1;
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+}
+
+// ================================================================
+// TRANSCRIPT MANAGEMENT
+// ================================================================
+function addTranscript() {
+  transcriptCount++;
+  var list = document.getElementById('transcript-list');
+  var div = document.createElement('div');
+  div.className = 'transcript-entry';
+  div.id = 't-entry-' + (transcriptCount - 1);
+  div.innerHTML = '<div class="transcript-entry-label" style="display:flex;align-items:center;justify-content:space-between;">Transcript ' + transcriptCount + '<button class="remove-transcript" onclick="removeTranscript(' + (transcriptCount-1) + ')">x</button></div>' +
+    '<textarea class="transcript-area" id="t-' + (transcriptCount-1) + '" placeholder="Paste transcript ' + transcriptCount + ' here..." style="min-height:100px;"></textarea>';
+  list.appendChild(div);
+}
+
+function removeTranscript(idx) {
+  var el = document.getElementById('t-entry-' + idx);
+  if (el) el.remove();
+}
+
+function getAllTranscripts() {
+  var texts = [];
+  for (var i = 0; i < transcriptCount + 5; i++) {
+    var el = document.getElementById('t-' + i);
+    if (el && el.value.trim().length > 30) texts.push(el.value.trim());
+  }
+  return texts;
+}
+
+// ================================================================
+// LOADERS
+// ================================================================
+var loaderTimers = {};
+var studioMsgs = ['Reading the transcript...','Finding the most powerful lines...','Writing captions in Tiffany\'s voice...','Building thumbnail briefs...','Writing carousel copy...','Pulling quote moments...','Almost ready...'];
+var learnMsgs = ['Reading all transcripts...','Building Tiffany\'s content profile...','Identifying recurring themes...','Mapping pillar coverage...','Extracting her phrases...','Almost done...'];
+var weekMsgs = ['Arranging content across the week...','Balancing the content pillars...','Writing Mon-Sun assignments...','Building designer delivery briefs...','Checking pillar distribution...','Almost ready...'];
+
+function startLoader(id, msgs) {
+  var idx = 0;
+  document.getElementById(id).textContent = msgs[0];
+  loaderTimers[id] = setInterval(function() {
+    idx = (idx + 1) % msgs.length;
+    document.getElementById(id).textContent = msgs[idx];
+  }, 2000);
+}
+
+function stopLoader(id) { clearInterval(loaderTimers[id]); }
+
+// ================================================================
+// COPY TO CLIPBOARD
+// ================================================================
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2200);
+  });
+}
+
+// ================================================================
+// TAB 1: GENERATE STUDIO CONTENT
+// ================================================================
+async function generateStudioContent() {
+  if (!checkApiKey()) return;
+  var transcript = document.getElementById('transcript').value.trim();
+  if (!transcript || transcript.length < 40) { alert('Please paste a transcript first.'); return; }
+
+  var typeEl = document.getElementById('content-type');
+  var typeLabel = typeEl.options[typeEl.selectedIndex].text;
+  var profile = getProfile();
+  var profileContext = profile.transcript_count > 0 ?
+    'TIFFANY\'S KNOWN TOPICS (do not repeat): ' + profile.topics.slice(-20).join(', ') + '\n' +
+    'HER RECURRING PHRASES: ' + profile.phrases.slice(-10).join(', ') : '';
+
+  document.getElementById('gen-btn-studio').disabled = true;
+  document.getElementById('error-studio').style.display = 'none';
+  document.getElementById('results-studio').style.display = 'none';
+  document.getElementById('loading-studio').style.display = 'block';
+  startLoader('gen-msg-studio', studioMsgs);
+
+  var prompt = 'You are the content manager for Tiffany Haynes and Co.\n\n' +
+    'BRAND VOICE: ' + BRAND.voice + '\n' +
+    'GOD\'S MATH: ' + BRAND.framework + '\n' +
+    'CAPTION RULES: ' + BRAND.captions + '\n' +
+    'DESIGN: ' + BRAND.design + '\n' +
+    'AVOID: ' + BRAND.avoid + '\n' +
+    (profileContext ? profileContext + '\n' : '') +
+    'CONTENT TYPE: ' + typeLabel + '\n\n' +
+    'TRANSCRIPT:\n' + transcript + '\n\n' +
+    'Return ONLY valid JSON. No markdown. No backticks.\n\n' +
+    '{"content_summary":"2-3 sentences on what this is about","primary_pillar":"which pillar",' +
+    '"profile_learning":{"topics_covered":["topic1","topic2"],"recurring_phrases":["phrase1"],"themes":["theme1"],"pillar_hits":{"Business and Entrepreneurship":0,"Spiritual Development and God\'s Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality (Shenanigans)":0,"Community and Testimony":0},"transcript_count":1},' +
+    '"captions":[{"platform":"Instagram and Facebook","caption":"Full caption. Hook first line. Teaching middle. Engagement CTA end. 150-300 words. No emojis. No em dashes.","hashtags":"#tag1 #tag2","cta":"specific CTA"},{"platform":"TikTok","caption":"Shorter adapted version. 80-150 words. Same voice rules.","hashtags":"#tag1 #tag2","cta":"specific CTA"}],' +
+    '"thumbnail":{"hook_text":"The exact short hook text to overlay on the photo. 5-8 words max. Stops the scroll.","photo_direction":"What kind of photo to use. Tiffany\'s expression, setting, mood. Specific enough for a photographer or library search.","text_treatment":"Font size, position, color treatment direction for Designer 1"},' +
+    '"carousels":[{"title":"Carousel title","pillar":"pillar name","slides":[{"role":"Hook","headline":"Hook headline","body":""},{"role":"Content","headline":"Slide 2 headline","body":"Copy"},{"role":"Content","headline":"Slide 3 headline","body":"Copy"},{"role":"CTA","headline":"CTA headline","body":"Engagement CTA"}],"design_brief":{"palette":"color direction","typography":"type direction","layout":"layout direction","accents":"design accents","mood":"5 words"}},{"title":"Second carousel","pillar":"pillar","slides":[{"role":"Hook","headline":"Hook","body":""},{"role":"Content","headline":"Slide 2","body":"Copy"},{"role":"Content","headline":"Slide 3","body":"Copy"},{"role":"CTA","headline":"CTA","body":"CTA copy"}],"design_brief":{"palette":"palette","typography":"type","layout":"layout","accents":"accents","mood":"mood"}}],' +
+    '"quotes":[{"quote":"EXACT word-for-word quote from transcript only. Never fabricated.","design_note":"Design direction for photo quote post."},{"quote":"Second exact quote","design_note":"Design direction"},{"quote":"Third exact quote","design_note":"Design direction"}]}';
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 6000, messages: [{ role: 'user', content: prompt }] })
+    });
+    var data = await res.json();
+    var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
+    if (!raw) throw new Error('No response. Check your API key.');
+    var content = JSON.parse(raw.text.replace(/```json|```/g,'').trim());
+
+    if (content.profile_learning) updateProfileFromLearning(content.profile_learning);
+
+    stopLoader('gen-msg-studio');
+    document.getElementById('loading-studio').style.display = 'none';
+    renderStudioResults(content, typeLabel);
+
+  } catch(e) {
+    stopLoader('gen-msg-studio');
+    document.getElementById('loading-studio').style.display = 'none';
+    var el = document.getElementById('error-studio');
+    el.style.display = 'block';
+    el.innerHTML = '<strong>Error:</strong> ' + e.message;
+    console.error(e);
+  }
+  document.getElementById('gen-btn-studio').disabled = false;
+}
+
+// ================================================================
+// RENDER STUDIO RESULTS
+// ================================================================
+function renderStudioResults(c, typeLabel) {
+  var h = '';
+
+  if (c.content_summary) {
+    h += '<div style="background:var(--cream-2);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:30px;">';
+    h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Content Summary</div>';
+    h += '<div style="font-size:13px;color:var(--charcoal);line-height:1.65;">' + c.content_summary + '</div>';
+    h += '</div>';
+  }
+
+  // CAPTIONS
+  h += '<div class="out-section"><div class="out-eyebrow">Step 2</div><div class="out-title">Captions</div>';
+  (c.captions || []).forEach(function(cap) {
+    var full = cap.caption + '\n\n' + cap.hashtags;
+    h += '<div class="caption-card"><div class="caption-card-header"><div class="cap-platform">' + cap.platform + '</div>';
+    h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(full) + ')">Copy</button></div>';
+    h += '<div class="caption-body"><div class="caption-text">' + esc(cap.caption) + '</div>';
+    h += '<div class="caption-hashtags">' + cap.hashtags + '</div>';
+    if (cap.cta) { h += '<div class="cap-cta-label">Call to Action</div><div class="cap-cta-text">' + cap.cta + '</div>'; }
+    h += '</div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="math-div">+ + +</div>';
+
+  // THUMBNAIL BRIEF (Designer 1)
+  if (c.thumbnail) {
+    h += '<div class="out-section"><div class="out-eyebrow">Designer 1 - Thumbnails</div><div class="out-title">Thumbnail / Cover Brief</div>';
+    h += '<div class="thumb-card">';
+    h += '<div class="thumb-header"><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;">Instagram Reel Cover</div></div>';
+    h += '<div class="thumb-body">';
+    h += '<div class="hook-display"><div class="hook-text">' + esc(c.thumbnail.hook_text) + '</div><div class="hook-sub">Hook Text Overlay</div></div>';
+
+    var thumbCopy = 'THUMBNAIL BRIEF\n\nHook Text (overlay on photo):\n' + c.thumbnail.hook_text + '\n\nPhoto Direction:\n' + c.thumbnail.photo_direction + '\n\nText Treatment:\n' + c.thumbnail.text_treatment;
+    h += '<div class="designer-label">Photo Direction</div>';
+    h += '<div style="font-size:13px;color:var(--charcoal2);line-height:1.65;margin-bottom:12px;">' + esc(c.thumbnail.photo_direction) + '</div>';
+    h += '<div class="designer-label">Text Treatment</div>';
+    h += '<div style="font-size:13px;color:var(--charcoal2);line-height:1.65;margin-bottom:14px;">' + esc(c.thumbnail.text_treatment) + '</div>';
+    h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(thumbCopy) + ')">Copy Full Brief</button>';
+    h += '</div></div></div>';
+    h += '<div class="math-div">+ + +</div>';
+  }
+
+  // CAROUSELS (Designer 2)
+  h += '<div class="out-section"><div class="out-eyebrow">Designer 2 - Carousels</div><div class="out-title">Carousel Slide Copy</div>';
+  h += '<div class="out-sub">Slide-by-slide copy for Designer 2. No design direction needed - just the words per slide.</div>';
+  h += '<div class="carousel-grid">';
+  (c.carousels || []).forEach(function(car) {
+    var slideCopy = car.title + '\n\n' + (car.slides || []).map(function(s, i) {
+      return 'Slide ' + (i+1) + ' (' + s.role + '):\n' + s.headline + (s.body ? '\n' + s.body : '');
+    }).join('\n\n');
+
+    h += '<div class="carousel-card"><div class="carousel-card-header">';
+    h += '<div class="carousel-card-title">' + esc(car.title) + '</div>';
+    h += '<div style="display:flex;align-items:center;gap:8px;">';
+    h += '<div class="slide-count">' + (car.slides ? car.slides.length : 0) + ' slides</div>';
+    h += '<button class="copy-btn" style="color:rgba(255,255,255,0.5);border-color:rgba(255,255,255,0.2);" onclick="copyText(this,' + JSON.stringify(slideCopy) + ')">Copy</button>';
+    h += '</div></div>';
+    (car.slides || []).forEach(function(slide, idx) {
+      var nc = slide.role === 'Hook' ? 'hook' : slide.role === 'CTA' ? 'cta' : '';
+      h += '<div class="slide-item"><div class="slide-num ' + nc + '">' + (idx+1) + '</div>';
+      h += '<div class="slide-content"><div class="slide-role">' + slide.role + '</div>';
+      h += '<div class="slide-headline">' + esc(slide.headline) + '</div>';
+      if (slide.body) h += '<div class="slide-body">' + esc(slide.body) + '</div>';
+      h += '</div></div>';
+    });
+    if (car.design_brief) {
+      h += '<div class="carousel-design"><div class="design-label">Design Brief</div>';
+      h += '<div style="font-size:11px;color:var(--charcoal2);line-height:1.6;">';
+      if (car.design_brief.palette) h += '<strong>Palette:</strong> ' + car.design_brief.palette + '<br>';
+      if (car.design_brief.typography) h += '<strong>Type:</strong> ' + car.design_brief.typography + '<br>';
+      if (car.design_brief.layout) h += '<strong>Layout:</strong> ' + car.design_brief.layout + '<br>';
+      if (car.design_brief.accents) h += '<strong>Accents:</strong> ' + car.design_brief.accents + '<br>';
+      if (car.design_brief.mood) h += '<strong>Mood:</strong> ' + car.design_brief.mood;
+      h += '</div></div>';
+    }
+    h += '</div>';
+  });
+  h += '</div></div>';
+
+  h += '<div class="math-div">+ + +</div>';
+
+  // QUOTES (Designer 2)
+  h += '<div class="out-section"><div class="out-eyebrow">Designer 2 - Quote Posts</div><div class="out-title">Quote Pulls</div>';
+  h += '<div class="out-sub">Word-for-word from the transcript only. Never fabricated.</div>';
+  h += '<div class="quotes-grid">';
+  (c.quotes || []).forEach(function(q, i) {
+    h += '<div class="quote-card"><div class="quote-tag">Quote ' + (i+1) + '</div>';
+    h += '<div class="quote-text">' + esc(q.quote) + '</div>';
+    h += '<div class="quote-design-note"><strong style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--charcoal3);">Design note: </strong>' + esc(q.design_note) + '</div>';
+    h += '<div style="margin-top:10px;"><button class="copy-btn" onclick="copyText(this,' + JSON.stringify(q.quote) + ')">Copy Quote</button></div>';
+    h += '</div>';
+  });
+  h += '</div></div>';
+
+  h += '<div class="studio-footer">Tiffany Haynes &amp; Co. Content Studio - Internal Use Only</div>';
+
+  document.getElementById('results-studio').innerHTML = h;
+  document.getElementById('results-studio').style.display = 'block';
+  document.getElementById('results-studio').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ================================================================
+// TAB 2: LEARN FROM TRANSCRIPTS
+// ================================================================
+async function learnFromTranscripts() {
+  if (!checkApiKey()) return;
+  var transcripts = getAllTranscripts();
+  if (transcripts.length === 0) { alert('Please paste at least one transcript.'); return; }
+
+  document.getElementById('gen-btn-learn').disabled = true;
+  document.getElementById('error-planner').style.display = 'none';
+  document.getElementById('profile-preview').style.display = 'none';
+  document.getElementById('loading-learn').style.display = 'block';
+  startLoader('gen-msg-learn', learnMsgs);
+
+  var profile = getProfile();
+  var existingTopics = profile.topics.length > 0 ? 'ALREADY COVERED TOPICS: ' + profile.topics.slice(-30).join(', ') : '';
+
+  var combined = transcripts.map(function(t, i) { return 'TRANSCRIPT ' + (i+1) + ':\n' + t; }).join('\n\n---\n\n');
+
+  var prompt = 'You are analyzing video transcripts for Tiffany Haynes and Co. to build her content profile.\n\n' +
+    'BRAND VOICE: ' + BRAND.voice + '\n' +
+    'CONTENT PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
+    (existingTopics ? existingTopics + '\n' : '') +
+    '\nTRANSCRIPTS:\n' + combined + '\n\n' +
+    'Return ONLY valid JSON. No markdown. No backticks.\n\n' +
+    '{"transcript_count":' + transcripts.length + ',' +
+    '"topics_covered":["specific topic 1","specific topic 2"],' +
+    '"recurring_phrases":["exact phrase she uses","another phrase"],' +
+    '"themes":["core theme 1","core theme 2"],' +
+    '"pillar_hits":{"Business and Entrepreneurship":0,"Spiritual Development and God\'s Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality (Shenanigans)":0,"Community and Testimony":0},' +
+    '"key_insights":["what I learned about her audience","what topics resonate","what she returns to"],' +
+    '"content_gaps":["pillar or topic that is missing or underrepresented"],' +
+    '"suggested_angles":["new angle from these transcripts","another angle"],' +
+    '"week_summary":"2-3 sentences summarizing what these transcripts cover and what it means for the weekly content plan"}';
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 3000, messages: [{ role: 'user', content: prompt }] })
+    });
+    var data = await res.json();
+    var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
+    if (!raw) throw new Error('No response. Check API key.');
+    learnedData = JSON.parse(raw.text.replace(/```json|```/g,'').trim());
+
+    updateProfileFromLearning(learnedData);
+
+    stopLoader('gen-msg-learn');
+    document.getElementById('loading-learn').style.display = 'none';
+    renderProfilePreview(learnedData);
+
+  } catch(e) {
+    stopLoader('gen-msg-learn');
+    document.getElementById('loading-learn').style.display = 'none';
+    var el = document.getElementById('error-planner');
+    el.style.display = 'block';
+    el.innerHTML = '<strong>Error:</strong> ' + e.message;
+    console.error(e);
+  }
+  document.getElementById('gen-btn-learn').disabled = false;
+}
+
+function renderProfilePreview(d) {
+  var h = '';
+
+  h += '<div class="learned-grid">';
+
+  h += '<div class="learned-cell"><div class="learned-cell-label">Topics Covered</div>';
+  (d.topics_covered || []).forEach(function(t) { h += '<span class="learned-tag">' + esc(t) + '</span>'; });
+  h += '</div>';
+
+  h += '<div class="learned-cell"><div class="learned-cell-label">Her Phrases</div>';
+  (d.recurring_phrases || []).forEach(function(p) { h += '<span class="learned-tag">"' + esc(p) + '"</span>'; });
+  h += '</div>';
+
+  h += '<div class="learned-cell"><div class="learned-cell-label">Core Themes</div>';
+  (d.themes || []).forEach(function(t) { h += '<span class="learned-tag">' + esc(t) + '</span>'; });
+  h += '</div>';
+
+  h += '<div class="learned-cell"><div class="learned-cell-label">Content Gaps to Fill</div>';
+  (d.content_gaps || []).forEach(function(g) { h += '<div class="learned-item" style="color:var(--red);">- ' + esc(g) + '</div>'; });
+  h += '</div>';
+
+  h += '</div>';
+
+  if (d.week_summary) {
+    h += '<div style="background:var(--cream-1);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--charcoal);line-height:1.65;">' + esc(d.week_summary) + '</div>';
+  }
+
+  document.getElementById('learned-grid').innerHTML = h;
+  document.getElementById('profile-preview').style.display = 'block';
+  document.getElementById('profile-preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ================================================================
+// TAB 2: GENERATE WEEKLY PLAN
+// ================================================================
+async function generateWeeklyPlan() {
+  if (!checkApiKey()) return;
+  if (!learnedData) { alert('Please analyze transcripts first.'); return; }
+
+  document.getElementById('gen-btn-week').disabled = true;
+  document.getElementById('results-planner').style.display = 'none';
+  document.getElementById('loading-week').style.display = 'block';
+  startLoader('gen-msg-week', weekMsgs);
+
+  var profile = getProfile();
+  var transcripts = getAllTranscripts();
+
+  var monday = getNextMonday();
+  var weekDates = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    weekDates.push(d.toLocaleDateString('en-US', {weekday:'long',month:'short',day:'numeric'}));
+  }
+
+  var profileCtx = 'CLIENT PROFILE CONTEXT:\n' +
+    'Total transcripts fed: ' + profile.transcript_count + '\n' +
+    'Topics already covered: ' + (profile.topics.slice(-20).join(', ') || 'none yet') + '\n' +
+    'Her recurring phrases: ' + (profile.phrases.slice(-8).join(', ') || 'building') + '\n' +
+    'Pillar coverage: ' + JSON.stringify(profile.pillars) + '\n' +
+    'Content gaps: ' + (learnedData.content_gaps || []).join(', ');
+
+  var prompt = 'You are the content strategist for Tiffany Haynes and Co. Build the weekly content calendar.\n\n' +
+    'BRAND VOICE: ' + BRAND.voice + '\n' +
+    'PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
+    'AVOID: ' + BRAND.avoid + '\n' +
+    profileCtx + '\n\n' +
+    'WEEK BEING PLANNED: ' + weekDates[0] + ' through ' + weekDates[6] + '\n' +
+    'POSTING TIME: 3:00 PM CST daily\n' +
+    'VARIETY RULE: Same content type never appears back to back. Mix reels, carousels, quotes, lifestyle across the week.\n' +
+    'TEAM: Designer 1 does thumbnails (hook text over photo). Designer 2 does carousels and quote posts. Video editor handles reels.\n\n' +
+    'Available content from this week transcripts: ' + (learnedData.topics_covered || []).join(', ') + '\n' +
+    'Suggested angles: ' + (learnedData.suggested_angles || []).join(', ') + '\n\n' +
+    'Return ONLY valid JSON. No markdown. No backticks.\n\n' +
+    '{"week_of":"' + weekDates[0] + ' - ' + weekDates[6] + '",' +
+    '"planning_note":"One sentence on the strategic mix for this week",' +
+    '"pillar_balance":{"Business and Entrepreneurship":0,"Spiritual Development and God\'s Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality (Shenanigans)":0,"Community and Testimony":0},' +
+    '"gaps_addressed":["what gaps are filled this week"],' +
+    '"days":[' +
+    '{"day":"Monday","date":"' + weekDates[0] + '","post_type":"Reel or Carousel or Quote Post or Lifestyle or Shenanigans","pillar":"pillar name","title":"post title","hook":"exact hook or opening line","content_direction":"what this post covers in 2-3 sentences","designer_needed":"Designer 1 or Designer 2 or Video Editor or None","thumbnail_hook":"if reel - exact hook text overlay for Designer 1. Empty if not reel.","carousel_slides":[],"quote":"if quote post - exact quote. Empty otherwise."},' +
+    '{"day":"Tuesday","date":"' + weekDates[1] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
+    '{"day":"Wednesday","date":"' + weekDates[2] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
+    '{"day":"Thursday","date":"' + weekDates[3] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
+    '{"day":"Friday","date":"' + weekDates[4] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
+    '{"day":"Saturday","date":"' + weekDates[5] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
+    '{"day":"Sunday","date":"' + weekDates[6] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""}' +
+    '],' +
+    '"delivery":{"designer1":{"name":"Designer 1 - Thumbnails","tasks":"List every reel day with hook text and photo direction. One per line. Ready to paste into Notion task.","notion_copy":"Full copyable Notion task text for Designer 1"},"designer2":{"name":"Designer 2 - Carousels and Quotes","tasks":"List every carousel and quote post with all slide copy inline. One post per section. Ready to paste into Notion task.","notion_copy":"Full copyable Notion task text for Designer 2"},"video_editor":{"name":"Video Editor","tasks":"List every reel with the transcript source and any specific direction. One per line.","notion_copy":"Full copyable Notion task text for video editor"}}}';
+
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 6000, messages: [{ role: 'user', content: prompt }] })
+    });
+    var data = await res.json();
+    var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
+    if (!raw) throw new Error('No response. Check API key.');
+    var plan = JSON.parse(raw.text.replace(/```json|```/g,'').trim());
+
+    stopLoader('gen-msg-week');
+    document.getElementById('loading-week').style.display = 'none';
+    renderWeeklyPlan(plan);
+
+  } catch(e) {
+    stopLoader('gen-msg-week');
+    document.getElementById('loading-week').style.display = 'none';
+    var el = document.getElementById('error-planner');
+    el.style.display = 'block';
+    el.innerHTML = '<strong>Error generating weekly plan:</strong> ' + e.message;
+    console.error(e);
+  }
+  document.getElementById('gen-btn-week').disabled = false;
+}
+
+// ================================================================
+// RENDER WEEKLY PLAN
+// ================================================================
+function renderWeeklyPlan(plan) {
+  var h = '';
+
+  // WEEK HEADER
+  h += '<div style="margin-bottom:24px;">';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">Weekly Content Plan</div>';
+  h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:26px;font-weight:600;color:var(--charcoal);">' + (plan.week_of || '') + '</div>';
+  if (plan.planning_note) h += '<div style="font-size:13px;color:var(--charcoal2);margin-top:6px;line-height:1.6;">' + esc(plan.planning_note) + '</div>';
+  h += '</div>';
+
+  // PILLAR TRACKER
+  if (plan.pillar_balance) {
+    var total = Object.values(plan.pillar_balance).reduce(function(a,b) { return a+b; }, 0) || 1;
+    h += '<div class="pillar-tracker"><div class="pillar-tracker-title">Pillar Balance This Week</div>';
+    BRAND.pillars.forEach(function(pname) {
+      var count = plan.pillar_balance[pname] || 0;
+      var pct = Math.round((count / total) * 100);
+      var col = (BRAND.pillarColors[pname] || {color:'#999'}).color;
+      h += '<div class="pillar-row">';
+      h += '<div class="pillar-name">' + pname + '</div>';
+      h += '<div class="pillar-track"><div class="pillar-fill" style="width:' + pct + '%;background:' + col + ';"></div></div>';
+      h += '<div class="pillar-pct">' + count + '</div>';
+      h += '</div>';
+    });
+    if (plan.gaps_addressed && plan.gaps_addressed.length) {
+      h += '<div class="gap-warning">Gaps addressed this week: ' + plan.gaps_addressed.join(', ') + '</div>';
+    }
+    h += '</div>';
+  }
+
+  // CALENDAR
+  h += '<div class="out-eyebrow" style="margin-bottom:10px;">Mon-Sun Calendar</div>';
+  h += '<div class="calendar-grid">';
+  (plan.days || []).forEach(function(day) {
+    var pc = BRAND.pillarColors[day.pillar] || {color:'#999',bg:'#F8F8F8'};
+    h += '<div class="cal-day">';
+    h += '<div class="cal-day-header">';
+    h += '<div class="cal-day-name">' + day.day + '</div>';
+    if (day.date) h += '<div style="font-size:10px;color:var(--charcoal3);">' + day.date + '</div>';
+    h += '</div>';
+    h += '<div class="cal-day-body">';
+    h += '<div class="cal-post-type" style="color:' + pc.color + ';">' + (day.post_type || '') + '</div>';
+    h += '<div class="cal-post-title">' + esc(day.title || '') + '</div>';
+    if (day.pillar) h += '<div class="cal-pillar-tag" style="background:' + pc.bg + ';color:' + pc.color + ';">' + day.pillar + '</div>';
+    if (day.designer_needed && day.designer_needed !== 'None') {
+      h += '<div style="font-size:9px;color:var(--charcoal3);margin-top:5px;font-weight:600;">' + day.designer_needed + '</div>';
+    }
+    h += '<div class="cal-time">3:00 PM CST</div>';
+    h += '</div></div>';
+  });
+  h += '</div>';
+
+  // POST DETAILS
+  h += '<div class="out-section"><div class="out-eyebrow" style="margin-bottom:6px;">Post Details</div><div class="out-title">Daily Content Breakdown</div>';
+  (plan.days || []).forEach(function(day) {
+    if (!day.title) return;
+    var pc = BRAND.pillarColors[day.pillar] || {color:'#999',bg:'#F8F8F8'};
+    h += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
+    h += '<div style="padding:12px 18px;background:var(--cream-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">';
+    h += '<div style="display:flex;align-items:center;gap:12px;">';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;">' + day.day + '</div>';
+    h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:600;color:var(--charcoal);">' + esc(day.title) + '</div>';
+    h += '</div>';
+    h += '<span style="font-size:9px;font-weight:600;padding:3px 9px;border-radius:12px;background:' + pc.bg + ';color:' + pc.color + ';">' + (day.post_type || '') + '</span>';
+    h += '</div>';
+    h += '<div style="padding:14px 18px;">';
+    if (day.hook) { h += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Hook</div>'; h += '<div style="font-size:13px;font-weight:600;color:var(--charcoal);font-style:italic;margin-bottom:10px;">"' + esc(day.hook) + '"</div>'; }
+    if (day.content_direction) { h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Direction</div>'; h += '<div style="font-size:12px;color:var(--charcoal2);line-height:1.6;margin-bottom:10px;">' + esc(day.content_direction) + '</div>'; }
+    if (day.thumbnail_hook) { h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Thumbnail Hook (Designer 1)</div>'; h += '<div style="font-size:12px;color:var(--charcoal2);font-style:italic;margin-bottom:10px;">' + esc(day.thumbnail_hook) + '</div>'; }
+    if (day.quote) { h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Quote (Designer 2)</div>'; h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:15px;font-style:italic;color:var(--charcoal);">' + esc(day.quote) + '</div>'; }
+    h += '</div></div>';
+  });
+  h += '</div>';
+
+  // DELIVERY CARDS
+  h += '<div class="math-div">+ + +</div>';
+  h += '<div class="out-section"><div class="out-eyebrow">Team Delivery</div><div class="out-title">Notion Task Assignments</div>';
+  h += '<div class="out-sub">Copy the block below and paste directly into each team member\'s Notion task.</div>';
+  h += '<div class="delivery-grid">';
+
+  if (plan.delivery) {
+    [
+      {key:'designer1', color:'#B87830', bg:'#FFF8F0', label:'Designer 1', sub:'Thumbnails'},
+      {key:'designer2', color:'#3A6EA8', bg:'#F0F5FF', label:'Designer 2', sub:'Carousels + Quotes'},
+      {key:'video_editor', color:'#3A9E6E', bg:'#F5FAF7', label:'Video Editor', sub:'Reels'}
+    ].forEach(function(role) {
+      var d = plan.delivery[role.key] || {};
+      var notionText = (d.notion_copy || d.tasks || '');
+      h += '<div class="delivery-card">';
+      h += '<div class="delivery-header" style="background:' + role.bg + ';border-bottom:1px solid ' + role.color + '20;">';
+      h += '<div class="delivery-role" style="color:' + role.color + ';">' + role.label + '</div>';
+      h += '<div class="delivery-person">' + role.sub + '</div>';
+      h += '</div>';
+      h += '<div class="delivery-body">';
+      h += '<div class="delivery-label">Notion Task Copy</div>';
+      h += '<div class="delivery-block">' + esc(notionText) + '</div>';
+      h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(notionText) + ')">Copy for Notion</button>';
+      h += '</div></div>';
+    });
+  }
+  h += '</div></div>';
+
+  h += '<div class="studio-footer">Tiffany Haynes &amp; Co. Content Studio - Submission deadline Tuesday EOD - Not for distribution outside the media team</div>';
+
+  document.getElementById('results-planner').innerHTML = h;
+  document.getElementById('results-planner').style.display = 'block';
+  document.getElementById('results-planner').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ================================================================
+// UTILITIES
+// ================================================================
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+
+function getNextMonday() {
+  var d = new Date();
+  var day = d.getDay();
+  var diff = (7 - day + 1) % 7;
+  if (diff === 0) diff = 7;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+// Render profile on load
+window.addEventListener('DOMContentLoaded', function() {
+  renderProfilePanel();
+});
+</script>
+</body>
+</html>
