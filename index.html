@@ -628,40 +628,115 @@ body::before {
 
     <!-- TAB: WEEKLY PLANNER -->
     <div id="tab-planner" class="tab-pane">
-      <div class="panel">
+
+      <!-- MODE TOGGLE -->
+      <div style="display:flex;gap:10px;margin-bottom:20px;">
+        <button id="mode-btn-fresh" onclick="setPlannerMode('fresh')" style="flex:1;padding:14px;border-radius:8px;border:2px solid var(--red);background:var(--red);color:white;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.15s;">
+          Fresh Ideas Mode
+          <div style="font-size:10px;font-weight:400;opacity:0.85;margin-top:3px;">AI generates brand new concepts from profile and data</div>
+        </button>
+        <button id="mode-btn-script" onclick="setPlannerMode('script')" style="flex:1;padding:14px;border-radius:8px;border:2px solid var(--border-md);background:transparent;color:var(--charcoal2);font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.15s;">
+          Script-Based Mode
+          <div style="font-size:10px;font-weight:400;opacity:0.7;margin-top:3px;">Build the week around videos already recorded</div>
+        </button>
+      </div>
+
+      <!-- STEP 1: WEEK SETUP (both modes) -->
+      <div class="panel" id="planner-setup-panel">
         <div class="panel-eyebrow">Step 1</div>
-        <div class="panel-title">Paste This Week's Transcripts</div>
-        <div class="panel-sub">Paste all available transcripts. The AI reads all of them, learns from them, updates the client profile, and builds the weekly calendar.</div>
-        <div class="transcript-list" id="transcript-list">
-          <div class="transcript-entry" id="t-entry-0">
-            <div class="transcript-entry-label">Transcript 1</div>
-            <textarea class="textarea" id="t-0" placeholder="Paste first transcript here..." style="min-height:90px;"></textarea>
+        <div class="panel-title" id="planner-step1-title">Set Up This Week</div>
+        <div class="panel-sub" id="planner-step1-sub">Tell the AI what to build around. The more context you give, the sharper the plan.</div>
+
+        <!-- WEEK THEME -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Week Theme or Focus <span style="font-weight:400;font-style:italic;">(optional)</span></div>
+          <input id="week-theme" type="text" placeholder="e.g. God's Math week, family focus, entrepreneurship push, back to basics..." style="width:100%;background:var(--cream-2);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:13px;padding:10px 14px;border-radius:6px;outline:none;" />
+        </div>
+
+        <!-- PILLAR PRIORITY -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Prioritize These Pillars This Week <span style="font-weight:400;font-style:italic;">(select all that apply)</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;" id="pillar-checkboxes">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Business and Entrepreneurship" class="pillar-cb" style="accent-color:var(--red);"> Business &amp; Entrepreneurship</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Spiritual Development and Gods Math Teaching" class="pillar-cb" style="accent-color:var(--red);"> God's Math Teaching</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Family and Lifestyle" class="pillar-cb" style="accent-color:var(--red);"> Family &amp; Lifestyle</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Humor and Personality Shenanigans" class="pillar-cb" style="accent-color:var(--red);"> Shenanigans</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Community and Testimony" class="pillar-cb" style="accent-color:var(--red);"> Community &amp; Testimony</label>
           </div>
         </div>
-        <button class="add-transcript-btn" onclick="addTranscript()">+ Add Another Transcript</button>
-        <div style="margin-top:12px;">
-          <button class="btn-primary" id="gen-btn-learn" onclick="learnFromTranscripts()">Analyze Transcripts</button>
+
+        <!-- EVENTS / PROMOTIONS -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Upcoming Events, Launches, or Promotions <span style="font-weight:400;font-style:italic;">(optional)</span></div>
+          <textarea id="week-events" class="textarea" placeholder="e.g. REVA Nation enrollment opens Thursday, live event Saturday in Atlanta, God's Math masterclass launching..." style="min-height:70px;"></textarea>
         </div>
-      </div>
-      <div class="gen-loading" id="loading-learn">
-        <div class="gen-label">Reading all transcripts...</div>
-        <div class="gen-track"></div>
-        <div class="gen-msg" id="gen-msg-learn">Building Tiffany's profile...</div>
-      </div>
-      <div class="gen-error" id="error-planner"></div>
-      <div class="profile-preview" id="profile-preview">
-        <div class="profile-preview-title">What I learned from these transcripts</div>
-        <div class="learned-grid" id="learned-grid"></div>
-        <div style="display:flex;gap:10px;align-items:center;">
+
+        <!-- CONTENT MIX -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Content Mix This Week</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+            <div>
+              <div style="font-size:11px;color:var(--charcoal2);margin-bottom:5px;">Reels</div>
+              <select id="mix-reels" class="select" style="width:100%;">
+                <option value="3" selected>3 Reels</option>
+                <option value="4">4 Reels</option>
+                <option value="5">5 Reels</option>
+                <option value="2">2 Reels</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--charcoal2);margin-bottom:5px;">Carousels</div>
+              <select id="mix-carousels" class="select" style="width:100%;">
+                <option value="2" selected>2 Carousels</option>
+                <option value="1">1 Carousel</option>
+                <option value="3">3 Carousels</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--charcoal2);margin-bottom:5px;">Quote Posts</div>
+              <select id="mix-quotes" class="select" style="width:100%;">
+                <option value="1" selected>1 Quote Post</option>
+                <option value="0">0 Quote Posts</option>
+                <option value="2">2 Quote Posts</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--charcoal2);margin-bottom:5px;">Lifestyle / Other</div>
+              <select id="mix-lifestyle" class="select" style="width:100%;">
+                <option value="1" selected>1 Lifestyle</option>
+                <option value="0">0 Lifestyle</option>
+                <option value="2">2 Lifestyle</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCRIPT MODE: TRANSCRIPT INPUT -->
+        <div id="script-mode-inputs" style="display:none;border-top:1px solid var(--border);padding-top:16px;margin-top:4px;">
+          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Step 2 - Paste Recorded Scripts</div>
+          <div style="font-size:12px;color:var(--charcoal3);margin-bottom:12px;line-height:1.6;">Paste scripts from videos already recorded this week. The AI builds the plan around them and fills remaining days with fresh concepts.</div>
+          <div class="transcript-list" id="transcript-list">
+            <div class="transcript-entry" id="t-entry-0">
+              <div class="transcript-entry-label">Script 1</div>
+              <textarea class="textarea" id="t-0" placeholder="Paste first recorded script here..." style="min-height:80px;"></textarea>
+            </div>
+          </div>
+          <button class="add-transcript-btn" onclick="addTranscript()">+ Add Another Script</button>
+        </div>
+
+        <div style="margin-top:16px;display:flex;gap:10px;align-items:center;">
           <button class="btn-primary" id="gen-btn-week" onclick="generateWeeklyPlan()">Generate Weekly Plan</button>
-          <span style="font-size:12px;color:var(--charcoal3);">Review above then generate the Mon-Sun calendar.</span>
+          <span style="font-size:11px;color:var(--charcoal3);" id="planner-gen-note">Generates a complete Mon-Sun calendar with fresh original concepts.</span>
         </div>
       </div>
+
       <div class="gen-loading" id="loading-week">
-        <div class="gen-label">Building the weekly calendar...</div>
+        <div class="gen-label">Building this week's calendar...</div>
         <div class="gen-track"></div>
-        <div class="gen-msg" id="gen-msg-week">Arranging content across the week...</div>
+        <div class="gen-msg" id="gen-msg-week">Developing fresh concepts...</div>
       </div>
+
+      <div class="gen-error" id="error-planner"></div>
       <div class="results-wrap" id="results-planner"></div>
     </div>
 
@@ -1292,14 +1367,50 @@ function renderStudioResults(c, typeLabel) {
 // ================================================================
 // TAB 2: WEEKLY PLANNER
 // ================================================================
+var plannerMode = 'fresh';
+
+function setPlannerMode(mode) {
+  plannerMode = mode;
+  var freshBtn = document.getElementById('mode-btn-fresh');
+  var scriptBtn = document.getElementById('mode-btn-script');
+  var scriptInputs = document.getElementById('script-mode-inputs');
+  var genNote = document.getElementById('planner-gen-note');
+  var step1title = document.getElementById('planner-step1-title');
+  var step1sub = document.getElementById('planner-step1-sub');
+
+  if (mode === 'fresh') {
+    freshBtn.style.background = 'var(--red)';
+    freshBtn.style.borderColor = 'var(--red)';
+    freshBtn.style.color = 'white';
+    scriptBtn.style.background = 'transparent';
+    scriptBtn.style.borderColor = 'var(--border-md)';
+    scriptBtn.style.color = 'var(--charcoal2)';
+    scriptInputs.style.display = 'none';
+    step1title.textContent = 'Set Up This Week';
+    step1sub.textContent = 'Tell the AI what to build around. It generates completely fresh original concepts based on her profile, performance data, and your direction.';
+    genNote.textContent = 'Generates a complete Mon-Sun calendar of brand new original concepts.';
+  } else {
+    scriptBtn.style.background = 'var(--red)';
+    scriptBtn.style.borderColor = 'var(--red)';
+    scriptBtn.style.color = 'white';
+    freshBtn.style.background = 'transparent';
+    freshBtn.style.borderColor = 'var(--border-md)';
+    freshBtn.style.color = 'var(--charcoal2)';
+    scriptInputs.style.display = 'block';
+    step1title.textContent = 'Set Up This Week';
+    step1sub.textContent = 'Paste scripts from videos already recorded. The AI builds the week around them and fills remaining days with fresh concepts.';
+    genNote.textContent = 'Builds around your recorded scripts then fills remaining days with fresh ideas.';
+  }
+}
+
 function addTranscript() {
   transcriptCount++;
   var list = document.getElementById('transcript-list');
   var div = document.createElement('div');
   div.className = 'transcript-entry';
   div.id = 't-entry-' + (transcriptCount-1);
-  div.innerHTML = '<div class="transcript-entry-label">Transcript ' + transcriptCount + '<button class="remove-transcript" onclick="removeTranscript(' + (transcriptCount-1) + ')">x</button></div>' +
-    '<textarea class="textarea" id="t-' + (transcriptCount-1) + '" placeholder="Paste transcript ' + transcriptCount + ' here..." style="min-height:90px;"></textarea>';
+  div.innerHTML = '<div class="transcript-entry-label">Script ' + transcriptCount + '<button class="remove-transcript" onclick="removeTranscript(' + (transcriptCount-1) + ')">x</button></div>' +
+    '<textarea class="textarea" id="t-' + (transcriptCount-1) + '" placeholder="Paste script ' + transcriptCount + ' here..." style="min-height:80px;"></textarea>';
   list.appendChild(div);
 }
 
@@ -1317,86 +1428,34 @@ function getAllTranscripts() {
   return texts;
 }
 
-async function learnFromTranscripts() {
-  if (!checkApiKey()) return;
-  var transcripts = getAllTranscripts();
-  if (!transcripts.length) { alert('Please paste at least one transcript.'); return; }
-
-  document.getElementById('gen-btn-learn').disabled = true;
-  document.getElementById('error-planner').style.display = 'none';
-  document.getElementById('profile-preview').style.display = 'none';
-  document.getElementById('loading-learn').style.display = 'block';
-  startLoader('gen-msg-learn', learnMsgs);
-
-  var profile = getProfile();
-  var existingTopics = profile.topics.length > 0 ? 'ALREADY COVERED: ' + profile.topics.slice(-20).join(', ') : '';
-  var combined = transcripts.map(function(t,i) { return 'TRANSCRIPT ' + (i+1) + ':\n' + t; }).join('\n\n---\n\n');
-
-  var prompt = 'You are analyzing transcripts for Tiffany Haynes and Co. content planning.\n' +
-    'PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
-    (existingTopics ? existingTopics + '\n' : '') +
-    '\nTRANSCRIPTS:\n' + combined + '\n\n' +
-    'Return ONLY valid JSON. No markdown. Start with {.\n\n' +
-    '{"transcript_count":' + transcripts.length + ',' +
-    '"topics_covered":["topic1","topic2"],' +
-    '"recurring_phrases":["exact phrase","another phrase"],' +
-    '"themes":["theme1","theme2"],' +
-    '"pillar_hits":{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0},' +
-    '"key_insights":["insight1","insight2"],' +
-    '"content_gaps":["gap1","gap2"],' +
-    '"suggested_angles":["angle1","angle2"],' +
-    '"week_summary":"2-3 sentences on what these transcripts cover"}';
-
-  try {
-    var result = await callAPI(prompt, 3000);
-    learnedData = result;
-    updateProfileFromLearning(result);
-    stopLoader('gen-msg-learn');
-    document.getElementById('loading-learn').style.display = 'none';
-    renderProfilePreview(result);
-  } catch(e) {
-    stopLoader('gen-msg-learn');
-    document.getElementById('loading-learn').style.display = 'none';
-    var el = document.getElementById('error-planner');
-    el.style.display = 'block';
-    el.innerHTML = '<strong>Error:</strong> ' + escRaw(e.message);
-    console.error(e);
-  }
-  document.getElementById('gen-btn-learn').disabled = false;
-}
-
-function renderProfilePreview(d) {
-  var h = '<div class="learned-grid">';
-  h += '<div class="learned-cell"><div class="learned-cell-label">Topics Covered</div>';
-  (d.topics_covered||[]).forEach(function(t) { h += '<span class="learned-tag">' + escRaw(t) + '</span>'; });
-  h += '</div>';
-  h += '<div class="learned-cell"><div class="learned-cell-label">Her Phrases</div>';
-  (d.recurring_phrases||[]).forEach(function(p) { h += '<span class="learned-tag">"' + escRaw(p) + '"</span>'; });
-  h += '</div>';
-  h += '<div class="learned-cell"><div class="learned-cell-label">Core Themes</div>';
-  (d.themes||[]).forEach(function(t) { h += '<span class="learned-tag">' + escRaw(t) + '</span>'; });
-  h += '</div>';
-  h += '<div class="learned-cell"><div class="learned-cell-label">Content Gaps</div>';
-  (d.content_gaps||[]).forEach(function(g) { h += '<div class="learned-item" style="color:var(--red);">- ' + escRaw(g) + '</div>'; });
-  h += '</div></div>';
-  if (d.week_summary) {
-    h += '<div style="background:var(--cream-1);border:1px solid var(--border);border-radius:8px;padding:12px 15px;margin-bottom:14px;font-size:13px;color:var(--charcoal);line-height:1.65;">' + escRaw(d.week_summary) + '</div>';
-  }
-  document.getElementById('learned-grid').innerHTML = h;
-  document.getElementById('profile-preview').style.display = 'block';
-  document.getElementById('profile-preview').scrollIntoView({behavior:'smooth',block:'start'});
+function getPlannerInputs() {
+  var theme = (document.getElementById('week-theme')||{}).value || '';
+  var events = (document.getElementById('week-events')||{}).value || '';
+  var reels = (document.getElementById('mix-reels')||{}).value || '3';
+  var carousels = (document.getElementById('mix-carousels')||{}).value || '2';
+  var quotes = (document.getElementById('mix-quotes')||{}).value || '1';
+  var lifestyle = (document.getElementById('mix-lifestyle')||{}).value || '1';
+  var pillars = [];
+  document.querySelectorAll('.pillar-cb:checked').forEach(function(cb) { pillars.push(cb.value); });
+  return { theme:theme.trim(), events:events.trim(), reels:parseInt(reels), carousels:parseInt(carousels), quotes:parseInt(quotes), lifestyle:parseInt(lifestyle), pillars:pillars };
 }
 
 async function generateWeeklyPlan() {
   if (!checkApiKey()) return;
-  if (!learnedData) { alert('Please analyze transcripts first.'); return; }
 
-  document.getElementById('gen-btn-week').disabled = true;
+  var inputs = getPlannerInputs();
+  var scripts = plannerMode === 'script' ? getAllTranscripts() : [];
+
+  var btn = document.getElementById('gen-btn-week');
+  btn.disabled = true; btn.textContent = 'Generating...';
   document.getElementById('results-planner').style.display = 'none';
+  document.getElementById('error-planner').style.display = 'none';
   document.getElementById('loading-week').style.display = 'block';
   startLoader('gen-msg-week', weekMsgs);
 
   var profile = getProfile();
+  var kb = getKnowledgeBase();
+
   var monday = getNextMonday();
   var weekDates = [];
   for (var i = 0; i < 7; i++) {
@@ -1404,29 +1463,96 @@ async function generateWeeklyPlan() {
     weekDates.push(d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}));
   }
 
-  var profileCtx = 'Topics covered: ' + profile.topics.slice(-15).join(', ') + '\nPillar coverage: ' + JSON.stringify(profile.pillars) + '\nContent gaps: ' + (learnedData.content_gaps||[]).join(', ');
+  var totalPosts = inputs.reels + inputs.carousels + inputs.quotes + inputs.lifestyle;
 
-  var prompt = 'Content strategist for Tiffany Haynes and Co. Build the weekly content calendar.\n' +
-    'BRAND: ' + BRAND.voice + '\nAVOID: ' + BRAND.avoid + '\nPILLARS: ' + BRAND.pillars.join(', ') + '\n' +
+  var profileCtx = '';
+  if (profile.transcript_count > 0) {
+    profileCtx = 'CLIENT PROFILE:\n' +
+      'Topics already covered (DO NOT REPEAT): ' + profile.topics.slice(-20).join(', ') + '\n' +
+      'Her recurring phrases and voice: ' + profile.phrases.slice(-8).join(', ') + '\n' +
+      'Core themes she returns to: ' + profile.themes.slice(-8).join(', ') + '\n' +
+      'Pillar history: ' + JSON.stringify(profile.pillars) + '\n';
+  }
+
+  var kbCtx = '';
+  if (kb.length > 0) {
+    var latest = kb[0].data || {};
+    kbCtx = 'PERFORMANCE DATA FROM KNOWLEDGE BASE:\n' +
+      'What is working: ' + (latest.what_is_working||[]).slice(0,3).join(', ') + '\n' +
+      'What needs attention: ' + (latest.what_needs_attention||[]).slice(0,3).join(', ') + '\n' +
+      'Top performing content: ' + (latest.top_performing_content||[]).slice(0,3).join(', ') + '\n' +
+      'Strategic priorities: ' + (latest.strategic_priorities||[]).slice(0,3).join(', ') + '\n' +
+      'Audience insights: ' + (latest.audience_insights||[]).slice(0,3).join(', ') + '\n';
+  }
+
+  var weekCtx = '';
+  if (inputs.theme) weekCtx += 'WEEK THEME: ' + inputs.theme + '\n';
+  if (inputs.pillars.length) weekCtx += 'PRIORITIZE THESE PILLARS: ' + inputs.pillars.join(', ') + '\n';
+  if (inputs.events) weekCtx += 'UPCOMING EVENTS AND PROMOTIONS: ' + inputs.events + '\n';
+  weekCtx += 'CONTENT MIX: ' + inputs.reels + ' Reels, ' + inputs.carousels + ' Carousels, ' + inputs.quotes + ' Quote Posts, ' + inputs.lifestyle + ' Lifestyle/Other posts (' + totalPosts + ' total)\n';
+
+  var scriptCtx = '';
+  if (scripts.length > 0) {
+    scriptCtx = 'RECORDED SCRIPTS TO BUILD AROUND (assign these to specific days first, then fill remaining days with fresh concepts):\n' +
+      scripts.map(function(s,i) { return 'Script ' + (i+1) + ':\n' + s.slice(0,400); }).join('\n\n---\n\n') + '\n\n';
+  }
+
+  var modeInstruction = plannerMode === 'fresh'
+    ? 'Generate completely FRESH, ORIGINAL content concepts. Do NOT pull from or reference any existing transcripts. Every idea must be brand new, drawn from her profile, performance data, and the week direction above. Each post concept should feel like something Tiffany has not said before but absolutely would say.'
+    : 'Build the first ' + scripts.length + ' day(s) around the recorded scripts provided. For the remaining days generate completely fresh original concepts. Mix the two seamlessly so the week feels cohesive.';
+
+  var prompt = 'You are the lead content strategist for Tiffany Haynes and Co.\n\n' +
+    'BRAND VOICE: ' + BRAND.voice + '\n' +
+    'STRICT AVOID: ' + BRAND.avoid + '\n' +
+    'ALL PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
+    'SOP RULES: Same content type never back to back. Variety is not optional. Post at 3:00 PM CST. Instagram cross-posts to Facebook. TikTok is separate upload.\n\n' +
     profileCtx + '\n' +
-    'WEEK: ' + weekDates[0] + ' through ' + weekDates[6] + '\n' +
-    'POSTING TIME: 3:00 PM CST daily\n' +
-    'RULE: Same content type never appears back to back.\n' +
-    'Available content: ' + (learnedData.topics_covered||[]).join(', ') + '\n' +
-    'Suggested angles: ' + (learnedData.suggested_angles||[]).join(', ') + '\n\n' +
-    'Return ONLY valid JSON. No markdown. Start with {.\n\n' +
+    kbCtx + '\n' +
+    weekCtx + '\n' +
+    scriptCtx +
+    modeInstruction + '\n\n' +
+    'WEEK: ' + weekDates[0] + ' through ' + weekDates[6] + '\n\n' +
+    'Return ONLY valid JSON. No markdown. No backticks. Start with {.\n\n' +
     '{"week_of":"' + weekDates[0] + ' - ' + weekDates[6] + '",' +
-    '"planning_note":"one sentence on the strategic mix for this week",' +
+    '"mode":"' + plannerMode + '",' +
+    '"planning_note":"One sentence describing the strategic direction and why this mix serves Tiffany this week.",' +
     '"pillar_balance":{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0},' +
-    '"gaps_addressed":["gap1","gap2"],' +
-    '"days":[{"day":"Monday","date":"' + weekDates[0] + '","post_type":"Reel or Carousel or Quote Post or Lifestyle","pillar":"pillar","title":"post title","hook":"exact hook","content_direction":"2-3 sentences","designer_needed":"Designer 1 or Designer 2 or Video Editor or None","thumbnail_hook":"if reel - hook text for Designer 1, else empty","carousel_slides":[],"quote":"if quote post - exact quote, else empty"}],' +
-    '"delivery":{"designer1":{"name":"Designer 1 - Thumbnails","notion_copy":"Full copyable Notion task text"},"designer2":{"name":"Designer 2 - Carousels and Quotes","notion_copy":"Full copyable Notion task text"},"video_editor":{"name":"Video Editor","notion_copy":"Full copyable Notion task text"}}}';
+    '"gaps_addressed":["gap filled 1","gap filled 2"],' +
+    '"days":[' +
+    '{"day":"Monday","date":"' + weekDates[0] + '","post_type":"Reel or Carousel or Quote Post or Lifestyle or Shenanigans","pillar":"pillar name",' +
+    '"title":"Post title. Specific and compelling. Not generic.",' +
+    '"hook":"The exact first line or on-screen text. Stops the scroll. In her voice.",' +
+    '"content_direction":"2-3 specific sentences on what this post covers and why it works for her audience right now.",' +
+    '"voiceover_topic":"If reel: a specific voiceover direction for Tiffany. What to say, the angle, the energy. If not reel: empty string.",' +
+    '"designer_needed":"Designer 1 or Designer 2 or Video Editor or None",' +
+    '"thumbnail_hook":"If reel: exact 4-6 word thumbnail text for Designer 1. Else empty.",' +
+    '"carousel_outline":"If carousel: slide 1 hook headline, slide 2 point, slide 3 point, CTA slide. Else empty.",' +
+    '"quote":"If quote post: the exact quote in her voice. Else empty.",' +
+    '"fresh_or_scripted":"fresh or from script ' + (scripts.length > 0 ? '1 through ' + scripts.length : '') + '"}' +
+    '],' +
+    '"delivery":{' +
+    '"designer1":{"name":"Designer 1","sub":"Thumbnails","notion_copy":"DESIGNER 1 TASKS - WEEK OF ' + weekDates[0] + '\n\nFor each reel listed below, create an Instagram thumbnail with the hook text overlaid on a photo of Tiffany. Brand colors only. Sharp well-lit photo. Text legible on mobile.\n\n[List each reel day with thumbnail hook text and photo direction]"},' +
+    '"designer2":{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":"DESIGNER 2 TASKS - WEEK OF ' + weekDates[0] + '\n\nFor each carousel and quote post below, create the graphic assets per the brand guide.\n\n[List each carousel with full slide outline and each quote post with the exact quote text]"},' +
+    '"video_editor":{"name":"Video Editor","sub":"Reels","notion_copy":"VIDEO EDITOR TASKS - WEEK OF ' + weekDates[0] + '\n\nReels to edit this week. Tiffany will record voiceovers based on the topics below. Match with available B-roll from the content library.\n\n[List each reel day with voiceover topic and any specific direction]"}' +
+    '}}';
 
   try {
     var plan = await callAPI(prompt, 6000);
+
+    if (plan.days) {
+      var pl = { topics_covered:[], recurring_phrases:[], themes:[], pillar_hits:{}, transcript_count:0 };
+      plan.days.forEach(function(day) {
+        if (day.title) pl.topics_covered.push(day.title);
+        if (day.pillar && pl.pillar_hits[day.pillar] !== undefined) pl.pillar_hits[day.pillar]++;
+        else if (day.pillar) pl.pillar_hits[day.pillar] = 1;
+      });
+      updateProfileFromLearning(pl);
+    }
+
     stopLoader('gen-msg-week');
     document.getElementById('loading-week').style.display = 'none';
     renderWeeklyPlan(plan);
+
   } catch(e) {
     stopLoader('gen-msg-week');
     document.getElementById('loading-week').style.display = 'none';
@@ -1435,17 +1561,21 @@ async function generateWeeklyPlan() {
     el.innerHTML = '<strong>Error generating weekly plan:</strong> ' + escRaw(e.message);
     console.error(e);
   }
-  document.getElementById('gen-btn-week').disabled = false;
+  btn.disabled = false; btn.textContent = 'Generate Weekly Plan';
 }
 
 function renderWeeklyPlan(plan) {
   var h = '';
-  h += '<div style="margin-bottom:20px;"><div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">Weekly Content Plan</div>';
+
+  // HEADER
+  h += '<div style="margin-bottom:20px;">';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">Weekly Content Plan</div>';
   h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:24px;font-weight:600;color:var(--charcoal);">' + escRaw(plan.week_of||'') + '</div>';
-  if (plan.planning_note) h += '<div style="font-size:13px;color:var(--charcoal2);margin-top:6px;line-height:1.6;">' + escRaw(plan.planning_note) + '</div>';
+  if (plan.mode) h += '<div style="display:inline-block;font-size:10px;font-weight:600;padding:2px 9px;border-radius:12px;margin-top:5px;' + (plan.mode==='fresh'?'background:var(--red-dim);color:var(--red);':'background:var(--blue-bg);color:var(--blue);') + '">' + (plan.mode==='fresh'?'Fresh Ideas Mode':'Script-Based Mode') + '</div>';
+  if (plan.planning_note) h += '<div style="font-size:13px;color:var(--charcoal2);margin-top:8px;line-height:1.65;">' + escRaw(plan.planning_note) + '</div>';
   h += '</div>';
 
-  // PILLAR TRACKER
+  // PILLAR BALANCE
   if (plan.pillar_balance) {
     var total = Object.values(plan.pillar_balance).reduce(function(a,b){return a+b;},0)||1;
     h += '<div class="pillar-tracker"><div class="pillar-tracker-title">Pillar Balance This Week</div>';
@@ -1455,6 +1585,9 @@ function renderWeeklyPlan(plan) {
       var col = (BRAND.pillarColors[pname]||{color:'#999'}).color;
       h += '<div class="pillar-bar-row"><div class="pillar-bar-label">' + pname + '</div><div class="pillar-bar-track"><div class="pillar-bar-fill" style="width:' + pct + '%;background:' + col + ';"></div></div><div class="pillar-bar-count">' + count + '</div></div>';
     });
+    if (plan.gaps_addressed && plan.gaps_addressed.length) {
+      h += '<div style="margin-top:10px;background:var(--green-bg);border:1px solid rgba(58,158,110,0.2);border-radius:6px;padding:8px 12px;font-size:11px;color:var(--green);">Gaps addressed this week: ' + plan.gaps_addressed.map(escRaw).join(', ') + '</div>';
+    }
     h += '</div>';
   }
 
@@ -1463,11 +1596,17 @@ function renderWeeklyPlan(plan) {
   h += '<div class="calendar-grid">';
   (plan.days||[]).forEach(function(day) {
     var pc = BRAND.pillarColors[day.pillar]||{color:'#999',bg:'var(--cream-2)'};
-    h += '<div class="cal-day"><div class="cal-day-header"><div class="cal-day-name">' + day.day + '</div><div class="cal-day-date">' + (day.date||'') + '</div></div>';
-    h += '<div class="cal-day-body"><div class="cal-post-type" style="color:' + pc.color + ';">' + escRaw(day.post_type||'') + '</div>';
+    var isFresh = !day.fresh_or_scripted || day.fresh_or_scripted === 'fresh';
+    h += '<div class="cal-day">';
+    h += '<div class="cal-day-header"><div class="cal-day-name">' + day.day + '</div>';
+    h += '<div class="cal-day-date">' + (day.date||'') + '</div></div>';
+    h += '<div class="cal-day-body">';
+    h += '<div class="cal-post-type" style="color:' + pc.color + ';">' + escRaw(day.post_type||'') + '</div>';
     h += '<div class="cal-post-title">' + escRaw(day.title||'') + '</div>';
     if (day.designer_needed && day.designer_needed !== 'None') h += '<div style="font-size:9px;color:var(--charcoal3);margin-top:3px;font-weight:600;">' + escRaw(day.designer_needed) + '</div>';
-    h += '<div class="cal-time">3:00 PM CST</div></div></div>';
+    if (!isFresh) h += '<div style="font-size:9px;color:var(--blue);margin-top:2px;">From script</div>';
+    h += '<div class="cal-time">3:00 PM CST</div>';
+    h += '</div></div>';
   });
   h += '</div>';
 
@@ -1476,40 +1615,59 @@ function renderWeeklyPlan(plan) {
   (plan.days||[]).forEach(function(day) {
     if (!day.title) return;
     var pc = BRAND.pillarColors[day.pillar]||{color:'#999',bg:'var(--cream-2)'};
+    var isFresh = !day.fresh_or_scripted || day.fresh_or_scripted === 'fresh';
     h += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
-    h += '<div style="padding:11px 16px;background:var(--cream-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">';
-    h += '<div style="display:flex;align-items:center;gap:10px;"><div style="font-size:11px;font-weight:700;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;">' + day.day + '</div>';
-    h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:600;color:var(--charcoal);">' + escRaw(day.title) + '</div></div>';
-    h += '<span style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:12px;background:' + (BRAND.pillarColors[day.pillar]||{bg:'var(--cream-3)'}).bg + ';color:' + pc.color + ';">' + escRaw(day.post_type||'') + '</span></div>';
-    h += '<div style="padding:13px 16px;">';
-    if (day.hook) { h += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Hook</div><div style="font-size:13px;font-weight:600;color:var(--charcoal);font-style:italic;margin-bottom:8px;">"' + escRaw(day.hook) + '"</div>'; }
-    if (day.content_direction) { h += '<div style="font-size:12px;color:var(--charcoal2);line-height:1.6;">' + escRaw(day.content_direction) + '</div>'; }
+    h += '<div style="padding:11px 16px;background:var(--cream-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">';
+    h += '<div style="display:flex;align-items:center;gap:10px;">';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;">' + day.day + '</div>';
+    h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:600;color:var(--charcoal);">' + escRaw(day.title) + '</div>';
+    if (!isFresh) h += '<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:10px;background:var(--blue-bg);color:var(--blue);">From script</span>';
+    h += '</div>';
+    h += '<span style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:12px;background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(day.post_type||'') + '</span>';
+    h += '</div>';
+    h += '<div style="padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">';
+
+    h += '<div>';
+    if (day.hook) { h += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Hook</div><div style="font-size:13px;font-weight:600;color:var(--charcoal);font-style:italic;margin-bottom:10px;">"' + escRaw(day.hook) + '"</div>'; }
+    if (day.content_direction) { h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Content Direction</div><div style="font-size:12px;color:var(--charcoal2);line-height:1.65;">' + escRaw(day.content_direction) + '</div>'; }
+    h += '</div>';
+
+    h += '<div>';
+    if (day.voiceover_topic) { h += '<div style="font-size:9px;font-weight:700;color:var(--amber);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Voiceover Direction</div><div style="font-size:12px;color:var(--charcoal2);line-height:1.65;margin-bottom:10px;">' + escRaw(day.voiceover_topic) + '</div>'; }
+    if (day.thumbnail_hook) { h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Thumbnail Text (Designer 1)</div><div style="font-size:13px;font-weight:600;font-style:italic;color:var(--charcoal);margin-bottom:10px;">' + escRaw(day.thumbnail_hook) + '</div>'; }
+    if (day.carousel_outline) { h += '<div style="font-size:9px;font-weight:700;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Carousel Outline (Designer 2)</div><div style="font-size:12px;color:var(--charcoal2);line-height:1.65;">' + escRaw(day.carousel_outline) + '</div>'; }
+    if (day.quote) { h += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Quote (Designer 2)</div><div style="font-family:\'Cormorant Garamond\',serif;font-size:15px;font-style:italic;color:var(--charcoal);">' + escRaw(day.quote) + '</div>'; }
+    h += '</div>';
+
     h += '</div></div>';
   });
   h += '</div>';
 
-  // DELIVERY CARDS
+  // DELIVERY
   h += '<div class="math-div">+ + +</div>';
-  h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;">Team Delivery - Notion Task Assignments</div>';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;">Notion Task Assignments</div>';
   h += '<div class="delivery-grid">';
   if (plan.delivery) {
     [
-      {key:'designer1',color:'#B87830',bg:'rgba(184,120,48,0.08)',label:'Designer 1',sub:'Thumbnails'},
-      {key:'designer2',color:'#3A6EA8',bg:'rgba(58,110,168,0.08)',label:'Designer 2',sub:'Carousels + Quotes'},
-      {key:'video_editor',color:'#3A9E6E',bg:'rgba(58,158,110,0.08)',label:'Video Editor',sub:'Reels'}
+      {key:'designer1', color:'#B87830', bg:'rgba(184,120,48,0.08)', label:'Designer 1', sub:'Thumbnails'},
+      {key:'designer2', color:'#3A6EA8', bg:'rgba(58,110,168,0.08)', label:'Designer 2', sub:'Carousels + Quotes'},
+      {key:'video_editor', color:'#3A9E6E', bg:'rgba(58,158,110,0.08)', label:'Video Editor', sub:'Reels'}
     ].forEach(function(role) {
       var d = plan.delivery[role.key]||{};
-      var notionText = d.notion_copy||d.tasks||'';
-      h += '<div class="delivery-card"><div class="delivery-header" style="background:' + role.bg + ';border-bottom:1px solid ' + role.color + '20;">';
+      var notionText = d.notion_copy||'';
+      h += '<div class="delivery-card">';
+      h += '<div class="delivery-header" style="background:' + role.bg + ';border-bottom:1px solid ' + role.color + '20;">';
       h += '<div class="delivery-role" style="color:' + role.color + ';">' + role.label + '</div>';
       h += '<div class="delivery-person">' + role.sub + '</div></div>';
-      h += '<div class="delivery-body"><div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Notion Task Copy</div>';
+      h += '<div class="delivery-body">';
+      h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Copy for Notion Task</div>';
       h += '<div class="delivery-block">' + escRaw(notionText) + '</div>';
-      h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(notionText) + ')">Copy for Notion</button></div></div>';
+      h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(notionText) + ')">Copy for Notion</button>';
+      h += '</div></div>';
     });
   }
   h += '</div>';
-  h += '<div class="studio-footer">Tiffany Haynes &amp; Co. Content Studio - Submit to Notion by Tuesday EOD</div>';
+  h += '<div class="studio-footer">Tiffany Haynes &amp; Co. Content Studio - Submit to Notion by Tuesday EOD - Not for distribution outside the media team</div>';
 
   document.getElementById('results-planner').innerHTML = h;
   document.getElementById('results-planner').style.display = 'block';
