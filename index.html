@@ -2471,32 +2471,40 @@ function buildHTMLEmailPreview(data) {
 
   function pc(pillar) { return PILLAR_COLORS[pillar] || {bg:"#F8F8F8", border:"#999", text:"#555"}; }
 
-  var topicsHtml = '';
+  // Build individual card HTML
+  var cardItems = [];
   topics.forEach(function(t) {
     var p = pc(t.pillar);
     var pts = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover||'').split('\n').filter(Boolean);
     var liHtml = pts.map(function(pt){ return '<li style="margin-bottom:5px;">' + pt + '</li>'; }).join('');
     var scriptureHtml = (t.scripture_angle && t.scripture_angle.trim()) ?
       '<div style="margin-top:10px;padding:8px 12px;border-left:3px solid ' + p.border + ';background:' + p.bg + ';font-style:italic;font-size:12px;color:' + p.text + ';">' + t.scripture_angle + '</div>' : '';
-
-    topicsHtml += '<div style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid #E3D3C8;background:#FFFDF5;">';
-    topicsHtml += '<div style="background:' + p.bg + ';padding:12px 16px;border-bottom:1px solid ' + p.border + '33;display:flex;align-items:flex-start;gap:12px;">';
-    topicsHtml += '<div style="width:26px;height:26px;border-radius:50%;background:' + p.border + ';color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (t.number||'') + '</div>';
-    topicsHtml += '<div><div style="font-size:15px;font-weight:700;color:#414141;margin-bottom:3px;">' + (t.title||'') + '</div>';
-    topicsHtml += '<div style="font-size:10px;font-weight:700;color:' + p.text + ';letter-spacing:1px;text-transform:uppercase;">' + (t.pillar||'') + ' &bull; ' + (t.content_type||'') + ' &bull; ' + (t.estimated_length||'') + '</div></div></div>';
-    topicsHtml += '<div style="padding:12px 16px;border-bottom:1px solid #E3D3C8;background:#FFFDF5;">';
-    topicsHtml += '<div style="font-size:9px;font-weight:700;color:#A00605;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">HOOK - FIRST 3 SECONDS</div>';
-    topicsHtml += '<div style="font-size:14px;font-weight:600;font-style:italic;color:#414141;line-height:1.4;">&ldquo;' + (t.hook||'') + '&rdquo;</div></div>';
-    topicsHtml += '<div style="padding:12px 16px;border-bottom:1px solid #E3D3C8;">';
-    topicsHtml += '<div style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;">WHAT TO COVER</div>';
-    topicsHtml += '<ul style="margin:0;padding-left:18px;color:#5A5A5A;font-size:13px;line-height:1.7;">' + liHtml + '</ul>' + scriptureHtml + '</div>';
-    topicsHtml += '<div style="padding:10px 16px;background:#F4F0EB;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">';
-    topicsHtml += '<div><span style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">WHY THIS WORKS: </span>';
-    topicsHtml += '<span style="font-size:12px;color:#5A5A5A;">' + (t.why_this_works||'') + '</span></div>';
     var uploadUrl = 'https://ebeprstudios.github.io/THCO-Social-Media-Manager/upload.html?topic=' + encodeURIComponent(t.title||'') + '&cloud=dgq3ahq1m&preset=tiffany_voiceovers';
-    topicsHtml += '<a href="' + uploadUrl + '" style="display:inline-block;background:#A00605;color:white;font-family:Georgia,serif;font-size:13px;font-weight:700;padding:9px 18px;border-radius:8px;text-decoration:none;white-space:nowrap;">Submit Voiceover</a>';
-    topicsHtml += '</div></div>';
+
+    var card = '';
+    card += '<div style="border-radius:8px;overflow:hidden;border:1px solid #E3D3C8;background:#FFFDF5;display:flex;flex-direction:column;height:100%;">';
+    card += '<div style="background:' + p.bg + ';padding:12px 16px;border-bottom:1px solid ' + p.border + '33;display:flex;align-items:flex-start;gap:12px;">';
+    card += '<div style="width:26px;height:26px;border-radius:50%;background:' + p.border + ';color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (t.number||'') + '</div>';
+    card += '<div><div style="font-size:14px;font-weight:700;color:#414141;margin-bottom:3px;">' + (t.title||'') + '</div>';
+    card += '<div style="font-size:10px;font-weight:700;color:' + p.text + ';letter-spacing:1px;text-transform:uppercase;">' + (t.pillar||'') + ' &bull; ' + (t.content_type||'') + ' &bull; ' + (t.estimated_length||'') + '</div></div></div>';
+    card += '<div style="padding:10px 14px;border-bottom:1px solid #E3D3C8;background:#FFFDF5;">';
+    card += '<div style="font-size:9px;font-weight:700;color:#A00605;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">HOOK</div>';
+    card += '<div style="font-size:13px;font-weight:600;font-style:italic;color:#414141;line-height:1.4;">&ldquo;' + (t.hook||'') + '&rdquo;</div></div>';
+    card += '<div style="padding:10px 14px;border-bottom:1px solid #E3D3C8;flex:1;">';
+    card += '<div style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">WHAT TO COVER</div>';
+    card += '<ul style="margin:0;padding-left:16px;color:#5A5A5A;font-size:12px;line-height:1.7;">' + liHtml + '</ul>' + scriptureHtml + '</div>';
+    card += '<div style="padding:10px 14px;background:#F4F0EB;">';
+    card += '<div style="font-size:11px;color:#5A5A5A;margin-bottom:8px;"><span style="font-weight:700;color:#8A8A8A;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;">WHY: </span>' + (t.why_this_works||'') + '</div>';
+    card += '<a href="' + uploadUrl + '" style="display:block;text-align:center;background:#A00605;color:white;font-family:Georgia,serif;font-size:12px;font-weight:700;padding:8px 14px;border-radius:7px;text-decoration:none;">Submit Voiceover</a>';
+    card += '</div></div>';
+
+    cardItems.push(card);
   });
+
+  // Wrap in 2-column grid
+  var topicsHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">';
+  cardItems.forEach(function(card) { topicsHtml += '<div>' + card + '</div>'; });
+  topicsHtml += '</div>';
 
   var html = '<div style="font-family:Georgia,serif;background:#F4F0EB;padding:24px 20px;">';
   html += '<div style="max-width:600px;margin:0 auto;">';

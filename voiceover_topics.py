@@ -101,49 +101,70 @@ def pc(pillar):
     return PILLAR_COLORS.get(pillar, {"bg":"#F8F8F8","border":"#999","text":"#555"})
 
 def build_html(data, rec_week, pub_week, is_test=False):
+    from urllib.parse import quote
     topics = data.get("topics", [])
     today = datetime.now().strftime("%B %-d, %Y")
     planning_note = data.get("planning_note", "")
-    test_banner = '<div style="background:#FFF3CD;border:2px solid #B87830;padding:12px 20px;text-align:center;font-family:Georgia,serif;font-size:13px;color:#7A4E0D;font-weight:700;">TEST EMAIL - Not sent to Tiffany</div>' if is_test else ""
-    cards = ""
+    test_banner = '''<div style="background:#FFF3CD;border:2px solid #B87830;padding:12px 20px;text-align:center;font-family:Georgia,serif;font-size:13px;color:#7A4E0D;font-weight:700;">TEST EMAIL - Not sent to Tiffany</div>''' if is_test else ""
+
+    # Build card HTML for each topic
+    card_cells = []
     for t in topics:
         p = pc(t.get("pillar",""))
         pts = t.get("what_to_cover", [])
         if isinstance(pts, str):
             pts = [x.strip() for x in pts.split("\n") if x.strip()]
-        li = "".join(f"<li style='margin-bottom:5px;'>{pt}</li>" for pt in pts)
+        li = "".join(f"<li style='margin-bottom:4px;'>{pt}</li>" for pt in pts)
         scr = t.get("scripture_angle","")
-        scr_html = f'<div style="margin-top:10px;padding:8px 12px;border-left:3px solid {p["border"]};background:{p["bg"]};font-style:italic;font-size:12px;color:{p["text"]};">{scr}</div>' if scr else ""
-        from urllib.parse import quote
+        scr_html = f'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid {p["border"]};background:{p["bg"]};font-style:italic;font-size:11px;color:{p["text"]};">{scr}</div>' if scr else ""
         upload_topic = quote(t.get("title",""), safe="")
-        cards += f"""<div style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid #E3D3C8;">
-          <div style="background:{p['bg']};padding:12px 16px;border-bottom:1px solid {p['border']}33;display:flex;align-items:flex-start;gap:12px;">
-            <div style="width:26px;height:26px;border-radius:50%;background:{p['border']};color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{t.get('number','')}</div>
-            <div><div style="font-size:15px;font-weight:700;color:#414141;margin-bottom:3px;">{t.get('title','')}</div>
-            <div style="font-size:10px;font-weight:700;color:{p['text']};letter-spacing:1px;text-transform:uppercase;">{t.get('pillar','')} &bull; {t.get('content_type','')} &bull; {t.get('estimated_length','')}</div></div>
-          </div>
-          <div style="padding:12px 16px;border-bottom:1px solid #E3D3C8;background:#FFFDF5;">
-            <div style="font-size:9px;font-weight:700;color:#A00605;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">HOOK - FIRST 3 SECONDS</div>
-            <div style="font-size:14px;font-weight:600;font-style:italic;color:#414141;">&ldquo;{t.get('hook','')}&rdquo;</div>
-          </div>
-          <div style="padding:12px 16px;border-bottom:1px solid #E3D3C8;">
-            <div style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;">WHAT TO COVER</div>
-            <ul style="margin:0;padding-left:18px;color:#5A5A5A;font-size:13px;line-height:1.7;">{li}</ul>{scr_html}
-          </div>
-          <div style="padding:10px 16px;background:#F4F0EB;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-            <div>
-              <span style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">WHY THIS WORKS: </span>
-              <span style="font-size:12px;color:#5A5A5A;">{t.get('why_this_works','')}</span>
-            </div>
-            <a href="https://ebeprstudios.github.io/THCO-Social-Media-Manager/upload.html?topic={upload_topic}&cloud=dgq3ahq1m&preset=tiffany_voiceovers" style="display:inline-block;background:#A00605;color:white;font-family:Georgia,serif;font-size:13px;font-weight:700;padding:9px 18px;border-radius:8px;text-decoration:none;white-space:nowrap;">Submit Voiceover</a>
-          </div>
-        </div>"""
+        upload_url = f"https://ebeprstudios.github.io/THCO-Social-Media-Manager/upload.html?topic={upload_topic}&cloud=dgq3ahq1m&preset=tiffany_voiceovers"
+
+        card = f'''
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #E3D3C8;border-radius:8px;overflow:hidden;background:#FFFDF5;">
+  <tr><td style="background:{p["bg"]};padding:10px 14px;border-bottom:1px solid {p["border"]}33;">
+    <table cellpadding="0" cellspacing="0"><tr>
+      <td style="width:24px;height:24px;background:{p["border"]};border-radius:50%;text-align:center;vertical-align:middle;color:white;font-size:11px;font-weight:700;font-family:Georgia,serif;">{t.get("number","")}</td>
+      <td style="padding-left:10px;">
+        <div style="font-size:13px;font-weight:700;color:#414141;margin-bottom:2px;">{t.get("title","")}</div>
+        <div style="font-size:9px;font-weight:700;color:{p["text"]};letter-spacing:1px;text-transform:uppercase;">{t.get("pillar","")} &bull; {t.get("estimated_length","")}</div>
+      </td>
+    </tr></table>
+  </td></tr>
+  <tr><td style="padding:10px 14px;border-bottom:1px solid #E3D3C8;background:#FFFDF5;">
+    <div style="font-size:8px;font-weight:700;color:#A00605;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">HOOK</div>
+    <div style="font-size:12px;font-weight:600;font-style:italic;color:#414141;line-height:1.4;">&ldquo;{t.get("hook","")}&rdquo;</div>
+  </td></tr>
+  <tr><td style="padding:10px 14px;border-bottom:1px solid #E3D3C8;">
+    <div style="font-size:8px;font-weight:700;color:#8A8A8A;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">WHAT TO COVER</div>
+    <ul style="margin:0;padding-left:16px;color:#5A5A5A;font-size:11px;line-height:1.65;">{li}</ul>{scr_html}
+  </td></tr>
+  <tr><td style="padding:10px 14px;background:#F4F0EB;">
+    <div style="font-size:10px;color:#5A5A5A;margin-bottom:8px;"><span style="font-size:8px;font-weight:700;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">WHY: </span>{t.get("why_this_works","")}</div>
+    <a href="{upload_url}" style="display:block;text-align:center;background:#A00605;color:white;font-family:Georgia,serif;font-size:12px;font-weight:700;padding:8px 12px;border-radius:6px;text-decoration:none;">Submit Voiceover</a>
+  </td></tr>
+</table>'''
+        card_cells.append(card)
+
+    # Build 2-column table rows (Gmail-safe)
+    rows_html = ""
+    for i in range(0, len(card_cells), 2):
+        left = card_cells[i]
+        right = card_cells[i+1] if i+1 < len(card_cells) else "<table width='100%'><tr><td></td></tr></table>"
+        rows_html += f'''
+<tr>
+  <td width="48%" valign="top" style="padding:6px 4px 6px 0;">{left}</td>
+  <td width="4%"></td>
+  <td width="48%" valign="top" style="padding:6px 0 6px 4px;">{right}</td>
+</tr>'''
+
     note_html = f'<p style="font-style:italic;color:#5A5A5A;font-size:13px;margin:0 0 12px;">{planning_note}</p>' if planning_note else ""
+
     return f"""<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#F4F0EB;font-family:Georgia,serif;">
 {test_banner}
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#F4F0EB;"><tr><td align="center" style="padding:24px 16px;">
-<table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;">
+<table width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
 <tr><td style="background:#414141;border-radius:10px 10px 0 0;padding:24px 28px;">
   <div style="font-size:10px;font-weight:700;color:#C49E3C;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;">TIFFANY HAYNES &amp; CO. MEDIA TEAM</div>
   <div style="font-size:24px;font-weight:700;color:#FFFDF5;margin-bottom:6px;">12 Voiceover Topics</div>
@@ -153,15 +174,18 @@ def build_html(data, rec_week, pub_week, is_test=False):
 <tr><td style="background:#FFFDF5;padding:18px 28px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">
   {note_html}
   <div style="background:#F4F0EB;border-radius:6px;padding:12px 16px;font-size:12px;color:#5A5A5A;line-height:1.7;">
-    <strong>How to use:</strong> Choose the topics that speak to you. Record at your own pace. You do not need to record all 12. The team begins editing the following week for publishing the week of {pub_week}.
+    <strong>How to use:</strong> Choose the topics that resonate with your authentic voice. Record at your own pace. Aim for up to 5. The team begins editing the following week for publishing the week of {pub_week}.
   </div>
 </td></tr>
-<tr><td style="background:#FFFDF5;padding:8px 28px 20px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">{cards}</td></tr>
+<tr><td style="background:#FFFDF5;padding:8px 28px 20px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">
+  <table width="100%" cellpadding="0" cellspacing="0">{rows_html}</table>
+</td></tr>
 <tr><td style="background:#414141;border-radius:0 0 10px 10px;padding:18px 28px;text-align:center;">
   <div style="font-size:14px;font-weight:700;color:#C49E3C;letter-spacing:3px;margin-bottom:4px;">1 + 1 = 10,000</div>
-  <div style="font-size:10px;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">Tiffany Haynes &amp; Co. Media Team &bull; Internal Use Only</div>
+  <div style="font-size:10px;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">The Creative Theologian Media Group &bull; Internal Use Only</div>
 </td></tr>
 </table></td></tr></table></body></html>"""
+
 
 def send_email(html, to_email, cc_emails, rec_week, is_test=False):
     prefix = "[TEST] " if is_test else ""
