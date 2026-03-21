@@ -5,795 +5,417 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tiffany Haynes &amp; Co. Content Studio</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --cream-1: #FFFDF5;
-  --cream-2: #F4F0EB;
-  --cream-3: #E3D3C8;
-  --cream-4: #D4C0B0;
-  --red:      #A00605;
-  --red-dim:  rgba(160,6,5,0.07);
-  --red-mid:  rgba(160,6,5,0.18);
-  --charcoal: #414141;
-  --charcoal2:#5A5A5A;
-  --charcoal3:#8A8A8A;
-  --charcoal4:#B8B8B8;
-  --border:   rgba(65,65,65,0.10);
-  --border-md:rgba(65,65,65,0.18);
-  --shadow:   rgba(65,65,65,0.07);
-  --green:    #3A9E6E;
-  --green-bg: rgba(58,158,110,0.08);
-  --amber:    #B87830;
-  --amber-bg: rgba(184,120,48,0.08);
-  --blue:     #3A6EA8;
-  --blue-bg:  rgba(58,110,168,0.08);
-  --purple:   #6A50A8;
-  --purple-bg:rgba(106,80,168,0.08);
+  --cream-1:#FFFDF5; --cream-2:#F4F0EB; --cream-3:#E3D3C8;
+  --red:#A00605; --red-dim:rgba(160,6,5,0.07); --red-mid:rgba(160,6,5,0.18);
+  --charcoal:#414141; --charcoal2:#5A5A5A; --charcoal3:#8A8A8A; --charcoal4:#B8B8B8;
+  --border:rgba(65,65,65,0.10); --border-md:rgba(65,65,65,0.18);
+  --shadow:rgba(65,65,65,0.07);
+  --green:#3A9E6E; --green-bg:rgba(58,158,110,0.08);
+  --amber:#B87830; --amber-bg:rgba(184,120,48,0.08);
+  --blue:#3A6EA8; --blue-bg:rgba(58,110,168,0.08);
+  --purple:#6A50A8; --purple-bg:rgba(106,80,168,0.08);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
 body {
-  background: var(--cream-1);
-  color: var(--charcoal);
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
+  background:var(--cream-1); color:var(--charcoal);
+  font-family:'Inter',sans-serif; font-size:13px;
+  line-height:1.6; min-height:100vh; -webkit-font-smoothing:antialiased;
 }
-
 body::before {
-  content: '+';
-  position: fixed;
-  bottom: -40px; right: 40px;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 280px;
-  color: rgba(65,65,65,0.022);
-  pointer-events: none;
-  z-index: 0;
-  line-height: 1;
+  content:'+'; position:fixed; bottom:-40px; right:40px;
+  font-family:'Cormorant Garamond',serif; font-size:280px;
+  color:rgba(65,65,65,0.022); pointer-events:none; z-index:0; line-height:1;
 }
 
-/* PASSWORD GATE */
+/* GATE */
 #password-gate {
-  position: fixed; inset: 0;
-  background: var(--cream-2);
-  z-index: 99999;
-  display: flex; align-items: center; justify-content: center;
+  position:fixed; inset:0; background:var(--cream-2);
+  z-index:99999; display:flex; align-items:center; justify-content:center;
 }
 .gate-box {
-  background: var(--cream-1);
-  border: 1px solid var(--border-md);
-  border-radius: 12px;
-  padding: 48px 40px;
-  width: 400px; max-width: 92vw;
-  text-align: center;
-  box-shadow: 0 4px 32px var(--shadow);
+  background:var(--cream-1); border:1px solid var(--border-md);
+  border-radius:12px; padding:48px 40px; width:400px; max-width:92vw;
+  text-align:center; box-shadow:0 4px 32px var(--shadow);
 }
-.gate-brand {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 10px; font-weight: 500;
-  color: var(--charcoal3);
-  letter-spacing: 4px; text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.gate-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 28px; font-weight: 600;
-  color: var(--charcoal); margin-bottom: 4px; line-height: 1.2;
-}
-.gate-math {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 13px; color: var(--red);
-  letter-spacing: 2px; margin-bottom: 32px;
-}
+.gate-brand { font-family:'Cormorant Garamond',serif; font-size:10px; font-weight:500; color:var(--charcoal3); letter-spacing:4px; text-transform:uppercase; margin-bottom:6px; }
+.gate-title { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600; color:var(--charcoal); margin-bottom:4px; }
+.gate-math { font-family:'Cormorant Garamond',serif; font-size:13px; color:var(--red); letter-spacing:2px; margin-bottom:32px; }
 .gate-input {
-  width: 100%; background: var(--cream-2);
-  border: 1px solid var(--border-md);
-  color: var(--charcoal);
-  font-family: 'Inter', sans-serif; font-size: 14px;
-  padding: 12px 16px; border-radius: 6px;
-  margin-bottom: 10px; outline: none;
-  text-align: center; letter-spacing: 2px;
-  transition: border-color 0.2s;
+  width:100%; background:var(--cream-2); border:1px solid var(--border-md);
+  color:var(--charcoal); font-family:'Inter',sans-serif; font-size:14px;
+  padding:11px 16px; border-radius:6px; margin-bottom:10px; outline:none;
+  text-align:center; letter-spacing:2px; transition:border-color 0.2s;
 }
-.gate-input:focus { border-color: var(--red); }
+.gate-input:focus { border-color:var(--red); }
 .gate-btn {
-  width: 100%; background: var(--red); color: white;
-  border: none; padding: 12px;
-  font-family: 'Inter', sans-serif; font-weight: 600;
-  font-size: 13px; cursor: pointer; border-radius: 6px;
-  transition: background 0.2s;
+  width:100%; background:var(--red); color:white; border:none; padding:11px;
+  font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+  cursor:pointer; border-radius:6px; transition:background 0.2s;
 }
-.gate-btn:hover { background: #8A0504; }
-.gate-error { color: var(--red); font-size: 11px; margin-top: 8px; display: none; }
+.gate-btn:hover { background:#8A0504; }
+.gate-error { color:var(--red); font-size:11px; margin-top:8px; display:none; }
 
 /* API MODAL */
 #api-modal {
-  display: none; position: fixed; inset: 0;
-  background: rgba(244,240,235,0.92); z-index: 1000;
-  align-items: center; justify-content: center;
+  display:none; position:fixed; inset:0;
+  background:rgba(244,240,235,0.92); z-index:1000;
+  align-items:center; justify-content:center;
 }
-#api-modal.show { display: flex; }
+#api-modal.show { display:flex; }
 .modal-box {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 12px; padding: 36px;
-  width: 460px; max-width: 90vw;
-  box-shadow: 0 8px 40px var(--shadow);
+  background:var(--cream-1); border:1px solid var(--border-md);
+  border-radius:12px; padding:36px; width:480px; max-width:90vw;
+  box-shadow:0 8px 40px var(--shadow);
 }
-.modal-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px; font-weight: 600;
-  color: var(--charcoal); margin-bottom: 10px;
-}
-.modal-sub { font-size: 13px; color: var(--charcoal2); line-height: 1.7; margin-bottom: 20px; }
-.modal-sub span { color: var(--red); }
+.modal-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--charcoal); margin-bottom:10px; }
+.modal-sub { font-size:13px; color:var(--charcoal2); line-height:1.7; margin-bottom:20px; }
+.modal-sub span { color:var(--red); }
 .modal-input {
-  width: 100%; background: var(--cream-2);
-  border: 1px solid var(--border-md);
-  color: var(--charcoal);
-  font-family: 'Inter', monospace; font-size: 12px;
-  padding: 10px 14px; border-radius: 6px;
-  margin-bottom: 10px; outline: none; transition: border-color 0.2s;
+  width:100%; background:var(--cream-2); border:1px solid var(--border-md);
+  color:var(--charcoal); font-family:'Inter',monospace; font-size:12px;
+  padding:10px 14px; border-radius:6px; margin-bottom:10px; outline:none;
 }
-.modal-input:focus { border-color: var(--red); }
+.modal-input:focus { border-color:var(--red); }
 .modal-btn {
-  width: 100%; background: var(--red); color: white;
-  border: none; padding: 11px;
-  font-family: 'Inter', sans-serif; font-weight: 600;
-  font-size: 13px; cursor: pointer; border-radius: 6px;
-  transition: background 0.2s;
+  width:100%; background:var(--red); color:white; border:none; padding:11px;
+  font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+  cursor:pointer; border-radius:6px;
 }
-.modal-btn:hover { background: #8A0504; }
-.modal-note { color: var(--charcoal3); font-size: 10px; margin-top: 10px; text-align: center; }
+.modal-btn:hover { background:#8A0504; }
+.modal-note { color:var(--charcoal3); font-size:10px; margin-top:10px; text-align:center; }
 
-/* TOP BAR */
+/* TOPBAR */
 #topbar {
-  background: var(--cream-1);
-  border-bottom: 1px solid var(--border);
-  padding: 13px 32px;
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
+  background:var(--cream-1); border-bottom:1px solid var(--border);
+  padding:12px 28px; display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
 }
-.logo-area { display: flex; flex-direction: column; }
-.logo-brand {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 9px; font-weight: 500;
-  color: var(--charcoal3); letter-spacing: 4px; text-transform: uppercase;
-}
-.logo-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 19px; font-weight: 600;
-  color: var(--charcoal); line-height: 1.1;
-}
-.logo-accent { color: var(--red); }
-.topbar-right { display: flex; align-items: center; gap: 8px; }
+.logo-brand { font-family:'Cormorant Garamond',serif; font-size:9px; font-weight:500; color:var(--charcoal3); letter-spacing:4px; text-transform:uppercase; }
+.logo-title { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; color:var(--charcoal); line-height:1.1; }
+.logo-accent { color:var(--red); }
+.topbar-right { display:flex; align-items:center; gap:8px; }
 .tb-btn {
-  background: transparent; border: 1px solid var(--border-md);
-  color: var(--charcoal2); padding: 6px 13px;
-  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
-  cursor: pointer; border-radius: 5px; transition: all 0.15s;
+  background:transparent; border:1px solid var(--border-md); color:var(--charcoal2);
+  padding:6px 13px; font-family:'Inter',sans-serif; font-size:11px; font-weight:500;
+  cursor:pointer; border-radius:5px; transition:all 0.15s;
 }
-.tb-btn:hover { border-color: var(--red); color: var(--red); }
-.tb-btn.primary { background: var(--red); border-color: var(--red); color: white; font-weight: 600; }
-.tb-btn.primary:hover { background: #8A0504; }
-.tb-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.tb-btn:hover { border-color:var(--red); color:var(--red); }
 
 /* TABS */
 #tab-bar {
-  background: var(--cream-1);
-  border-bottom: 1px solid var(--border);
-  padding: 0 32px;
-  display: flex; gap: 0;
-  position: sticky; top: 55px; z-index: 99;
+  background:var(--cream-1); border-bottom:1px solid var(--border);
+  padding:0 28px; display:flex; position:sticky; top:55px; z-index:99; display:none;
 }
 .tab-btn {
-  background: transparent; border: none;
-  padding: 13px 22px;
-  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
-  color: var(--charcoal3); cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.15s;
-  white-space: nowrap;
+  background:transparent; border:none; padding:12px 20px;
+  font-family:'Inter',sans-serif; font-size:12px; font-weight:500;
+  color:var(--charcoal3); cursor:pointer; border-bottom:2px solid transparent;
+  transition:all 0.15s; white-space:nowrap;
 }
-.tab-btn:hover { color: var(--charcoal); }
-.tab-btn.active { color: var(--red); border-bottom-color: var(--red); font-weight: 600; }
+.tab-btn:hover { color:var(--charcoal); }
+.tab-btn.active { color:var(--red); border-bottom-color:var(--red); font-weight:600; }
 
 /* MAIN */
-#main { max-width: 1100px; margin: 0 auto; padding: 36px 32px; position: relative; z-index: 1; }
+#main { max-width:1100px; margin:0 auto; padding:32px 28px; position:relative; z-index:1; }
 
 /* LANDING */
 #landing {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; min-height: 72vh;
-  text-align: center; padding: 40px 24px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-height:72vh; text-align:center; padding:40px 24px;
 }
-.landing-eyebrow {
-  font-size: 10px; font-weight: 600; color: var(--red);
-  letter-spacing: 4px; text-transform: uppercase; margin-bottom: 16px;
-}
-.landing-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 40px; font-weight: 600; color: var(--charcoal);
-  letter-spacing: -0.5px; margin-bottom: 12px; line-height: 1.15;
-}
-.landing-math {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 16px; color: var(--red); letter-spacing: 3px; margin-bottom: 12px;
-}
-.landing-sub {
-  font-size: 14px; color: var(--charcoal2);
-  margin-bottom: 40px; max-width: 500px; line-height: 1.7;
-}
+.landing-eyebrow { font-size:10px; font-weight:600; color:var(--red); letter-spacing:4px; text-transform:uppercase; margin-bottom:16px; }
+.landing-title { font-family:'Cormorant Garamond',serif; font-size:40px; font-weight:600; color:var(--charcoal); margin-bottom:10px; line-height:1.15; }
+.landing-math { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--red); letter-spacing:3px; margin-bottom:12px; }
+.landing-sub { font-size:14px; color:var(--charcoal2); margin-bottom:36px; max-width:500px; line-height:1.7; }
 .landing-btn {
-  background: var(--red); color: white; border: none;
-  padding: 14px 40px;
-  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
-  cursor: pointer; border-radius: 6px;
-  transition: all 0.2s; margin-bottom: 10px;
+  background:var(--red); color:white; border:none; padding:13px 36px;
+  font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
+  cursor:pointer; border-radius:6px; transition:all 0.2s; margin-bottom:10px;
 }
-.landing-btn:hover { background: #8A0504; transform: translateY(-1px); }
+.landing-btn:hover { background:#8A0504; transform:translateY(-1px); }
 .key-btn-land {
-  background: transparent; border: 1px solid var(--border-md);
-  color: var(--charcoal3); padding: 8px 18px;
-  font-family: 'Inter', sans-serif; font-size: 11px;
-  cursor: pointer; border-radius: 6px; transition: all 0.15s;
+  background:transparent; border:1px solid var(--border-md); color:var(--charcoal3);
+  padding:8px 18px; font-family:'Inter',sans-serif; font-size:11px;
+  cursor:pointer; border-radius:6px; transition:all 0.15s;
 }
-.key-btn-land:hover { border-color: var(--red); color: var(--red); }
-.tool-chips {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  justify-content: center; margin-top: 40px; max-width: 600px;
-}
-.tool-chip {
-  background: var(--cream-2); border: 1px solid var(--border);
-  padding: 5px 14px; border-radius: 20px;
-  font-size: 10px; color: var(--charcoal3); letter-spacing: 0.5px;
-}
+.key-btn-land:hover { border-color:var(--red); color:var(--red); }
+.tool-chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:36px; max-width:600px; }
+.tool-chip { background:var(--cream-2); border:1px solid var(--border); padding:5px 14px; border-radius:20px; font-size:10px; color:var(--charcoal3); }
 
-/* CLIENT PROFILE PANEL */
+/* PROFILE PANEL */
 #profile-panel {
-  background: var(--cream-2);
-  border: 1px solid var(--border-md);
-  border-radius: 10px;
-  padding: 20px 24px;
-  margin-bottom: 28px;
+  background:var(--cream-2); border:1px solid var(--border-md);
+  border-radius:10px; padding:18px 22px; margin-bottom:24px;
 }
-.profile-header {
-  display: flex; align-items: center;
-  justify-content: space-between; margin-bottom: 16px;
-}
-.profile-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 17px; font-weight: 600; color: var(--charcoal);
-}
-.profile-actions { display: flex; gap: 8px; }
-.profile-stats {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 12px; margin-bottom: 16px;
-}
-.profile-stat {
-  background: var(--cream-1); border: 1px solid var(--border);
-  border-radius: 7px; padding: 12px 14px; text-align: center;
-}
-.profile-stat-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 24px; font-weight: 700; color: var(--red); line-height: 1;
-}
-.profile-stat-label {
-  font-size: 10px; color: var(--charcoal3);
-  letter-spacing: 1px; text-transform: uppercase; margin-top: 3px;
-}
-.pillar-bars { display: flex; flex-direction: column; gap: 7px; }
-.pillar-bar-row {
-  display: flex; align-items: center; gap: 10px;
-}
-.pillar-bar-label { font-size: 11px; color: var(--charcoal2); width: 220px; flex-shrink: 0; }
-.pillar-bar-track {
-  flex: 1; height: 6px; background: var(--cream-3);
-  border-radius: 3px; overflow: hidden;
-}
-.pillar-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
-.pillar-bar-count { font-size: 10px; color: var(--charcoal3); width: 30px; text-align: right; flex-shrink: 0; }
-.profile-empty {
-  text-align: center; padding: 24px;
-  color: var(--charcoal3); font-size: 13px; line-height: 1.7;
-}
+.profile-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.profile-title { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; color:var(--charcoal); }
+.profile-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+.profile-stat { background:var(--cream-1); border:1px solid var(--border); border-radius:7px; padding:11px 12px; text-align:center; }
+.profile-stat-num { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:var(--red); line-height:1; }
+.profile-stat-label { font-size:9px; color:var(--charcoal3); letter-spacing:1px; text-transform:uppercase; margin-top:3px; }
+.pillar-bars { display:flex; flex-direction:column; gap:6px; }
+.pillar-bar-row { display:flex; align-items:center; gap:10px; }
+.pillar-bar-label { font-size:11px; color:var(--charcoal2); width:220px; flex-shrink:0; }
+.pillar-bar-track { flex:1; height:5px; background:var(--cream-3); border-radius:3px; overflow:hidden; }
+.pillar-bar-fill { height:100%; border-radius:3px; }
+.pillar-bar-count { font-size:10px; color:var(--charcoal3); width:28px; text-align:right; flex-shrink:0; }
+.profile-empty { text-align:center; padding:20px; color:var(--charcoal3); font-size:12px; line-height:1.7; }
 
 /* TAB PANES */
-.tab-pane { display: none; }
-.tab-pane.active { display: block; }
+.tab-pane { display:none; }
+.tab-pane.active { display:block; }
 
-/* INPUT PANEL */
-.input-panel {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 12px; padding: 26px 30px;
-  margin-bottom: 28px;
-  box-shadow: 0 2px 12px var(--shadow);
+/* CARDS / PANELS */
+.panel {
+  background:var(--cream-1); border:1px solid var(--border-md);
+  border-radius:12px; padding:24px 28px; margin-bottom:24px;
+  box-shadow:0 2px 12px var(--shadow);
 }
-.input-eyebrow {
-  font-size: 10px; font-weight: 600; color: var(--red);
-  letter-spacing: 3px; text-transform: uppercase; margin-bottom: 5px;
+.panel-eyebrow { font-size:10px; font-weight:600; color:var(--red); letter-spacing:3px; text-transform:uppercase; margin-bottom:5px; }
+.panel-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--charcoal); margin-bottom:14px; }
+.panel-sub { font-size:12px; color:var(--charcoal3); margin-bottom:14px; line-height:1.6; }
+
+/* FORM ELEMENTS */
+.textarea {
+  width:100%; background:var(--cream-2); border:1px solid var(--border-md);
+  color:var(--charcoal); font-family:'Inter',sans-serif; font-size:13px;
+  line-height:1.7; padding:12px 16px; border-radius:8px;
+  resize:vertical; min-height:120px; outline:none; transition:border-color 0.2s;
+  margin-bottom:12px;
 }
-.input-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px; font-weight: 600; color: var(--charcoal); margin-bottom: 14px;
+.textarea:focus { border-color:var(--red); }
+.textarea::placeholder { color:var(--charcoal4); }
+.select {
+  background:var(--cream-2); border:1px solid var(--border-md); color:var(--charcoal);
+  font-family:'Inter',sans-serif; font-size:12px; padding:8px 12px;
+  border-radius:6px; outline:none; cursor:pointer; flex:1; min-width:180px;
 }
-.transcript-area {
-  width: 100%; background: var(--cream-2);
-  border: 1px solid var(--border-md); color: var(--charcoal);
-  font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.7;
-  padding: 14px 16px; border-radius: 8px;
-  resize: vertical; min-height: 140px; outline: none;
-  transition: border-color 0.2s; margin-bottom: 12px;
+.input-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.btn-primary {
+  background:var(--red); color:white; border:none; padding:9px 24px;
+  font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+  cursor:pointer; border-radius:6px; transition:all 0.15s; white-space:nowrap;
 }
-.transcript-area:focus { border-color: var(--red); }
-.transcript-area::placeholder { color: var(--charcoal4); }
-.input-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.content-type-select {
-  background: var(--cream-2); border: 1px solid var(--border-md);
-  color: var(--charcoal); font-family: 'Inter', sans-serif;
-  font-size: 12px; padding: 8px 12px; border-radius: 6px;
-  outline: none; cursor: pointer; flex: 1; min-width: 180px;
+.btn-primary:hover { background:#8A0504; }
+.btn-primary:disabled { opacity:0.5; cursor:not-allowed; }
+.btn-secondary {
+  background:transparent; border:1px solid var(--border-md); color:var(--charcoal2);
+  padding:7px 16px; font-family:'Inter',sans-serif; font-size:11px; font-weight:500;
+  cursor:pointer; border-radius:6px; transition:all 0.15s;
 }
-.generate-btn {
-  background: var(--red); color: white; border: none;
-  padding: 10px 26px;
-  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px;
-  cursor: pointer; border-radius: 6px;
-  transition: all 0.15s; white-space: nowrap;
-}
-.generate-btn:hover { background: #8A0504; }
-.generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-secondary:hover { border-color:var(--red); color:var(--red); }
 
 /* LOADING */
-.gen-loading { display: none; text-align: center; padding: 56px 20px; }
-.gen-label {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px; font-weight: 500; color: var(--charcoal); margin-bottom: 20px;
-}
-.gen-track {
-  width: 180px; height: 1px; background: var(--border-md);
-  margin: 0 auto 18px; overflow: hidden;
-}
-.gen-track::after {
-  content: ''; display: block; height: 100%; width: 30%;
-  background: var(--red); animation: scan 1.6s ease-in-out infinite;
-}
-@keyframes scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(430%); } }
-.gen-msg { font-size: 11px; color: var(--charcoal3); letter-spacing: 1px; animation: blink 1s step-end infinite; }
-@keyframes blink { 50% { opacity: 0.2; } }
+.gen-loading { display:none; text-align:center; padding:48px 20px; }
+.gen-label { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:500; color:var(--charcoal); margin-bottom:18px; }
+.gen-track { width:180px; height:1px; background:var(--border-md); margin:0 auto 16px; overflow:hidden; }
+.gen-track::after { content:''; display:block; height:100%; width:30%; background:var(--red); animation:scan 1.6s ease-in-out infinite; }
+@keyframes scan { 0%{transform:translateX(-100%);} 100%{transform:translateX(430%);} }
+.gen-msg { font-size:11px; color:var(--charcoal3); letter-spacing:1px; animation:blink 1s step-end infinite; }
+@keyframes blink { 50%{opacity:0.2;} }
 
 /* ERROR */
-.gen-error {
-  display: none; background: var(--red-dim);
-  border: 1px solid var(--red-mid); color: var(--red);
-  padding: 16px; border-radius: 8px;
-  font-size: 13px; line-height: 1.6; margin-bottom: 22px;
-}
+.gen-error { display:none; background:var(--red-dim); border:1px solid var(--red-mid); color:var(--red); padding:14px; border-radius:8px; font-size:12px; line-height:1.6; margin-bottom:20px; }
 
 /* RESULTS */
-.results-wrap { display: none; animation: appear 0.35s ease; }
-@keyframes appear { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; } }
+.results-wrap { display:none; animation:appear 0.35s ease; }
+@keyframes appear { from{opacity:0;transform:translateY(7px);} to{opacity:1;} }
 
-/* SECTION */
-.out-section { margin-bottom: 44px; }
-.out-eyebrow {
-  font-size: 9px; font-weight: 700; color: var(--red);
-  letter-spacing: 4px; text-transform: uppercase; margin-bottom: 5px;
-}
-.out-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 24px; font-weight: 600; color: var(--charcoal);
-  margin-bottom: 18px; line-height: 1.2;
-}
-.out-sub {
-  font-size: 12px; color: var(--charcoal3);
-  margin-bottom: 18px; margin-top: -12px; line-height: 1.5;
-}
+/* SECTION HEADERS */
+.out-eyebrow { font-size:9px; font-weight:700; color:var(--red); letter-spacing:4px; text-transform:uppercase; margin-bottom:4px; }
+.out-title { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:600; color:var(--charcoal); margin-bottom:16px; }
+.out-sub { font-size:12px; color:var(--charcoal3); margin-bottom:16px; margin-top:-10px; }
+.math-div { text-align:center; padding:12px 0; color:var(--cream-3); font-family:'Cormorant Garamond',serif; font-size:18px; letter-spacing:10px; margin:8px 0 32px; }
+.out-section { margin-bottom:40px; }
 
-/* MATH DIVIDER */
-.math-div {
-  text-align: center; padding: 12px 0;
-  color: var(--cream-3);
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px; letter-spacing: 10px;
-  margin: 8px 0 36px;
-}
-
-/* CAPTION CARD */
-.caption-card {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 10px; overflow: hidden;
-  box-shadow: 0 2px 10px var(--shadow); margin-bottom: 14px;
-}
-.caption-card-header {
-  background: var(--cream-2); padding: 11px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-}
-.cap-platform { font-size: 10px; font-weight: 700; color: var(--charcoal2); letter-spacing: 1.5px; text-transform: uppercase; }
-.caption-body { padding: 18px 22px; }
-.caption-text {
-  font-size: 14px; color: var(--charcoal); line-height: 1.85;
-  white-space: pre-wrap; margin-bottom: 14px;
-}
-.caption-hashtags { font-size: 12px; color: var(--red); line-height: 1.6; opacity: 0.75; }
-.cap-cta-label {
-  font-size: 9px; font-weight: 700; color: var(--charcoal3);
-  letter-spacing: 2px; text-transform: uppercase;
-  margin-bottom: 4px; margin-top: 12px;
-}
-.cap-cta-text { font-size: 12px; color: var(--charcoal2); font-style: italic; }
+/* CARDS */
+.card { background:var(--cream-1); border:1px solid var(--border-md); border-radius:10px; overflow:hidden; box-shadow:0 2px 10px var(--shadow); margin-bottom:14px; }
+.card-header { background:var(--cream-2); padding:10px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+.card-header-left { display:flex; align-items:center; }
+.card-accent { width:3px; height:13px; border-radius:0; margin-right:9px; flex-shrink:0; }
+.card-title { font-size:11px; font-weight:700; color:var(--charcoal2); letter-spacing:1.5px; text-transform:uppercase; }
+.card-body { padding:16px 18px; }
 
 /* COPY BUTTON */
 .copy-btn {
-  background: transparent; border: 1px solid var(--border-md);
-  color: var(--charcoal3); padding: 4px 11px;
-  font-size: 10px; font-family: 'Inter', sans-serif;
-  cursor: pointer; border-radius: 4px; transition: all 0.15s;
+  background:transparent; border:1px solid var(--border-md); color:var(--charcoal3);
+  padding:4px 11px; font-size:10px; font-family:'Inter',sans-serif;
+  cursor:pointer; border-radius:4px; transition:all 0.15s;
 }
-.copy-btn:hover { border-color: var(--red); color: var(--red); }
-.copy-btn.copied { border-color: var(--green); color: var(--green); }
+.copy-btn:hover { border-color:var(--red); color:var(--red); }
+.copy-btn.copied { border-color:var(--green); color:var(--green); }
 
-/* DESIGNER CARDS */
-.designer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.designer-card {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 10px; overflow: hidden;
-  box-shadow: 0 2px 10px var(--shadow);
-}
-.designer-card-header {
-  padding: 13px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-}
-.designer-role {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 2px; text-transform: uppercase;
-}
-.designer-name { font-size: 12px; color: var(--charcoal2); margin-top: 2px; }
-.designer-body { padding: 16px 18px; }
-.designer-copy-block {
-  background: var(--cream-2); border: 1px solid var(--border);
-  border-radius: 6px; padding: 12px 14px;
-  font-size: 12px; color: var(--charcoal2);
-  line-height: 1.7; white-space: pre-wrap;
-  margin-bottom: 10px; font-family: 'Inter', sans-serif;
-}
-.designer-label {
-  font-size: 9px; font-weight: 700; color: var(--charcoal3);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;
-}
+/* TABLES */
+.data-table { width:100%; border-collapse:collapse; }
+.data-table thead tr { background:var(--cream-2); }
+.data-table thead th { padding:7px 13px; font-size:10px; font-weight:600; color:var(--charcoal3); letter-spacing:1px; text-transform:uppercase; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
+.data-table tbody tr { border-bottom:1px solid var(--border); transition:background 0.1s; }
+.data-table tbody tr:last-child { border-bottom:none; }
+.data-table tbody tr:hover { background:rgba(255,255,255,0.5); }
+.data-table tbody td { padding:9px 13px; font-size:13px; vertical-align:middle; }
+.ticker { font-family:'Inter',monospace; font-size:13px; font-weight:600; color:var(--charcoal); }
+.cell-muted { font-size:11px; color:var(--charcoal2); line-height:1.45; }
 
-/* THUMBNAIL CARD (Designer 1) */
-.thumb-card {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 10px; overflow: hidden;
-  box-shadow: 0 2px 10px var(--shadow);
-}
-.thumb-header {
-  background: var(--charcoal); padding: 13px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.thumb-header-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px; font-weight: 500; color: var(--cream-1);
-}
-.thumb-body { padding: 18px; }
-.hook-display {
-  background: var(--charcoal);
-  border-radius: 8px; padding: 20px;
-  text-align: center; margin-bottom: 14px;
-  position: relative; overflow: hidden;
-}
-.hook-display::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(160,6,5,0.3) 0%, rgba(0,0,0,0.6) 100%);
-}
-.hook-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px; font-weight: 700; color: white;
-  line-height: 1.3; position: relative; z-index: 1;
-  font-style: italic;
-}
-.hook-sub { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 6px; position: relative; z-index: 1; letter-spacing: 2px; text-transform: uppercase; }
+/* BADGES */
+.badge { display:inline-flex; align-items:center; padding:2px 7px; border-radius:3px; font-family:'Inter',sans-serif; font-size:10px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; white-space:nowrap; }
+.badge-script { background:var(--red-dim); color:var(--red); border:1px solid var(--red-mid); }
+.badge-free { background:var(--blue-bg); color:var(--blue); border:1px solid rgba(58,110,168,0.25); }
 
-/* CAROUSEL CARDS */
-.carousel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.carousel-card {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 10px; overflow: hidden;
-  box-shadow: 0 2px 10px var(--shadow);
-}
-.carousel-card-header {
-  background: var(--charcoal); padding: 13px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.carousel-card-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 15px; font-weight: 500; color: var(--cream-1); line-height: 1.3;
-}
-.slide-count { font-size: 10px; color: var(--cream-3); letter-spacing: 1px; flex-shrink: 0; margin-left: 12px; }
-.slide-item {
-  padding: 12px 16px; border-bottom: 1px solid var(--border);
-  display: flex; gap: 12px; align-items: flex-start;
-}
-.slide-item:last-child { border-bottom: none; }
-.slide-num {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--cream-2); border: 1px solid var(--border-md);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; color: var(--charcoal2); flex-shrink: 0;
-}
-.slide-num.hook { background: var(--red); border-color: var(--red); color: white; }
-.slide-num.cta { background: var(--charcoal); border-color: var(--charcoal); color: white; }
-.slide-content { flex: 1; }
-.slide-role {
-  font-size: 9px; font-weight: 700; color: var(--red);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 3px;
-}
-.slide-headline { font-size: 13px; font-weight: 600; color: var(--charcoal); margin-bottom: 3px; }
-.slide-body { font-size: 12px; color: var(--charcoal2); line-height: 1.55; }
-.carousel-design {
-  background: var(--cream-2); padding: 12px 16px;
-  border-top: 1px solid var(--border);
-  font-size: 11px; color: var(--charcoal2); line-height: 1.6;
-}
-.design-label {
-  font-size: 9px; font-weight: 700; color: var(--charcoal3);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;
-}
+/* CAROUSEL SLIDES */
+.slide-item { padding:10px 16px; border-bottom:1px solid var(--border); display:flex; gap:10px; align-items:flex-start; }
+.slide-item:last-child { border-bottom:none; }
+.slide-num { width:20px; height:20px; border-radius:50%; background:var(--cream-2); border:1px solid var(--border-md); display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:var(--charcoal2); flex-shrink:0; }
+.slide-num.hook { background:var(--red); border-color:var(--red); color:white; }
+.slide-num.cta { background:var(--charcoal); border-color:var(--charcoal); color:white; }
+.slide-role { font-size:9px; font-weight:700; color:var(--red); letter-spacing:2px; text-transform:uppercase; margin-bottom:2px; }
+.slide-headline { font-size:13px; font-weight:600; color:var(--charcoal); margin-bottom:2px; }
+.slide-body { font-size:11px; color:var(--charcoal2); line-height:1.5; }
 
 /* QUOTE CARDS */
-.quotes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.quote-card {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 10px; padding: 22px; position: relative; overflow: hidden;
-  box-shadow: 0 2px 10px var(--shadow);
-}
-.quote-card::before {
-  content: '"';
-  position: absolute; top: -10px; left: 14px;
-  font-family: 'Cormorant Garamond', serif; font-size: 80px;
-  color: rgba(160,6,5,0.05); line-height: 1; pointer-events: none;
-}
-.quote-tag {
-  font-size: 9px; font-weight: 700; color: var(--red);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
-}
-.quote-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 17px; font-weight: 500; color: var(--charcoal);
-  line-height: 1.5; margin-bottom: 14px;
-  position: relative; z-index: 1; font-style: italic;
-}
-.quote-design-note {
-  font-size: 11px; color: var(--charcoal3); line-height: 1.5;
-  border-top: 1px solid var(--border); padding-top: 10px;
-}
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.quote-card { background:var(--cream-1); border:1px solid var(--border-md); border-radius:10px; padding:20px; position:relative; overflow:hidden; box-shadow:0 2px 10px var(--shadow); }
+.quote-card::before { content:'"'; position:absolute; top:-10px; left:14px; font-family:'Cormorant Garamond',serif; font-size:80px; color:rgba(160,6,5,0.05); line-height:1; pointer-events:none; }
+.quote-tag { font-size:9px; font-weight:700; color:var(--red); letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+.quote-text { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:500; color:var(--charcoal); line-height:1.5; margin-bottom:12px; position:relative; z-index:1; font-style:italic; }
+.quote-design-note { font-size:11px; color:var(--charcoal3); line-height:1.5; border-top:1px solid var(--border); padding-top:8px; }
 
-/* ================================================================
-   WEEKLY PLANNER TAB
-================================================================ */
-.week-input-panel {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 12px; padding: 26px 30px;
-  margin-bottom: 22px; box-shadow: 0 2px 12px var(--shadow);
-}
-.transcript-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-.transcript-entry { position: relative; }
-.transcript-entry-label {
-  font-size: 10px; font-weight: 600; color: var(--charcoal3);
-  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px;
-}
-.remove-transcript {
-  position: absolute; top: 0; right: 0;
-  background: transparent; border: none;
-  color: var(--charcoal3); font-size: 16px; cursor: pointer;
-  padding: 0 4px; line-height: 1;
-}
-.remove-transcript:hover { color: var(--red); }
-.add-transcript-btn {
-  background: transparent; border: 1px dashed var(--border-md);
-  color: var(--charcoal3); padding: 10px;
-  font-family: 'Inter', sans-serif; font-size: 12px;
-  cursor: pointer; border-radius: 8px; width: 100%;
-  transition: all 0.15s; text-align: center;
-}
-.add-transcript-btn:hover { border-color: var(--red); color: var(--red); }
+/* THUMBNAIL PREVIEW */
+.thumb-preview { background:#1A1A1A; border-radius:8px; padding:16px; text-align:center; margin:8px 0; position:relative; overflow:hidden; }
+.thumb-preview::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(160,6,5,0.4),rgba(0,0,0,0.7)); }
+.thumb-text { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:600; color:white; line-height:1.3; position:relative; z-index:1; font-style:italic; }
+.thumb-label { font-size:9px; color:rgba(255,255,255,0.4); position:relative; z-index:1; margin-top:4px; letter-spacing:1px; text-transform:uppercase; }
 
-/* PROFILE PREVIEW */
-.profile-preview {
-  display: none; background: var(--cream-2);
-  border: 1px solid var(--border-md); border-radius: 10px;
-  padding: 22px 26px; margin-bottom: 22px;
-  animation: appear 0.3s ease;
-}
-.profile-preview-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px; font-weight: 600; color: var(--charcoal); margin-bottom: 14px;
-}
-.learned-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-.learned-cell { background: var(--cream-1); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
-.learned-cell-label {
-  font-size: 9px; font-weight: 700; color: var(--red);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px;
-}
-.learned-item { font-size: 12px; color: var(--charcoal2); line-height: 1.6; }
-.learned-tag {
-  display: inline-block; font-size: 10px; color: var(--charcoal2);
-  background: var(--cream-2); border: 1px solid var(--border);
-  padding: 2px 9px; border-radius: 12px; margin: 2px 3px 2px 0;
-}
-.profile-confirm-row { display: flex; gap: 10px; align-items: center; }
+/* WORD COUNT BADGE */
+.wc-badge { font-size:10px; padding:2px 7px; border-radius:3px; font-weight:500; margin-bottom:5px; display:inline-block; }
+.wc-ok { background:rgba(58,158,110,0.1); color:var(--green); }
+.wc-short { background:rgba(184,120,48,0.1); color:var(--amber); }
+.wc-long { background:rgba(160,6,5,0.1); color:var(--red); }
 
-/* CALENDAR */
-.calendar-grid {
-  display: grid; grid-template-columns: repeat(7, 1fr);
-  gap: 10px; margin-bottom: 36px;
-}
-.cal-day {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 10px; overflow: hidden;
-  box-shadow: 0 2px 8px var(--shadow);
-}
-.cal-day-header {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-  text-align: center;
-}
-.cal-day-name {
-  font-size: 10px; font-weight: 700; color: var(--charcoal3);
-  letter-spacing: 1.5px; text-transform: uppercase;
-}
-.cal-day-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px; font-weight: 600; color: var(--charcoal); line-height: 1;
-}
-.cal-day-body { padding: 10px 12px; }
-.cal-post-type {
-  font-size: 9px; font-weight: 700; letter-spacing: 1px;
-  text-transform: uppercase; margin-bottom: 5px;
-}
-.cal-post-title { font-size: 11px; font-weight: 600; color: var(--charcoal); line-height: 1.4; margin-bottom: 5px; }
-.cal-pillar-tag {
-  font-size: 9px; padding: 2px 7px; border-radius: 10px;
-  font-weight: 500; display: inline-block;
-}
-.cal-time { font-size: 9px; color: var(--charcoal3); margin-top: 5px; }
+/* DIAG BOX */
+.diag-box { background:var(--cream-2); border:1px solid var(--border-md); border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:12px; color:var(--charcoal2); line-height:1.6; display:none; }
+.diag-box.show { display:block; }
+.diag-ok { color:var(--green); }
+.diag-err { color:var(--red); }
+.diag-warn { color:var(--amber); }
 
-/* PILLAR TRACKER */
-.pillar-tracker {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 10px; padding: 20px 24px;
-  margin-bottom: 28px; box-shadow: 0 2px 8px var(--shadow);
-}
-.pillar-tracker-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 18px; font-weight: 600; color: var(--charcoal); margin-bottom: 16px;
-}
-.pillar-row {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
-}
-.pillar-name { font-size: 12px; color: var(--charcoal2); width: 240px; flex-shrink: 0; }
-.pillar-track {
-  flex: 1; height: 8px; background: var(--cream-2);
-  border-radius: 4px; overflow: hidden;
-}
-.pillar-fill { height: 100%; border-radius: 4px; }
-.pillar-pct { font-size: 11px; color: var(--charcoal3); width: 36px; text-align: right; flex-shrink: 0; }
-.gap-warning {
-  background: var(--amber-bg); border: 1px solid rgba(184,120,48,0.25);
-  border-radius: 6px; padding: 10px 14px;
-  font-size: 12px; color: var(--amber); margin-top: 12px;
-}
-
-/* DELIVERY SECTION */
-.delivery-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-.delivery-card {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 10px; overflow: hidden;
-  box-shadow: 0 2px 10px var(--shadow);
-}
-.delivery-header {
-  padding: 12px 16px; border-bottom: 1px solid var(--border);
-}
-.delivery-role {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 2px; text-transform: uppercase;
-}
-.delivery-person { font-size: 13px; font-weight: 600; color: var(--charcoal); margin-top: 2px; }
-.delivery-body { padding: 14px 16px; }
-.delivery-block {
-  background: var(--cream-2); border: 1px solid var(--border);
-  border-radius: 6px; padding: 11px 13px;
-  font-size: 12px; color: var(--charcoal2);
-  line-height: 1.7; white-space: pre-wrap;
-  margin-bottom: 8px;
-}
-.delivery-label {
-  font-size: 9px; font-weight: 700; color: var(--charcoal3);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px;
-}
+/* DASHBOARD */
+.dash-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.dash-title { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:600; color:var(--charcoal); }
+.dash-sub { font-size:11px; color:var(--charcoal3); margin-top:3px; }
+.dash-ts { font-size:10px; color:var(--charcoal3); }
+.script-note-row { display:flex; align-items:center; justify-content:space-between; margin-top:8px; }
+.script-note { font-size:11px; color:var(--charcoal3); }
+.quad-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; }
+.dash-card { background:var(--cream-1); border:1px solid var(--border-md); border-radius:10px; overflow:hidden; display:flex; flex-direction:column; min-height:400px; box-shadow:0 2px 10px var(--shadow); }
+.dash-card-header { padding:11px 15px; border-bottom:1px solid var(--border); background:var(--cream-2); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.dash-card-hl { display:flex; align-items:center; gap:9px; }
+.dash-accent { width:3px; border-radius:0; flex-shrink:0; }
+.dash-card-name { font-size:13px; font-weight:600; color:var(--charcoal); }
+.dash-card-desc { font-size:10px; color:var(--charcoal3); margin-top:1px; }
+.rbtn { background:transparent; border:1px solid var(--border-md); color:var(--charcoal3); width:28px; height:28px; border-radius:50%; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+.rbtn:hover { border-color:var(--red); color:var(--red); transform:rotate(180deg); }
+.rbtn.spin { animation:spin 0.7s linear infinite; }
+@keyframes spin { 100%{transform:rotate(360deg);} }
+.dash-card-body { padding:12px 14px; overflow-y:auto; flex:1; }
+.dash-empty { color:var(--charcoal4); font-size:12px; text-align:center; padding:36px 16px; line-height:1.7; }
+.dash-loading { color:var(--charcoal3); font-size:11px; text-align:center; padding:36px 16px; letter-spacing:1px; animation:blink 1s step-end infinite; }
+.dash-item { border-bottom:1px solid var(--border); padding:10px 0; }
+.dash-item:last-child { border-bottom:none; }
+.d-ptag { display:inline-block; font-size:9px; font-weight:600; padding:2px 8px; border-radius:12px; margin:3px 0 4px; }
+.d-quote { font-family:'Cormorant Garamond',serif; font-size:15px; font-weight:500; font-style:italic; color:var(--charcoal); line-height:1.5; margin-bottom:4px; }
+.d-qnote { font-size:10px; color:var(--charcoal3); margin-bottom:5px; }
+.d-cap-platform { font-size:10px; font-weight:700; color:var(--green); letter-spacing:1px; text-transform:uppercase; margin-bottom:3px; }
+.d-cap-hook { font-size:12px; font-weight:600; font-style:italic; color:var(--charcoal); margin-bottom:4px; }
+.d-cap-text { font-size:11px; color:var(--charcoal2); line-height:1.65; white-space:pre-wrap; margin-bottom:4px; }
+.d-cap-tags { font-size:10px; color:var(--red); opacity:0.7; margin-bottom:4px; }
+.d-hook-num { font-size:10px; font-weight:700; color:var(--amber); letter-spacing:1px; text-transform:uppercase; margin-bottom:3px; }
+.d-hook-title { font-size:14px; font-weight:600; font-style:italic; color:var(--charcoal); line-height:1.4; margin-bottom:3px; }
+.d-hook-text { font-size:11px; color:var(--charcoal2); line-height:1.4; margin-bottom:4px; }
+.d-car-title { font-size:13px; font-weight:600; color:var(--charcoal); margin-bottom:6px; }
+.d-slide { display:flex; gap:7px; align-items:flex-start; margin-bottom:4px; }
+.d-snum { width:16px; height:16px; border-radius:50%; background:var(--cream-2); border:1px solid var(--border-md); display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:var(--charcoal3); flex-shrink:0; margin-top:1px; }
+.d-snum.h { background:var(--red); border-color:var(--red); color:white; }
+.d-snum.c { background:var(--charcoal); border-color:var(--charcoal); color:white; }
+.d-stext { font-size:11px; color:var(--charcoal2); line-height:1.4; }
 
 /* KNOWLEDGE BASE */
-.kb-entry {
-  background: var(--cream-1); border: 1px solid var(--border-md);
-  border-radius: 10px; overflow: hidden;
-  box-shadow: 0 2px 10px var(--shadow); margin-bottom: 16px;
-}
-.kb-entry-header {
-  background: var(--cream-2); padding: 12px 18px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-}
-.kb-entry-title { font-size: 13px; font-weight: 600; color: var(--charcoal); }
-.kb-entry-meta { font-size: 10px; color: var(--charcoal3); margin-top: 2px; }
-.kb-doc-type {
-  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
-  text-transform: uppercase; padding: 3px 9px; border-radius: 12px;
-}
-.kb-entry-body { padding: 18px 20px; }
-.kb-insight-group { margin-bottom: 16px; }
-.kb-insight-label {
-  font-size: 9px; font-weight: 700; color: var(--red);
-  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 7px;
-}
-.kb-insight-item {
-  font-size: 12px; color: var(--charcoal2); line-height: 1.6;
-  padding: 5px 0; border-bottom: 1px solid var(--border);
-}
-.kb-insight-item:last-child { border-bottom: none; }
-.kb-tag {
-  display: inline-block; font-size: 10px; color: var(--charcoal2);
-  background: var(--cream-2); border: 1px solid var(--border);
-  padding: 2px 9px; border-radius: 12px; margin: 2px 3px 2px 0;
-}
-.kb-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-.kb-stat {
-  background: var(--cream-2); border: 1px solid var(--border);
-  border-radius: 7px; padding: 11px 13px; text-align: center;
-}
-.kb-stat-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px; font-weight: 700; color: var(--red); line-height: 1;
-}
-.kb-stat-label { font-size: 9px; color: var(--charcoal3); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
-.kb-empty {
-  text-align: center; padding: 40px 20px;
-  color: var(--charcoal3); font-size: 13px; line-height: 1.7;
-}
-#upload-zone:hover {
-  border-color: var(--red); background: var(--cream-1);
-}
+#upload-zone { border:2px dashed var(--border-md); border-radius:10px; padding:32px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--cream-2); margin-bottom:14px; }
+#upload-zone:hover { border-color:var(--red); background:var(--cream-1); }
+.kb-entry { background:var(--cream-1); border:1px solid var(--border-md); border-radius:10px; overflow:hidden; box-shadow:0 2px 10px var(--shadow); margin-bottom:14px; }
+.kb-entry-header { background:var(--cream-2); padding:11px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+.kb-entry-title { font-size:13px; font-weight:600; color:var(--charcoal); }
+.kb-entry-meta { font-size:10px; color:var(--charcoal3); margin-top:2px; }
+.kb-doc-type { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; padding:3px 9px; border-radius:12px; }
+.kb-body { padding:16px 18px; }
+.kb-label { font-size:9px; font-weight:700; color:var(--red); letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; margin-top:12px; }
+.kb-label:first-child { margin-top:0; }
+.kb-item { font-size:12px; color:var(--charcoal2); line-height:1.6; padding:4px 0; border-bottom:1px solid var(--border); }
+.kb-item:last-child { border-bottom:none; }
+.kb-stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:4px; }
+.kb-stat { background:var(--cream-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; text-align:center; }
+.kb-stat-num { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:700; color:var(--red); line-height:1; }
+.kb-stat-label { font-size:9px; color:var(--charcoal3); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+.kb-empty { text-align:center; padding:40px 20px; color:var(--charcoal3); font-size:12px; line-height:1.7; }
 
-/* PRINT */
+/* WEEKLY PLANNER */
+.transcript-list { display:flex; flex-direction:column; gap:10px; margin-bottom:12px; }
+.transcript-entry-label { font-size:10px; font-weight:600; color:var(--charcoal3); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:5px; display:flex; align-items:center; justify-content:space-between; }
+.remove-transcript { background:transparent; border:none; color:var(--charcoal3); font-size:16px; cursor:pointer; padding:0 4px; line-height:1; }
+.remove-transcript:hover { color:var(--red); }
+.add-transcript-btn { background:transparent; border:1px dashed var(--border-md); color:var(--charcoal3); padding:10px; font-family:'Inter',sans-serif; font-size:12px; cursor:pointer; border-radius:8px; width:100%; transition:all 0.15s; text-align:center; }
+.add-transcript-btn:hover { border-color:var(--red); color:var(--red); }
+.profile-preview { display:none; background:var(--cream-2); border:1px solid var(--border-md); border-radius:10px; padding:20px 24px; margin-bottom:20px; animation:appear 0.3s ease; }
+.profile-preview-title { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--charcoal); margin-bottom:14px; }
+.learned-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.learned-cell { background:var(--cream-1); border:1px solid var(--border); border-radius:8px; padding:13px 15px; }
+.learned-cell-label { font-size:9px; font-weight:700; color:var(--red); letter-spacing:2px; text-transform:uppercase; margin-bottom:7px; }
+.learned-tag { display:inline-block; font-size:10px; color:var(--charcoal2); background:var(--cream-2); border:1px solid var(--border); padding:2px 9px; border-radius:12px; margin:2px 3px 2px 0; }
+.learned-item { font-size:12px; color:var(--charcoal2); line-height:1.6; }
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:28px; }
+.cal-day { background:var(--cream-1); border:1px solid var(--border-md); border-radius:8px; overflow:hidden; box-shadow:0 2px 6px var(--shadow); }
+.cal-day-header { padding:8px 10px; border-bottom:1px solid var(--border); text-align:center; }
+.cal-day-name { font-size:9px; font-weight:700; color:var(--charcoal3); letter-spacing:1.5px; text-transform:uppercase; }
+.cal-day-date { font-size:10px; color:var(--charcoal3); margin-top:1px; }
+.cal-day-body { padding:9px 10px; }
+.cal-post-type { font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+.cal-post-title { font-size:11px; font-weight:600; color:var(--charcoal); line-height:1.3; margin-bottom:4px; }
+.cal-time { font-size:9px; color:var(--charcoal3); margin-top:4px; }
+.pillar-tracker { background:var(--cream-1); border:1px solid var(--border-md); border-radius:10px; padding:18px 22px; margin-bottom:24px; box-shadow:0 2px 8px var(--shadow); }
+.pillar-tracker-title { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--charcoal); margin-bottom:14px; }
+.delivery-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.delivery-card { background:var(--cream-1); border:1px solid var(--border-md); border-radius:10px; overflow:hidden; box-shadow:0 2px 8px var(--shadow); }
+.delivery-header { padding:11px 15px; border-bottom:1px solid var(--border); }
+.delivery-role { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; }
+.delivery-person { font-size:13px; font-weight:600; color:var(--charcoal); margin-top:2px; }
+.delivery-body { padding:13px 15px; }
+.delivery-block { background:var(--cream-2); border:1px solid var(--border); border-radius:6px; padding:10px 12px; font-size:12px; color:var(--charcoal2); line-height:1.7; white-space:pre-wrap; margin-bottom:8px; }
+.priority-item { display:flex; align-items:flex-start; gap:12px; padding:9px 0; border-bottom:1px solid var(--border); }
+.priority-item:last-child { border-bottom:none; }
+.priority-num { width:20px; height:20px; border-radius:50%; background:var(--red-dim); border:1px solid var(--red-mid); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--red); flex-shrink:0; margin-top:1px; }
+.priority-text { font-size:12px; color:var(--charcoal); line-height:1.5; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+
+/* FOOTER */
+.studio-footer { text-align:center; padding:28px; color:var(--charcoal4); font-size:10px; letter-spacing:2px; text-transform:uppercase; border-top:1px solid var(--border); margin-top:40px; }
+
+@media (max-width:900px) {
+  .quad-grid,.two-col,.delivery-grid,.learned-grid { grid-template-columns:1fr; }
+  .calendar-grid { grid-template-columns:repeat(4,1fr); }
+  .profile-stats { grid-template-columns:1fr 1fr; }
+  #main { padding:20px 16px; }
+  #tab-bar { padding:0 16px; overflow-x:auto; }
+}
+@media (max-width:600px) {
+  .calendar-grid { grid-template-columns:1fr 1fr; }
+  .delivery-grid { grid-template-columns:1fr; }
+}
 @media print {
-  #topbar, #tab-bar, .generate-btn, .tb-btn, .copy-btn,
-  .add-transcript-btn, #profile-panel, #upload-zone,
-  .content-type-select, #kb-file-input { display: none !important; }
-  body { background: white; }
-}
-
-</style>
-  text-align: center; padding: 28px;
-  color: var(--charcoal4); font-size: 10px; letter-spacing: 2px;
-  text-transform: uppercase; border-top: 1px solid var(--border); margin-top: 48px;
-}
-
-@media (max-width: 900px) {
-  .calendar-grid { grid-template-columns: repeat(4, 1fr); }
-  .carousel-grid, .quotes-grid, .designer-grid, .delivery-grid, .learned-grid { grid-template-columns: 1fr; }
-  .profile-stats { grid-template-columns: 1fr 1fr; }
-  #main { padding: 24px 16px; }
-  #tab-bar { padding: 0 16px; overflow-x: auto; }
-}
-@media (max-width: 600px) {
-  .calendar-grid { grid-template-columns: 1fr 1fr; }
-  .delivery-grid { grid-template-columns: 1fr; }
+  #topbar,#tab-bar,.btn-primary,.tb-btn,.copy-btn,.add-transcript-btn,#profile-panel,#upload-zone { display:none !important; }
+  body { background:white; }
 }
 </style>
 </head>
@@ -815,16 +437,16 @@ body::before {
 <div id="api-modal">
   <div class="modal-box">
     <div class="modal-title">Anthropic API Key</div>
-    <div class="modal-sub">Enter your Anthropic API key. Saved in your browser only. Get your key at <span>console.anthropic.com</span>.</div>
+    <div class="modal-sub">Enter your key. Saved in your browser only. Get it at <span>console.anthropic.com</span> under API Keys.</div>
     <input class="modal-input" id="api-key-input" type="password" placeholder="sk-ant-api03-..." />
     <button class="modal-btn" onclick="saveApiKey()">Save Key</button>
     <div class="modal-note">Stored in localStorage only</div>
   </div>
 </div>
 
-<!-- TOP BAR -->
+<!-- TOPBAR -->
 <div id="topbar">
-  <div class="logo-area">
+  <div>
     <div class="logo-brand">Content Studio</div>
     <div class="logo-title">Tiffany Haynes <span class="logo-accent">&amp;</span> Co.</div>
   </div>
@@ -838,8 +460,9 @@ body::before {
 </div>
 
 <!-- TAB BAR -->
-<div id="tab-bar" style="display:none;">
-  <button class="tab-btn active" onclick="switchTab('studio')">Transcript to Content</button>
+<div id="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+  <button class="tab-btn" onclick="switchTab('studio')">Transcript to Content</button>
   <button class="tab-btn" onclick="switchTab('planner')">Weekly Planner</button>
   <button class="tab-btn" onclick="switchTab('knowledge')">Knowledge Base</button>
 </div>
@@ -852,46 +475,137 @@ body::before {
     <div class="landing-eyebrow">Tiffany Haynes &amp; Co. Media Team</div>
     <div class="landing-title">Content Studio</div>
     <div class="landing-math">1 + 1 = 10,000</div>
-    <div class="landing-sub">Paste transcripts, generate captions, carousels, quote pulls, and thumbnail briefs. Build a weekly content calendar. All in Tiffany's voice.</div>
+    <div class="landing-sub">Paste scripts, generate captions, carousels, quote pulls, and thumbnail briefs. Build weekly calendars. All in Tiffany's voice.</div>
     <button class="landing-btn" onclick="startStudio()">Open Studio</button>
     <br><br>
     <button class="key-btn-land" onclick="showKeyModal()">Enter API Key</button>
     <div class="tool-chips">
+      <div class="tool-chip">Script-Powered Dashboard</div>
       <div class="tool-chip">Captions Ready to Post</div>
       <div class="tool-chip">Thumbnail Briefs</div>
       <div class="tool-chip">Carousel Copy</div>
-      <div class="tool-chip">Quote Pulls</div>
       <div class="tool-chip">Weekly Planner</div>
-      <div class="tool-chip">Client Profile</div>
-      <div class="tool-chip">Designer Delivery Cards</div>
+      <div class="tool-chip">Knowledge Base</div>
     </div>
   </div>
 
-  <!-- STUDIO TABS -->
+  <!-- STUDIO WRAP -->
   <div id="studio-wrap" style="display:none;">
 
-    <!-- CLIENT PROFILE PANEL -->
+    <!-- CLIENT PROFILE -->
     <div id="profile-panel">
       <div class="profile-header">
         <div class="profile-title">Tiffany's Client Profile</div>
-        <div class="profile-actions">
-          <button class="tb-btn" onclick="clearProfile()">Clear Profile</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-secondary" onclick="clearProfile()">Clear Profile</button>
         </div>
       </div>
       <div id="profile-content">
-        <div class="profile-empty">No profile built yet. Paste transcripts to start building Tiffany's content profile. The more transcripts you feed in, the smarter the suggestions become.</div>
+        <div class="profile-empty">No profile yet. Paste transcripts or upload documents to start building Tiffany's content profile.</div>
       </div>
     </div>
 
-    <!-- TAB 1: CONTENT STUDIO -->
-    <div id="tab-studio" class="tab-pane active">
+    <!-- TAB: DASHBOARD -->
+    <div id="tab-dashboard" class="tab-pane active">
 
-      <div class="input-panel">
-        <div class="input-eyebrow">Step 1</div>
-        <div class="input-title">Paste the Video Transcript</div>
-        <textarea class="transcript-area" id="transcript" placeholder="Paste Tiffany's voiceover transcript here. Full sentences. Natural speech. Include everything she said."></textarea>
+      <div class="dash-header">
+        <div>
+          <div class="dash-title">Weekly Content Dashboard</div>
+          <div class="dash-sub" id="dash-last">Not yet generated</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn-secondary" id="test-conn-btn" onclick="testConnection()">Test Connection</button>
+          <button class="btn-primary" id="dash-gen-btn" onclick="generateDashboard()">Generate From Script</button>
+        </div>
+      </div>
+
+      <div class="diag-box" id="diag-box"><div id="diag-content"></div></div>
+
+      <!-- SCRIPT INPUT -->
+      <div class="panel" style="margin-bottom:20px;">
+        <div class="panel-eyebrow">Script Input</div>
+        <div class="panel-title" style="margin-bottom:10px;">Paste Tiffany's Script</div>
+        <textarea class="textarea" id="dash-script" placeholder="Paste Tiffany's voiceover script or transcript here. Quotes, captions, and title hooks are pulled directly from this script. Carousels use it as additional context."></textarea>
+        <div class="script-note-row">
+          <span class="script-note" id="dash-script-note">No script pasted yet</span>
+          <span style="font-size:11px;color:var(--charcoal3);">Use Chrome for best results</span>
+        </div>
+      </div>
+
+      <!-- 4 CARDS -->
+      <div class="quad-grid">
+
+        <!-- QUOTE PULLS -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-hl">
+              <div class="dash-accent" style="background:var(--red);height:28px;"></div>
+              <div>
+                <div class="dash-card-name">Quote Pulls</div>
+                <div class="dash-card-desc">Word-for-word from the script</div>
+              </div>
+            </div>
+            <span class="badge badge-script">From Script</span>
+          </div>
+          <div class="dash-card-body" id="body-quotes"><div class="dash-empty">Paste a script above and click Generate From Script</div></div>
+        </div>
+
+        <!-- CAPTION STARTERS -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-hl">
+              <div class="dash-accent" style="background:var(--green);height:28px;"></div>
+              <div>
+                <div class="dash-card-name">Caption Starters</div>
+                <div class="dash-card-desc">Written from the script's message</div>
+              </div>
+            </div>
+            <span class="badge badge-script">From Script</span>
+          </div>
+          <div class="dash-card-body" id="body-captions"><div class="dash-empty">Paste a script above and click Generate From Script</div></div>
+        </div>
+
+        <!-- TITLE HOOKS -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-hl">
+              <div class="dash-accent" style="background:var(--amber);height:28px;"></div>
+              <div>
+                <div class="dash-card-name">Title Hooks</div>
+                <div class="dash-card-desc">Reel titles + thumbnail text for Designer 1</div>
+              </div>
+            </div>
+            <span class="badge badge-script">From Script</span>
+          </div>
+          <div class="dash-card-body" id="body-hooks"><div class="dash-empty">Paste a script above and click Generate From Script</div></div>
+        </div>
+
+        <!-- CAROUSELS -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <div class="dash-card-hl">
+              <div class="dash-accent" style="background:var(--blue);height:28px;"></div>
+              <div>
+                <div class="dash-card-name">Carousel Concepts</div>
+                <div class="dash-card-desc">Profile + KB + script context</div>
+              </div>
+            </div>
+            <button class="rbtn" id="rbtn-car" onclick="refreshCarousels()" title="Refresh carousels">&#8635;</button>
+          </div>
+          <div class="dash-card-body" id="body-carousels"><div class="dash-empty">Generate from script or click refresh for profile-based ideas</div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB: TRANSCRIPT TO CONTENT -->
+    <div id="tab-studio" class="tab-pane">
+      <div class="panel">
+        <div class="panel-eyebrow">Step 1</div>
+        <div class="panel-title">Paste the Video Transcript</div>
+        <textarea class="textarea" id="transcript" placeholder="Paste Tiffany's voiceover transcript here. Full sentences. Natural speech. Include everything she said."></textarea>
         <div class="input-row">
-          <select class="content-type-select" id="content-type">
+          <select class="select" id="content-type">
             <option value="talking-head">Talking Head Reel</option>
             <option value="broll">B-Roll with Text Overlay</option>
             <option value="teaching">Teaching / God's Math</option>
@@ -900,87 +614,71 @@ body::before {
             <option value="shenanigans">Shenanigans / Humor</option>
             <option value="business">Business + Entrepreneurship</option>
           </select>
-          <button class="generate-btn" id="gen-btn-studio" onclick="generateStudioContent()">Generate Content</button>
+          <button class="btn-primary" id="gen-btn-studio" onclick="generateStudioContent()">Generate Content</button>
         </div>
       </div>
-
       <div class="gen-loading" id="loading-studio">
         <div class="gen-label">Generating in Tiffany's voice...</div>
         <div class="gen-track"></div>
         <div class="gen-msg" id="gen-msg-studio">Reading the transcript...</div>
       </div>
-
       <div class="gen-error" id="error-studio"></div>
       <div class="results-wrap" id="results-studio"></div>
-
     </div>
 
-    <!-- TAB 2: WEEKLY PLANNER -->
+    <!-- TAB: WEEKLY PLANNER -->
     <div id="tab-planner" class="tab-pane">
-
-      <div class="week-input-panel">
-        <div class="input-eyebrow">Step 1</div>
-        <div class="input-title">Paste This Week's Transcripts</div>
-        <div style="font-size:12px;color:var(--charcoal3);margin-bottom:16px;line-height:1.6;">Paste all available transcripts for the week. The AI will read all of them, learn from them, update the client profile, and build the weekly calendar.</div>
+      <div class="panel">
+        <div class="panel-eyebrow">Step 1</div>
+        <div class="panel-title">Paste This Week's Transcripts</div>
+        <div class="panel-sub">Paste all available transcripts. The AI reads all of them, learns from them, updates the client profile, and builds the weekly calendar.</div>
         <div class="transcript-list" id="transcript-list">
           <div class="transcript-entry" id="t-entry-0">
             <div class="transcript-entry-label">Transcript 1</div>
-            <textarea class="transcript-area" id="t-0" placeholder="Paste first transcript here..." style="min-height:100px;"></textarea>
+            <textarea class="textarea" id="t-0" placeholder="Paste first transcript here..." style="min-height:90px;"></textarea>
           </div>
         </div>
         <button class="add-transcript-btn" onclick="addTranscript()">+ Add Another Transcript</button>
-        <div style="margin-top:14px;">
-          <button class="generate-btn" id="gen-btn-learn" onclick="learnFromTranscripts()">Analyze Transcripts</button>
+        <div style="margin-top:12px;">
+          <button class="btn-primary" id="gen-btn-learn" onclick="learnFromTranscripts()">Analyze Transcripts</button>
         </div>
       </div>
-
       <div class="gen-loading" id="loading-learn">
         <div class="gen-label">Reading all transcripts...</div>
         <div class="gen-track"></div>
         <div class="gen-msg" id="gen-msg-learn">Building Tiffany's profile...</div>
       </div>
-
       <div class="gen-error" id="error-planner"></div>
-
-      <!-- PROFILE PREVIEW (shown after analysis) -->
       <div class="profile-preview" id="profile-preview">
-        <div class="profile-preview-title">Here is what I learned from these transcripts</div>
+        <div class="profile-preview-title">What I learned from these transcripts</div>
         <div class="learned-grid" id="learned-grid"></div>
-        <div class="profile-confirm-row">
-          <button class="generate-btn" id="gen-btn-week" onclick="generateWeeklyPlan()">Generate Weekly Plan</button>
-          <span style="font-size:12px;color:var(--charcoal3);">Review the profile above, then generate the full Mon-Sun calendar.</span>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="btn-primary" id="gen-btn-week" onclick="generateWeeklyPlan()">Generate Weekly Plan</button>
+          <span style="font-size:12px;color:var(--charcoal3);">Review above then generate the Mon-Sun calendar.</span>
         </div>
       </div>
-
       <div class="gen-loading" id="loading-week">
         <div class="gen-label">Building the weekly calendar...</div>
         <div class="gen-track"></div>
         <div class="gen-msg" id="gen-msg-week">Arranging content across the week...</div>
       </div>
-
       <div class="results-wrap" id="results-planner"></div>
-
     </div>
 
-    <!-- TAB 3: KNOWLEDGE BASE -->
+    <!-- TAB: KNOWLEDGE BASE -->
     <div id="tab-knowledge" class="tab-pane">
-
-      <div class="input-panel">
-        <div class="input-eyebrow">Knowledge Base</div>
-        <div class="input-title">Upload Documents &amp; Reports</div>
-        <div style="font-size:13px;color:var(--charcoal2);line-height:1.65;margin-bottom:20px;">Upload META performance reports, 90-day plans, brand guidelines, audience research, content calendars, or CSV files. The AI reads each one and automatically updates Tiffany's client profile with every insight.</div>
-
-        <!-- UPLOAD ZONE -->
-        <div id="upload-zone" onclick="document.getElementById('kb-file-input').click()" style="border:2px dashed var(--border-md);border-radius:10px;padding:36px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--cream-2);margin-bottom:16px;">
+      <div class="panel">
+        <div class="panel-eyebrow">Knowledge Base</div>
+        <div class="panel-title">Upload Documents &amp; Reports</div>
+        <div class="panel-sub">Upload META performance reports, 90-day plans, brand guidelines, audience research, content calendars, or CSV files. The AI reads each one and automatically updates Tiffany's client profile.</div>
+        <div id="upload-zone" onclick="document.getElementById('kb-file-input').click()">
           <div style="font-size:28px;margin-bottom:10px;">+</div>
           <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--charcoal);margin-bottom:6px;">Drop a file or click to upload</div>
-          <div style="font-size:11px;color:var(--charcoal3);">PDF, CSV, TXT supported &bull; META reports, brand guides, 90-day plans, audience research</div>
+          <div style="font-size:11px;color:var(--charcoal3);">PDF, CSV, TXT supported</div>
         </div>
         <input type="file" id="kb-file-input" accept=".pdf,.csv,.txt" style="display:none" onchange="handleKBUpload(event)" />
-
-        <!-- DOC TYPE SELECTOR -->
         <div class="input-row" style="margin-top:8px;">
-          <select class="content-type-select" id="kb-doc-type">
+          <select class="select" id="kb-doc-type">
             <option value="meta-report">META Performance Report</option>
             <option value="strategy">90-Day Strategic Plan</option>
             <option value="brand">Brand Guidelines</option>
@@ -989,53 +687,39 @@ body::before {
             <option value="csv">CSV Data Export</option>
             <option value="other">Other Document</option>
           </select>
-          <span style="font-size:11px;color:var(--charcoal3);flex:1;">Select the document type before uploading for best extraction.</span>
+          <span style="font-size:11px;color:var(--charcoal3);">Select document type before uploading</span>
         </div>
       </div>
-
-      <!-- PROCESSING STATE -->
       <div class="gen-loading" id="loading-kb">
         <div class="gen-label">Reading document...</div>
         <div class="gen-track"></div>
         <div class="gen-msg" id="gen-msg-kb">Extracting insights...</div>
       </div>
-
       <div class="gen-error" id="error-kb"></div>
-
-      <!-- KNOWLEDGE BASE ENTRIES -->
       <div id="kb-entries"></div>
-
     </div>
 
   </div>
-
 </div>
 
 <script>
-// ================================================================
-// BRAND
-// ================================================================
 var BRAND = {
-  voice: "Conviction-based, rooted in testimony and scripture. Authoritative but warm. Spiritually mature but relatable. Compassionate big sister in Christ. She has lived both bankruptcy and breakthrough. She teaches with authority, not arrogance. Never condescending, never preachy, never performative. She is funny and real.",
-  framework: "God's Math: The supernatural formula where divine partnership creates results beyond natural limits. 1 + 1 = 10,000.",
-  avoid: "NEVER use: the words divine or activate, em dashes, emojis, generic Christian cliches, hustle culture language, self-reliance messaging, complex theological jargon without practical application, hype-based motivation, passive or apologetic language, fabricated quotes. No sales CTAs unless directed by leadership.",
-  captions: "Captions: No emojis. No em dashes. No filler. Hook in the first line. Story or teaching in the middle. Engagement CTA at the end. In Tiffany's exact voice.",
-  design: "Visual brand: Cream palette (#FFFDF5, #F4F0EB, #E3D3C8). Deep Red (#A00605) and Charcoal (#414141). Clean generous spacing. Mathematical symbols as design elements. Scripture always italicized or visually offset.",
-  pillars: ["Business and Entrepreneurship", "Spiritual Development and God's Math Teaching", "Family and Lifestyle", "Humor and Personality (Shenanigans)", "Community and Testimony"],
+  voice: "Conviction-based, rooted in testimony and scripture. Authoritative but warm. Spiritually mature but relatable. Compassionate big sister in Christ. Gods Math: 1+1=10000. She has lived both bankruptcy and breakthrough.",
+  avoid: "NEVER use: words divine or activate, em dashes, emojis, generic Christian cliches, hustle culture language, self-reliance messaging, complex theological jargon without practical application, hype-based motivation, passive or apologetic language, fabricated quotes. No sales CTAs unless directed by leadership.",
+  captions: "Caption rules: No emojis. No em dashes. No typos. No filler language. Hook in the first line. Story or teaching in the middle. Engagement CTA at the end. In Tiffany's exact voice.",
+  pillars: ["Business and Entrepreneurship","Spiritual Development and Gods Math Teaching","Family and Lifestyle","Humor and Personality Shenanigans","Community and Testimony"],
   pillarColors: {
-    "Business and Entrepreneurship": {color:"#B87830", bg:"#FFF8F0"},
-    "Spiritual Development and God's Math Teaching": {color:"#A00605", bg:"#FFF5F5"},
-    "Family and Lifestyle": {color:"#3A9E6E", bg:"#F5FAF7"},
-    "Humor and Personality (Shenanigans)": {color:"#6A50A8", bg:"#F8F5FF"},
-    "Community and Testimony": {color:"#3A6EA8", bg:"#F0F5FF"}
+    "Business and Entrepreneurship":{color:"#B87830",bg:"rgba(184,120,48,0.1)"},
+    "Spiritual Development and Gods Math Teaching":{color:"#A00605",bg:"rgba(160,6,5,0.08)"},
+    "Family and Lifestyle":{color:"#3A9E6E",bg:"rgba(58,158,110,0.1)"},
+    "Humor and Personality Shenanigans":{color:"#6A50A8",bg:"rgba(106,80,168,0.1)"},
+    "Community and Testimony":{color:"#3A6EA8",bg:"rgba(58,110,168,0.1)"}
   }
 };
 
-// ================================================================
-// STATE
-// ================================================================
 var transcriptCount = 1;
 var learnedData = null;
+var lastDashScript = '';
 
 // ================================================================
 // PASSWORD
@@ -1068,6 +752,14 @@ var learnedData = null;
     if (g) g.addEventListener('keydown', function(e) { if (e.key === 'Enter') window.checkPassword(); });
     var a = document.getElementById('api-key-input');
     if (a) a.addEventListener('keydown', function(e) { if (e.key === 'Enter') saveApiKey(); });
+    var ds = document.getElementById('dash-script');
+    if (ds) ds.addEventListener('input', function() {
+      lastDashScript = this.value.trim();
+      var note = document.getElementById('dash-script-note');
+      if (note) note.textContent = lastDashScript ? lastDashScript.split(/\s+/).length + ' words pasted' : 'No script pasted yet';
+    });
+    renderProfilePanel();
+    renderKnowledgeBase();
   });
 })();
 
@@ -1091,80 +783,191 @@ function checkApiKey() {
 }
 
 // ================================================================
+// NAVIGATION
+// ================================================================
+function startStudio() {
+  if (!checkApiKey()) return;
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('studio-wrap').style.display = 'block';
+  document.getElementById('tab-bar').style.display = 'flex';
+  renderProfilePanel();
+  renderKnowledgeBase();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('tab-' + tab).classList.add('active');
+  var tabs = ['dashboard','studio','planner','knowledge'];
+  var idx = tabs.indexOf(tab);
+  if (idx >= 0) document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  if (tab === 'knowledge') renderKnowledgeBase();
+}
+
+// ================================================================
+// UTILITIES
+// ================================================================
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function escRaw(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function ptag(p) {
+  var pc = BRAND.pillarColors[p] || {color:'#888',bg:'rgba(136,136,136,0.1)'};
+  return '<span class="d-ptag" style="background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(p) + '</span>';
+}
+
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = 'Copied'; btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2200);
+  }).catch(function() { btn.textContent = 'Failed'; setTimeout(function() { btn.textContent = 'Copy'; }, 2000); });
+}
+
+function wcBadge(text, minW, maxW) {
+  var wc = (text||'').trim().split(/\s+/).length;
+  var cls = wc < minW ? 'wc-short' : wc > maxW ? 'wc-long' : 'wc-ok';
+  var lbl = wc < minW ? wc + ' words - too short' : wc > maxW ? wc + ' words - trim' : wc + ' words';
+  return '<span class="wc-badge ' + cls + '">' + lbl + '</span>';
+}
+
+function showDiag(type, msg) {
+  var box = document.getElementById('diag-box');
+  if (!box) return;
+  var cls = type === 'ok' ? 'diag-ok' : type === 'warn' ? 'diag-warn' : 'diag-err';
+  var icon = type === 'ok' ? 'OK' : type === 'warn' ? 'NOTE' : 'ERROR';
+  document.getElementById('diag-content').innerHTML = '<span class="' + cls + '"><strong>' + icon + ':</strong> ' + escRaw(msg) + '</span>';
+  box.classList.add('show');
+}
+
+function safeParseJSON(raw) {
+  if (!raw) throw new Error('Empty response from API');
+  var s = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+  var a = s.indexOf('{'); var b = s.lastIndexOf('}');
+  if (a === -1 || b === -1) throw new Error('No JSON found in response. Got: ' + s.slice(0,150));
+  s = s.slice(a, b+1);
+  s = s.replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[\u2013\u2014]/g,'-');
+  try { return JSON.parse(s); } catch(e) {
+    s = s.replace(/,(\s*[}\]])/g,'$1');
+    try { return JSON.parse(s); } catch(e2) {
+      throw new Error('Parse error: ' + e2.message + ' | Snippet: ' + s.slice(0,200));
+    }
+  }
+}
+
+async function callAPI(prompt, tokens) {
+  if (!getApiKey()) throw new Error('No API key. Enter and save your key first.');
+  var res;
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': getApiKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: tokens || 4000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+  } catch(fetchErr) {
+    throw new Error('Network error: ' + fetchErr.message + '. If using Safari, switch to Chrome - Safari blocks direct API calls.');
+  }
+  var bodyText = await res.text();
+  if (!res.ok) {
+    var errMsg = 'API error ' + res.status;
+    try { var j = JSON.parse(bodyText); errMsg += ': ' + (j.error && j.error.message ? j.error.message : bodyText.slice(0,200)); } catch(x) { errMsg += ': ' + bodyText.slice(0,150); }
+    throw new Error(errMsg);
+  }
+  var data;
+  try { data = JSON.parse(bodyText); } catch(e) { throw new Error('Could not parse API response: ' + bodyText.slice(0,150)); }
+  var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
+  if (!raw || !raw.text) throw new Error('No text in API response.');
+  return safeParseJSON(raw.text);
+}
+
+// ================================================================
+// TEST CONNECTION
+// ================================================================
+async function testConnection() {
+  if (!getApiKey()) { showDiag('err', 'No API key saved. Click API Key button and save your key first.'); return; }
+  var btn = document.getElementById('test-conn-btn');
+  btn.textContent = 'Testing...'; btn.disabled = true;
+  showDiag('warn', 'Connecting to Anthropic API...');
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 10, messages: [{ role: 'user', content: 'Say OK' }] })
+    });
+    if (res.status === 200) {
+      showDiag('ok', 'Connection successful. API key is working. Ready to generate.');
+    } else if (res.status === 401) {
+      showDiag('err', 'Authentication failed (401). Your API key is invalid or expired. Get a new one at console.anthropic.com.');
+    } else if (res.status === 429) {
+      showDiag('warn', 'Rate limited (429). Check your billing and usage limits at console.anthropic.com.');
+    } else {
+      showDiag('err', 'Unexpected status ' + res.status + '. Check console.anthropic.com.');
+    }
+  } catch(e) {
+    showDiag('err', 'Fetch failed: ' + e.message + '. You must use Chrome - Safari blocks direct API calls.');
+  }
+  btn.textContent = 'Test Connection'; btn.disabled = false;
+}
+
+// ================================================================
 // CLIENT PROFILE
 // ================================================================
 function getProfile() {
   var raw = localStorage.getItem('tiffany_profile');
-  if (!raw) return { topics: [], pillars: {}, phrases: [], themes: [], transcript_count: 0, last_updated: null };
-  try { return JSON.parse(raw); } catch(e) { return { topics: [], pillars: {}, phrases: [], themes: [], transcript_count: 0, last_updated: null }; }
+  if (!raw) return { topics:[], pillars:{}, phrases:[], themes:[], transcript_count:0, last_updated:null };
+  try { return JSON.parse(raw); } catch(e) { return { topics:[], pillars:{}, phrases:[], themes:[], transcript_count:0, last_updated:null }; }
 }
 
-function saveProfile(p) {
-  localStorage.setItem('tiffany_profile', JSON.stringify(p));
-}
+function saveProfile(p) { localStorage.setItem('tiffany_profile', JSON.stringify(p)); }
 
 function updateProfileFromLearning(learned) {
   var p = getProfile();
   p.transcript_count = (p.transcript_count || 0) + (learned.transcript_count || 1);
   p.last_updated = new Date().toISOString();
-
-  if (learned.topics_covered) {
-    learned.topics_covered.forEach(function(t) {
-      if (p.topics.indexOf(t) === -1) p.topics.push(t);
-    });
-  }
-  if (learned.recurring_phrases) {
-    learned.recurring_phrases.forEach(function(ph) {
-      if (p.phrases.indexOf(ph) === -1) p.phrases.push(ph);
-    });
-  }
-  if (learned.themes) {
-    learned.themes.forEach(function(th) {
-      if (p.themes.indexOf(th) === -1) p.themes.push(th);
-    });
-  }
-  if (learned.pillar_hits) {
-    Object.keys(learned.pillar_hits).forEach(function(k) {
-      p.pillars[k] = (p.pillars[k] || 0) + (learned.pillar_hits[k] || 0);
-    });
-  }
+  if (learned.topics_covered) learned.topics_covered.forEach(function(t) { if (p.topics.indexOf(t) === -1) p.topics.push(t); });
+  if (learned.recurring_phrases) learned.recurring_phrases.forEach(function(ph) { if (p.phrases.indexOf(ph) === -1) p.phrases.push(ph); });
+  if (learned.themes) learned.themes.forEach(function(th) { if (p.themes.indexOf(th) === -1) p.themes.push(th); });
+  if (learned.pillar_hits) Object.keys(learned.pillar_hits).forEach(function(k) { p.pillars[k] = (p.pillars[k] || 0) + (learned.pillar_hits[k] || 0); });
   saveProfile(p);
   renderProfilePanel();
 }
 
 function renderProfilePanel() {
   var p = getProfile();
+  var el = document.getElementById('profile-content');
+  if (!el) return;
   if (!p.transcript_count) {
-    document.getElementById('profile-content').innerHTML = '<div class="profile-empty">No profile built yet. Paste transcripts to start building Tiffany\'s content profile.</div>';
+    el.innerHTML = '<div class="profile-empty">No profile yet. Paste transcripts or upload documents to start building Tiffany\'s content profile.</div>';
     return;
   }
-
   var totalPillar = Object.values(p.pillars).reduce(function(a,b) { return a+b; }, 0) || 1;
-  var pillarBars = BRAND.pillars.map(function(pname) {
+  var bars = BRAND.pillars.map(function(pname) {
     var count = p.pillars[pname] || 0;
     var pct = Math.round((count / totalPillar) * 100);
     var col = (BRAND.pillarColors[pname] || {color:'#999'}).color;
-    return '<div class="pillar-bar-row">' +
-      '<div class="pillar-bar-label">' + pname + '</div>' +
-      '<div class="pillar-bar-track"><div class="pillar-bar-fill" style="width:' + pct + '%;background:' + col + ';"></div></div>' +
-      '<div class="pillar-bar-count">' + count + '</div>' +
-    '</div>';
+    return '<div class="pillar-bar-row"><div class="pillar-bar-label">' + pname + '</div><div class="pillar-bar-track"><div class="pillar-bar-fill" style="width:' + pct + '%;background:' + col + ';"></div></div><div class="pillar-bar-count">' + count + '</div></div>';
   }).join('');
-
-  var html = '<div class="profile-stats">' +
+  el.innerHTML = '<div class="profile-stats">' +
     '<div class="profile-stat"><div class="profile-stat-num">' + p.transcript_count + '</div><div class="profile-stat-label">Transcripts</div></div>' +
-    '<div class="profile-stat"><div class="profile-stat-num">' + p.topics.length + '</div><div class="profile-stat-label">Topics Covered</div></div>' +
+    '<div class="profile-stat"><div class="profile-stat-num">' + p.topics.length + '</div><div class="profile-stat-label">Topics</div></div>' +
     '<div class="profile-stat"><div class="profile-stat-num">' + p.phrases.length + '</div><div class="profile-stat-label">Her Phrases</div></div>' +
-    '<div class="profile-stat"><div class="profile-stat-num">' + p.themes.length + '</div><div class="profile-stat-label">Core Themes</div></div>' +
-  '</div>' +
-  '<div class="pillar-bars">' + pillarBars + '</div>';
-
-  if (p.last_updated) {
-    var d = new Date(p.last_updated);
-    html += '<div style="font-size:10px;color:var(--charcoal3);margin-top:12px;">Last updated: ' + d.toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'}) + '</div>';
-  }
-
-  document.getElementById('profile-content').innerHTML = html;
+    '<div class="profile-stat"><div class="profile-stat-num">' + p.themes.length + '</div><div class="profile-stat-label">Themes</div></div>' +
+    '</div><div class="pillar-bars">' + bars + '</div>' +
+    (p.last_updated ? '<div style="font-size:10px;color:var(--charcoal3);margin-top:10px;">Last updated: ' + new Date(p.last_updated).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) + '</div>' : '');
 }
 
 function clearProfile() {
@@ -1175,10 +978,10 @@ function clearProfile() {
 
 function exportProfile() {
   var p = getProfile();
-  var blob = new Blob([JSON.stringify(p, null, 2)], {type:'application/json'});
+  var blob = new Blob([JSON.stringify(p,null,2)],{type:'application/json'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'tiffany-haynes-profile-' + new Date().toISOString().split('T')[0] + '.json';
+  a.download = 'tiffany-profile-' + new Date().toISOString().split('T')[0] + '.json';
   a.click();
 }
 
@@ -1188,49 +991,315 @@ function importProfile(e) {
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(ev) {
-    try {
-      var p = JSON.parse(ev.target.result);
-      saveProfile(p);
-      renderProfilePanel();
-      alert('Profile imported successfully.');
-    } catch(err) {
-      alert('Could not read profile file. Make sure it is a valid JSON export.');
-    }
+    try { var p = JSON.parse(ev.target.result); saveProfile(p); renderProfilePanel(); alert('Profile imported.'); } catch(err) { alert('Could not read profile file.'); }
   };
   reader.readAsText(file);
 }
 
 // ================================================================
-// NAVIGATION
+// LOADERS
 // ================================================================
-function startStudio() {
+var loaderTimers = {};
+var studioMsgs = ['Reading the transcript...','Finding the most powerful lines...','Writing captions in Tiffany\'s voice...','Building thumbnail briefs...','Writing carousel copy...','Pulling quote moments...','Almost ready...'];
+var learnMsgs = ['Reading all transcripts...','Building Tiffany\'s content profile...','Identifying recurring themes...','Mapping pillar coverage...','Extracting her phrases...','Almost done...'];
+var weekMsgs = ['Arranging content across the week...','Balancing the content pillars...','Writing Mon-Sun assignments...','Building designer delivery briefs...','Almost ready...'];
+var kbMsgs = ['Reading the document...','Extracting key insights...','Identifying performance data...','Updating client profile...','Almost done...'];
+var dashMsgs = ['Reading the script...','Extracting quotes...','Writing captions...','Building hooks...','Generating carousels...','Almost ready...'];
+
+function startLoader(msgId, msgs) {
+  var idx = 0;
+  var el = document.getElementById(msgId);
+  if (el) el.textContent = msgs[0];
+  loaderTimers[msgId] = setInterval(function() {
+    idx = (idx + 1) % msgs.length;
+    var el2 = document.getElementById(msgId);
+    if (el2) el2.textContent = msgs[idx];
+  }, 1800);
+}
+
+function stopLoader(msgId) { clearInterval(loaderTimers[msgId]); }
+
+// ================================================================
+// DASHBOARD GENERATE
+// ================================================================
+async function generateDashboard() {
   if (!checkApiKey()) return;
-  document.getElementById('landing').style.display = 'none';
-  document.getElementById('studio-wrap').style.display = 'block';
-  document.getElementById('tab-bar').style.display = 'flex';
-  renderProfilePanel();
+  var script = document.getElementById('dash-script').value.trim();
+  if (!script || script.length < 20) { showDiag('warn', 'Please paste a script before generating.'); return; }
+
+  var btn = document.getElementById('dash-gen-btn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  ['quotes','captions','hooks','carousels'].forEach(function(c) {
+    document.getElementById('body-' + c).innerHTML = '<div class="dash-loading">Generating...</div>';
+  });
+  document.getElementById('diag-box').classList.remove('show');
+
+  var profile = getProfile();
+  var profileCtx = profile.transcript_count > 0 ? 'Her known phrases: ' + profile.phrases.slice(-6).join(', ') + '. Topics covered: ' + profile.topics.slice(-10).join(', ') + '.' : '';
+
+  var prompt = 'You are the content strategist for Tiffany Haynes and Co.\n' +
+    'BRAND VOICE: ' + BRAND.voice + '\n' +
+    'STRICT AVOID: ' + BRAND.avoid + '\n' +
+    'CAPTION RULES: ' + BRAND.captions + '\n' +
+    'PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
+    (profileCtx ? 'PROFILE CONTEXT: ' + profileCtx + '\n' : '') +
+    '\nSCRIPT:\n' + script + '\n\n' +
+    'IMPORTANT: Return ONLY a raw JSON object. No markdown. No backticks. Start with { and end with }.\n\n' +
+    'Generate four sections:\n' +
+    '1. quotes: 4 exact word-for-word quotes pulled from the script. Real words only. Under 35 words each. Never fabricated.\n' +
+    '2. captions: 2 captions from this script. First for Instagram and Facebook (150-250 words, hook first line, no emojis, no em dashes). Second for TikTok (80-130 words).\n' +
+    '3. hooks: 5 title options from the strongest moments in this script. Each has a title, hook text, and thumbnail text for Designer 1.\n' +
+    '4. carousels: 3 carousel concepts. First goes deeper into this script topic. Second and third from her pillars freely. Max 4 slides each.\n\n' +
+    '{"quotes":[{"quote":"exact quote","pillar":"pillar name","design_note":"one sentence for Designer 2"}],' +
+    '"captions":[{"platform":"Instagram and Facebook","hook":"first line","caption":"full caption","hashtags":"#tag1 #tag2"},{"platform":"TikTok","hook":"hook","caption":"caption","hashtags":"#tag1 #tag2"}],' +
+    '"hooks":[{"title":"4-7 word reel title","hook":"exact first 3 seconds from script","thumbnail_text":"4-6 words for Designer 1","type":"Talking Head or B-Roll or Teaching"}],' +
+    '"carousels":[{"title":"title","pillar":"pillar","influenced_by":"script or profile","slides":[{"role":"Hook","headline":"headline","body":""},{"role":"Content","headline":"slide 2","body":"copy"},{"role":"Content","headline":"slide 3","body":"copy"},{"role":"CTA","headline":"cta","body":"cta text"}]}]}';
+
+  try {
+    var result = await callAPI(prompt, 5000);
+    renderDashCard('quotes', result.quotes);
+    renderDashCard('captions', result.captions);
+    renderDashCard('hooks', result.hooks);
+    renderDashCard('carousels', result.carousels);
+    var now = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true});
+    document.getElementById('dash-last').textContent = 'Generated ' + now;
+    if (result.quotes && result.quotes.length) {
+      var pl = {topics_covered:[],recurring_phrases:[],themes:[],pillar_hits:{},transcript_count:1};
+      result.quotes.forEach(function(q) { if (q.pillar && pl.pillar_hits[q.pillar] !== undefined) pl.pillar_hits[q.pillar]++; else if (q.pillar) pl.pillar_hits[q.pillar] = 1; });
+      updateProfileFromLearning(pl);
+    }
+  } catch(e) {
+    ['quotes','captions','hooks','carousels'].forEach(function(c) {
+      document.getElementById('body-' + c).innerHTML = '<div class="dash-empty" style="color:var(--red);font-size:11px;">Error: ' + escRaw(e.message) + '</div>';
+    });
+    showDiag('err', e.message);
+    console.error(e);
+  }
+  btn.disabled = false; btn.textContent = 'Generate From Script';
 }
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
-  document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
-  document.getElementById('tab-' + tab).classList.add('active');
-  var idx = tab === 'studio' ? 0 : tab === 'planner' ? 1 : 2;
-  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
-  if (tab === 'knowledge') renderKnowledgeBase();
+async function refreshCarousels() {
+  if (!checkApiKey()) return;
+  var rbtn = document.getElementById('rbtn-car');
+  rbtn.classList.add('spin');
+  document.getElementById('body-carousels').innerHTML = '<div class="dash-loading">Refreshing...</div>';
+
+  var scriptCtx = lastDashScript.length > 20 ? 'Recent script context (use as additional influence only):\n' + lastDashScript.slice(0,400) + '\n\n' : '';
+  var prompt = 'Content strategist for Tiffany Haynes and Co.\nBRAND: ' + BRAND.voice + '\nAVOID: ' + BRAND.avoid + '\nPILLARS: ' + BRAND.pillars.join(', ') + '\n\n' + scriptCtx +
+    'Return ONLY raw JSON. No backticks. Start with {.\n\n' +
+    'Generate 3 carousel concepts using her content pillars. Vary pillars. Max 4 slides each. Hook slide 1. CTA last slide. No emojis. No em dashes.\n\n' +
+    '{"carousels":[{"title":"title","pillar":"pillar","influenced_by":"profile or script","slides":[{"role":"Hook","headline":"headline","body":""},{"role":"Content","headline":"slide 2","body":"copy"},{"role":"Content","headline":"slide 3","body":"copy"},{"role":"CTA","headline":"cta","body":"cta"}]}]}';
+
+  try {
+    var result = await callAPI(prompt, 2500);
+    renderDashCard('carousels', result.carousels);
+  } catch(e) {
+    document.getElementById('body-carousels').innerHTML = '<div class="dash-empty" style="color:var(--red);font-size:11px;">Error: ' + escRaw(e.message) + '</div>';
+  }
+  rbtn.classList.remove('spin');
+}
+
+function renderDashCard(cardName, items) {
+  var el = document.getElementById('body-' + cardName);
+  if (!items || !items.length) { el.innerHTML = '<div class="dash-empty">No content generated. Try refreshing.</div>'; return; }
+  var h = '';
+
+  if (cardName === 'quotes') {
+    items.forEach(function(q) {
+      h += '<div class="dash-item"><div class="d-quote">"' + escRaw(q.quote) + '"</div>';
+      if (q.pillar) h += ptag(q.pillar);
+      if (q.design_note) h += '<div class="d-qnote">Design: ' + escRaw(q.design_note) + '</div>';
+      h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(q.quote||'') + ')">Copy</button></div>';
+    });
+  }
+  else if (cardName === 'captions') {
+    items.forEach(function(cap) {
+      var full = (cap.caption||'') + '\n\n' + (cap.hashtags||'');
+      var isIG = (cap.platform||'').toLowerCase().indexOf('instagram') !== -1;
+      h += '<div class="dash-item"><div class="d-cap-platform">' + escRaw(cap.platform||'') + '</div>';
+      if (cap.hook) h += '<div class="d-cap-hook">"' + escRaw(cap.hook) + '"</div>';
+      h += wcBadge(cap.caption, isIG?100:60, isIG?250:130);
+      h += '<div class="d-cap-text">' + escRaw(cap.caption||'') + '</div>';
+      h += '<div class="d-cap-tags">' + escRaw(cap.hashtags||'') + '</div>';
+      h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(full) + ')">Copy Caption</button></div>';
+    });
+  }
+  else if (cardName === 'hooks') {
+    items.forEach(function(hk, i) {
+      var copyText2 = 'Reel Title: ' + (hk.title||'') + '\nHook (first 3 sec): ' + (hk.hook||'') + '\nThumbnail text for Designer 1: ' + (hk.thumbnail_text||'');
+      h += '<div class="dash-item"><div class="d-hook-num">Option ' + (i+1) + (hk.type ? ' - ' + hk.type : '') + '</div>';
+      h += '<div class="d-hook-title">' + escRaw(hk.title||'') + '</div>';
+      h += '<div class="d-hook-text">' + escRaw(hk.hook||'') + '</div>';
+      if (hk.thumbnail_text) {
+        h += '<div class="thumb-preview"><div class="thumb-text">' + escRaw(hk.thumbnail_text) + '</div><div class="thumb-label">Thumbnail preview</div></div>';
+      }
+      h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(copyText2) + ')">Copy All</button></div>';
+    });
+  }
+  else if (cardName === 'carousels') {
+    items.forEach(function(car) {
+      var pc = BRAND.pillarColors[car.pillar] || {color:'#888',bg:'rgba(136,136,136,0.1)'};
+      var slideCopy = (car.title||'') + '\n\n' + (car.slides||[]).map(function(s,i) { return 'Slide '+(i+1)+' ('+s.role+'): '+s.headline+(s.body?'\n'+s.body:''); }).join('\n\n');
+      h += '<div class="dash-item"><div class="d-car-title">' + escRaw(car.title||'') + '</div>';
+      if (car.pillar) h += '<span class="d-ptag" style="background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(car.pillar) + '</span>';
+      if (car.influenced_by) h += '<span class="d-ptag" style="background:var(--cream-2);color:var(--charcoal3);margin-left:3px;">via ' + escRaw(car.influenced_by) + '</span>';
+      h += '<div style="margin-top:6px;">';
+      (car.slides||[]).forEach(function(slide, idx) {
+        var nc = slide.role==='Hook'?'h':slide.role==='CTA'?'c':'';
+        h += '<div class="d-slide"><div class="d-snum ' + nc + '">' + (idx+1) + '</div>';
+        h += '<div class="d-stext"><strong>' + escRaw(slide.headline) + '</strong>' + (slide.body?' - '+escRaw(slide.body):'') + '</div></div>';
+      });
+      h += '</div><button class="copy-btn" onclick="copyText(this,' + JSON.stringify(slideCopy) + ')">Copy Slides</button></div>';
+    });
+  }
+  el.innerHTML = h;
 }
 
 // ================================================================
-// TRANSCRIPT MANAGEMENT
+// TAB 1: TRANSCRIPT TO CONTENT
+// ================================================================
+async function generateStudioContent() {
+  if (!checkApiKey()) return;
+  var transcript = document.getElementById('transcript').value.trim();
+  if (!transcript || transcript.length < 40) { alert('Please paste a transcript first.'); return; }
+  var typeEl = document.getElementById('content-type');
+  var typeLabel = typeEl.options[typeEl.selectedIndex].text;
+  var profile = getProfile();
+  var profileCtx = profile.transcript_count > 0 ? 'Already covered: ' + profile.topics.slice(-15).join(', ') : '';
+
+  document.getElementById('gen-btn-studio').disabled = true;
+  document.getElementById('error-studio').style.display = 'none';
+  document.getElementById('results-studio').style.display = 'none';
+  document.getElementById('loading-studio').style.display = 'block';
+  startLoader('gen-msg-studio', studioMsgs);
+
+  var prompt = 'You are the content manager for Tiffany Haynes and Co.\n' +
+    'BRAND VOICE: ' + BRAND.voice + '\n' +
+    'AVOID: ' + BRAND.avoid + '\n' +
+    'CAPTION RULES: ' + BRAND.captions + '\n' +
+    'PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
+    'DESIGN: Cream palette (#FFFDF5, #F4F0EB, #E3D3C8). Deep Red (#A00605) and Charcoal (#414141). Clean generous spacing. Mathematical symbols as design elements. Scripture always italicized.\n' +
+    (profileCtx ? 'PROFILE: ' + profileCtx + '\n' : '') +
+    'CONTENT TYPE: ' + typeLabel + '\n\n' +
+    'TRANSCRIPT:\n' + transcript + '\n\n' +
+    'Return ONLY valid JSON. No markdown. No backticks. Start with {.\n\n' +
+    '{"content_summary":"2-3 sentences on what this is about","primary_pillar":"pillar",' +
+    '"profile_learning":{"topics_covered":["topic1"],"recurring_phrases":["phrase"],"themes":["theme"],"pillar_hits":{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0},"transcript_count":1},' +
+    '"captions":[{"platform":"Instagram and Facebook","caption":"Full caption. Hook first. Teaching middle. Engagement CTA end. 150-300 words. No emojis. No em dashes.","hashtags":"#tag1 #tag2 (8-10 hashtags)","cta":"specific CTA"},{"platform":"TikTok","caption":"Shorter adapted version. 80-150 words. Same voice rules.","hashtags":"#tag1 #tag2","cta":"cta"}],' +
+    '"thumbnail":{"hook_text":"Short hook text to overlay on photo. 5-8 words max.","photo_direction":"What kind of photo to use.","text_treatment":"Typography direction for Designer 1"},' +
+    '"carousels":[{"title":"Carousel title","pillar":"pillar","slides":[{"role":"Hook","headline":"Hook headline","body":""},{"role":"Content","headline":"Slide 2","body":"copy"},{"role":"Content","headline":"Slide 3","body":"copy"},{"role":"CTA","headline":"CTA","body":"engagement CTA"}],"design_brief":{"palette":"palette direction","typography":"type direction","layout":"layout direction","accents":"accent elements","mood":"5 words"}},{"title":"Second carousel","pillar":"pillar","slides":[{"role":"Hook","headline":"Hook","body":""},{"role":"Content","headline":"Slide 2","body":"copy"},{"role":"Content","headline":"Slide 3","body":"copy"},{"role":"CTA","headline":"CTA","body":"CTA"}],"design_brief":{"palette":"palette","typography":"type","layout":"layout","accents":"accents","mood":"mood"}}],' +
+    '"quotes":[{"quote":"EXACT word-for-word quote from transcript only. Never fabricated.","design_note":"Design direction for photo quote post."},{"quote":"Second exact quote","design_note":"Design direction"},{"quote":"Third exact quote","design_note":"Design direction"}]}';
+
+  try {
+    var content = await callAPI(prompt, 6000);
+    if (content.profile_learning) updateProfileFromLearning(content.profile_learning);
+    stopLoader('gen-msg-studio');
+    document.getElementById('loading-studio').style.display = 'none';
+    renderStudioResults(content, typeLabel);
+  } catch(e) {
+    stopLoader('gen-msg-studio');
+    document.getElementById('loading-studio').style.display = 'none';
+    var el = document.getElementById('error-studio');
+    el.style.display = 'block';
+    el.innerHTML = '<strong>Error:</strong> ' + escRaw(e.message);
+    console.error(e);
+  }
+  document.getElementById('gen-btn-studio').disabled = false;
+}
+
+function renderStudioResults(c, typeLabel) {
+  var h = '';
+
+  if (c.content_summary) {
+    h += '<div style="background:var(--cream-2);border:1px solid var(--border);border-radius:8px;padding:13px 16px;margin-bottom:28px;">';
+    h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Content Summary</div>';
+    h += '<div style="font-size:13px;color:var(--charcoal);line-height:1.65;">' + escRaw(c.content_summary) + '</div></div>';
+  }
+
+  // CAPTIONS
+  h += '<div class="out-section"><div class="out-eyebrow">Step 2</div><div class="out-title">Captions</div>';
+  (c.captions||[]).forEach(function(cap) {
+    var full = cap.caption + '\n\n' + cap.hashtags;
+    h += '<div class="card"><div class="card-header"><div class="card-header-left"><div class="card-accent" style="background:var(--green);"></div><div class="card-title">' + escRaw(cap.platform) + '</div></div><button class="copy-btn" onclick="copyText(this,' + JSON.stringify(full) + ')">Copy</button></div>';
+    h += '<div class="card-body"><div style="font-size:14px;color:var(--charcoal);line-height:1.85;white-space:pre-wrap;margin-bottom:12px;">' + escRaw(cap.caption) + '</div>';
+    h += '<div style="font-size:12px;color:var(--red);opacity:0.75;">' + escRaw(cap.hashtags) + '</div>';
+    if (cap.cta) h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-top:12px;margin-bottom:3px;">Call to Action</div><div style="font-size:12px;color:var(--charcoal2);font-style:italic;">' + escRaw(cap.cta) + '</div>';
+    h += '</div></div>';
+  });
+  h += '</div><div class="math-div">+ + +</div>';
+
+  // THUMBNAIL
+  if (c.thumbnail) {
+    h += '<div class="out-section"><div class="out-eyebrow">Designer 1 - Thumbnails</div><div class="out-title">Thumbnail / Cover Brief</div>';
+    var thumbCopy = 'Hook Text: ' + c.thumbnail.hook_text + '\nPhoto Direction: ' + c.thumbnail.photo_direction + '\nText Treatment: ' + c.thumbnail.text_treatment;
+    h += '<div class="card"><div class="card-header"><div class="card-header-left"><div class="card-accent" style="background:var(--charcoal);"></div><div class="card-title">Instagram Reel Cover</div></div><button class="copy-btn" onclick="copyText(this,' + JSON.stringify(thumbCopy) + ')">Copy Brief</button></div>';
+    h += '<div class="card-body">';
+    h += '<div class="thumb-preview" style="margin-bottom:14px;"><div class="thumb-text">' + escRaw(c.thumbnail.hook_text) + '</div><div class="thumb-label">Hook Text Overlay</div></div>';
+    h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Photo Direction</div>';
+    h += '<div style="font-size:13px;color:var(--charcoal2);line-height:1.65;margin-bottom:10px;">' + escRaw(c.thumbnail.photo_direction) + '</div>';
+    h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Text Treatment</div>';
+    h += '<div style="font-size:13px;color:var(--charcoal2);line-height:1.65;">' + escRaw(c.thumbnail.text_treatment) + '</div>';
+    h += '</div></div></div><div class="math-div">+ + +</div>';
+  }
+
+  // CAROUSELS
+  h += '<div class="out-section"><div class="out-eyebrow">Designer 2 - Carousels</div><div class="out-title">Carousel Slide Copy</div>';
+  h += '<div class="out-sub">Slide-by-slide copy for Designer 2. Ready to design.</div>';
+  h += '<div class="two-col">';
+  (c.carousels||[]).forEach(function(car) {
+    var slideCopy = car.title + '\n\n' + (car.slides||[]).map(function(s,i) { return 'Slide '+(i+1)+' ('+s.role+'): '+s.headline+(s.body?'\n'+s.body:''); }).join('\n\n');
+    h += '<div class="card"><div class="card-header"><div class="card-header-left"><div class="card-accent" style="background:var(--blue);"></div><div class="card-title" style="white-space:normal;">' + escRaw(car.title) + '</div></div><button class="copy-btn" onclick="copyText(this,' + JSON.stringify(slideCopy) + ')">Copy</button></div>';
+    (car.slides||[]).forEach(function(slide, idx) {
+      var nc = slide.role==='Hook'?'hook':slide.role==='CTA'?'cta':'';
+      h += '<div class="slide-item"><div class="slide-num ' + nc + '">' + (idx+1) + '</div>';
+      h += '<div><div class="slide-role">' + slide.role + '</div><div class="slide-headline">' + escRaw(slide.headline) + '</div>';
+      if (slide.body) h += '<div class="slide-body">' + escRaw(slide.body) + '</div>';
+      h += '</div></div>';
+    });
+    if (car.design_brief) {
+      h += '<div style="background:var(--cream-2);padding:11px 16px;border-top:1px solid var(--border);">';
+      h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Design Brief</div>';
+      h += '<div style="font-size:11px;color:var(--charcoal2);line-height:1.6;">';
+      if (car.design_brief.palette) h += '<strong>Palette:</strong> ' + escRaw(car.design_brief.palette) + '<br>';
+      if (car.design_brief.typography) h += '<strong>Type:</strong> ' + escRaw(car.design_brief.typography) + '<br>';
+      if (car.design_brief.layout) h += '<strong>Layout:</strong> ' + escRaw(car.design_brief.layout) + '<br>';
+      if (car.design_brief.mood) h += '<strong>Mood:</strong> ' + escRaw(car.design_brief.mood);
+      h += '</div></div>';
+    }
+    h += '</div>';
+  });
+  h += '</div></div><div class="math-div">+ + +</div>';
+
+  // QUOTES
+  h += '<div class="out-section"><div class="out-eyebrow">Designer 2 - Quote Posts</div><div class="out-title">Quote Pulls</div>';
+  h += '<div class="out-sub">Word-for-word from the transcript only. Never fabricated.</div>';
+  h += '<div class="two-col">';
+  (c.quotes||[]).forEach(function(q, i) {
+    h += '<div class="quote-card"><div class="quote-tag">Quote ' + (i+1) + '</div>';
+    h += '<div class="quote-text">' + escRaw(q.quote) + '</div>';
+    h += '<div class="quote-design-note"><strong style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--charcoal3);">Design: </strong>' + escRaw(q.design_note) + '</div>';
+    h += '<div style="margin-top:8px;"><button class="copy-btn" onclick="copyText(this,' + JSON.stringify(q.quote) + ')">Copy Quote</button></div>';
+    h += '</div>';
+  });
+  h += '</div></div>';
+  h += '<div class="studio-footer">Tiffany Haynes &amp; Co. Content Studio - Internal Use Only</div>';
+
+  document.getElementById('results-studio').innerHTML = h;
+  document.getElementById('results-studio').style.display = 'block';
+  document.getElementById('results-studio').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ================================================================
+// TAB 2: WEEKLY PLANNER
 // ================================================================
 function addTranscript() {
   transcriptCount++;
   var list = document.getElementById('transcript-list');
   var div = document.createElement('div');
   div.className = 'transcript-entry';
-  div.id = 't-entry-' + (transcriptCount - 1);
-  div.innerHTML = '<div class="transcript-entry-label" style="display:flex;align-items:center;justify-content:space-between;">Transcript ' + transcriptCount + '<button class="remove-transcript" onclick="removeTranscript(' + (transcriptCount-1) + ')">x</button></div>' +
-    '<textarea class="transcript-area" id="t-' + (transcriptCount-1) + '" placeholder="Paste transcript ' + transcriptCount + ' here..." style="min-height:100px;"></textarea>';
+  div.id = 't-entry-' + (transcriptCount-1);
+  div.innerHTML = '<div class="transcript-entry-label">Transcript ' + transcriptCount + '<button class="remove-transcript" onclick="removeTranscript(' + (transcriptCount-1) + ')">x</button></div>' +
+    '<textarea class="textarea" id="t-' + (transcriptCount-1) + '" placeholder="Paste transcript ' + transcriptCount + ' here..." style="min-height:90px;"></textarea>';
   list.appendChild(div);
 }
 
@@ -1248,214 +1317,10 @@ function getAllTranscripts() {
   return texts;
 }
 
-// ================================================================
-// LOADERS
-// ================================================================
-var loaderTimers = {};
-var studioMsgs = ['Reading the transcript...','Finding the most powerful lines...','Writing captions in Tiffany\'s voice...','Building thumbnail briefs...','Writing carousel copy...','Pulling quote moments...','Almost ready...'];
-var learnMsgs = ['Reading all transcripts...','Building Tiffany\'s content profile...','Identifying recurring themes...','Mapping pillar coverage...','Extracting her phrases...','Almost done...'];
-var weekMsgs = ['Arranging content across the week...','Balancing the content pillars...','Writing Mon-Sun assignments...','Building designer delivery briefs...','Checking pillar distribution...','Almost ready...'];
-
-function startLoader(id, msgs) {
-  var idx = 0;
-  document.getElementById(id).textContent = msgs[0];
-  loaderTimers[id] = setInterval(function() {
-    idx = (idx + 1) % msgs.length;
-    document.getElementById(id).textContent = msgs[idx];
-  }, 2000);
-}
-
-function stopLoader(id) { clearInterval(loaderTimers[id]); }
-
-// ================================================================
-// COPY TO CLIPBOARD
-// ================================================================
-function copyText(btn, text) {
-  navigator.clipboard.writeText(text).then(function() {
-    btn.textContent = 'Copied';
-    btn.classList.add('copied');
-    setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2200);
-  });
-}
-
-// ================================================================
-// TAB 1: GENERATE STUDIO CONTENT
-// ================================================================
-async function generateStudioContent() {
-  if (!checkApiKey()) return;
-  var transcript = document.getElementById('transcript').value.trim();
-  if (!transcript || transcript.length < 40) { alert('Please paste a transcript first.'); return; }
-
-  var typeEl = document.getElementById('content-type');
-  var typeLabel = typeEl.options[typeEl.selectedIndex].text;
-  var profile = getProfile();
-  var profileContext = profile.transcript_count > 0 ?
-    'TIFFANY\'S KNOWN TOPICS (do not repeat): ' + profile.topics.slice(-20).join(', ') + '\n' +
-    'HER RECURRING PHRASES: ' + profile.phrases.slice(-10).join(', ') : '';
-
-  document.getElementById('gen-btn-studio').disabled = true;
-  document.getElementById('error-studio').style.display = 'none';
-  document.getElementById('results-studio').style.display = 'none';
-  document.getElementById('loading-studio').style.display = 'block';
-  startLoader('gen-msg-studio', studioMsgs);
-
-  var prompt = 'You are the content manager for Tiffany Haynes and Co.\n\n' +
-    'BRAND VOICE: ' + BRAND.voice + '\n' +
-    'GOD\'S MATH: ' + BRAND.framework + '\n' +
-    'CAPTION RULES: ' + BRAND.captions + '\n' +
-    'DESIGN: ' + BRAND.design + '\n' +
-    'AVOID: ' + BRAND.avoid + '\n' +
-    (profileContext ? profileContext + '\n' : '') +
-    'CONTENT TYPE: ' + typeLabel + '\n\n' +
-    'TRANSCRIPT:\n' + transcript + '\n\n' +
-    'Return ONLY valid JSON. No markdown. No backticks.\n\n' +
-    '{"content_summary":"2-3 sentences on what this is about","primary_pillar":"which pillar",' +
-    '"profile_learning":{"topics_covered":["topic1","topic2"],"recurring_phrases":["phrase1"],"themes":["theme1"],"pillar_hits":{"Business and Entrepreneurship":0,"Spiritual Development and God\'s Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality (Shenanigans)":0,"Community and Testimony":0},"transcript_count":1},' +
-    '"captions":[{"platform":"Instagram and Facebook","caption":"Full caption. Hook first line. Teaching middle. Engagement CTA end. 150-300 words. No emojis. No em dashes.","hashtags":"#tag1 #tag2","cta":"specific CTA"},{"platform":"TikTok","caption":"Shorter adapted version. 80-150 words. Same voice rules.","hashtags":"#tag1 #tag2","cta":"specific CTA"}],' +
-    '"thumbnail":{"hook_text":"The exact short hook text to overlay on the photo. 5-8 words max. Stops the scroll.","photo_direction":"What kind of photo to use. Tiffany\'s expression, setting, mood. Specific enough for a photographer or library search.","text_treatment":"Font size, position, color treatment direction for Designer 1"},' +
-    '"carousels":[{"title":"Carousel title","pillar":"pillar name","slides":[{"role":"Hook","headline":"Hook headline","body":""},{"role":"Content","headline":"Slide 2 headline","body":"Copy"},{"role":"Content","headline":"Slide 3 headline","body":"Copy"},{"role":"CTA","headline":"CTA headline","body":"Engagement CTA"}],"design_brief":{"palette":"color direction","typography":"type direction","layout":"layout direction","accents":"design accents","mood":"5 words"}},{"title":"Second carousel","pillar":"pillar","slides":[{"role":"Hook","headline":"Hook","body":""},{"role":"Content","headline":"Slide 2","body":"Copy"},{"role":"Content","headline":"Slide 3","body":"Copy"},{"role":"CTA","headline":"CTA","body":"CTA copy"}],"design_brief":{"palette":"palette","typography":"type","layout":"layout","accents":"accents","mood":"mood"}}],' +
-    '"quotes":[{"quote":"EXACT word-for-word quote from transcript only. Never fabricated.","design_note":"Design direction for photo quote post."},{"quote":"Second exact quote","design_note":"Design direction"},{"quote":"Third exact quote","design_note":"Design direction"}]}';
-
-  try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 6000, messages: [{ role: 'user', content: prompt }] })
-    });
-    var data = await res.json();
-    var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
-    if (!raw) throw new Error('No response. Check your API key.');
-    var content = JSON.parse(raw.text.replace(/```json|```/g,'').trim());
-
-    if (content.profile_learning) updateProfileFromLearning(content.profile_learning);
-
-    stopLoader('gen-msg-studio');
-    document.getElementById('loading-studio').style.display = 'none';
-    renderStudioResults(content, typeLabel);
-
-  } catch(e) {
-    stopLoader('gen-msg-studio');
-    document.getElementById('loading-studio').style.display = 'none';
-    var el = document.getElementById('error-studio');
-    el.style.display = 'block';
-    el.innerHTML = '<strong>Error:</strong> ' + e.message;
-    console.error(e);
-  }
-  document.getElementById('gen-btn-studio').disabled = false;
-}
-
-// ================================================================
-// RENDER STUDIO RESULTS
-// ================================================================
-function renderStudioResults(c, typeLabel) {
-  var h = '';
-
-  if (c.content_summary) {
-    h += '<div style="background:var(--cream-2);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:30px;">';
-    h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Content Summary</div>';
-    h += '<div style="font-size:13px;color:var(--charcoal);line-height:1.65;">' + c.content_summary + '</div>';
-    h += '</div>';
-  }
-
-  // CAPTIONS
-  h += '<div class="out-section"><div class="out-eyebrow">Step 2</div><div class="out-title">Captions</div>';
-  (c.captions || []).forEach(function(cap) {
-    var full = cap.caption + '\n\n' + cap.hashtags;
-    h += '<div class="caption-card"><div class="caption-card-header"><div class="cap-platform">' + cap.platform + '</div>';
-    h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(full) + ')">Copy</button></div>';
-    h += '<div class="caption-body"><div class="caption-text">' + esc(cap.caption) + '</div>';
-    h += '<div class="caption-hashtags">' + cap.hashtags + '</div>';
-    if (cap.cta) { h += '<div class="cap-cta-label">Call to Action</div><div class="cap-cta-text">' + cap.cta + '</div>'; }
-    h += '</div></div>';
-  });
-  h += '</div>';
-
-  h += '<div class="math-div">+ + +</div>';
-
-  // THUMBNAIL BRIEF (Designer 1)
-  if (c.thumbnail) {
-    h += '<div class="out-section"><div class="out-eyebrow">Designer 1 - Thumbnails</div><div class="out-title">Thumbnail / Cover Brief</div>';
-    h += '<div class="thumb-card">';
-    h += '<div class="thumb-header"><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;">Instagram Reel Cover</div></div>';
-    h += '<div class="thumb-body">';
-    h += '<div class="hook-display"><div class="hook-text">' + esc(c.thumbnail.hook_text) + '</div><div class="hook-sub">Hook Text Overlay</div></div>';
-
-    var thumbCopy = 'THUMBNAIL BRIEF\n\nHook Text (overlay on photo):\n' + c.thumbnail.hook_text + '\n\nPhoto Direction:\n' + c.thumbnail.photo_direction + '\n\nText Treatment:\n' + c.thumbnail.text_treatment;
-    h += '<div class="designer-label">Photo Direction</div>';
-    h += '<div style="font-size:13px;color:var(--charcoal2);line-height:1.65;margin-bottom:12px;">' + esc(c.thumbnail.photo_direction) + '</div>';
-    h += '<div class="designer-label">Text Treatment</div>';
-    h += '<div style="font-size:13px;color:var(--charcoal2);line-height:1.65;margin-bottom:14px;">' + esc(c.thumbnail.text_treatment) + '</div>';
-    h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(thumbCopy) + ')">Copy Full Brief</button>';
-    h += '</div></div></div>';
-    h += '<div class="math-div">+ + +</div>';
-  }
-
-  // CAROUSELS (Designer 2)
-  h += '<div class="out-section"><div class="out-eyebrow">Designer 2 - Carousels</div><div class="out-title">Carousel Slide Copy</div>';
-  h += '<div class="out-sub">Slide-by-slide copy for Designer 2. No design direction needed - just the words per slide.</div>';
-  h += '<div class="carousel-grid">';
-  (c.carousels || []).forEach(function(car) {
-    var slideCopy = car.title + '\n\n' + (car.slides || []).map(function(s, i) {
-      return 'Slide ' + (i+1) + ' (' + s.role + '):\n' + s.headline + (s.body ? '\n' + s.body : '');
-    }).join('\n\n');
-
-    h += '<div class="carousel-card"><div class="carousel-card-header">';
-    h += '<div class="carousel-card-title">' + esc(car.title) + '</div>';
-    h += '<div style="display:flex;align-items:center;gap:8px;">';
-    h += '<div class="slide-count">' + (car.slides ? car.slides.length : 0) + ' slides</div>';
-    h += '<button class="copy-btn" style="color:rgba(255,255,255,0.5);border-color:rgba(255,255,255,0.2);" onclick="copyText(this,' + JSON.stringify(slideCopy) + ')">Copy</button>';
-    h += '</div></div>';
-    (car.slides || []).forEach(function(slide, idx) {
-      var nc = slide.role === 'Hook' ? 'hook' : slide.role === 'CTA' ? 'cta' : '';
-      h += '<div class="slide-item"><div class="slide-num ' + nc + '">' + (idx+1) + '</div>';
-      h += '<div class="slide-content"><div class="slide-role">' + slide.role + '</div>';
-      h += '<div class="slide-headline">' + esc(slide.headline) + '</div>';
-      if (slide.body) h += '<div class="slide-body">' + esc(slide.body) + '</div>';
-      h += '</div></div>';
-    });
-    if (car.design_brief) {
-      h += '<div class="carousel-design"><div class="design-label">Design Brief</div>';
-      h += '<div style="font-size:11px;color:var(--charcoal2);line-height:1.6;">';
-      if (car.design_brief.palette) h += '<strong>Palette:</strong> ' + car.design_brief.palette + '<br>';
-      if (car.design_brief.typography) h += '<strong>Type:</strong> ' + car.design_brief.typography + '<br>';
-      if (car.design_brief.layout) h += '<strong>Layout:</strong> ' + car.design_brief.layout + '<br>';
-      if (car.design_brief.accents) h += '<strong>Accents:</strong> ' + car.design_brief.accents + '<br>';
-      if (car.design_brief.mood) h += '<strong>Mood:</strong> ' + car.design_brief.mood;
-      h += '</div></div>';
-    }
-    h += '</div>';
-  });
-  h += '</div></div>';
-
-  h += '<div class="math-div">+ + +</div>';
-
-  // QUOTES (Designer 2)
-  h += '<div class="out-section"><div class="out-eyebrow">Designer 2 - Quote Posts</div><div class="out-title">Quote Pulls</div>';
-  h += '<div class="out-sub">Word-for-word from the transcript only. Never fabricated.</div>';
-  h += '<div class="quotes-grid">';
-  (c.quotes || []).forEach(function(q, i) {
-    h += '<div class="quote-card"><div class="quote-tag">Quote ' + (i+1) + '</div>';
-    h += '<div class="quote-text">' + esc(q.quote) + '</div>';
-    h += '<div class="quote-design-note"><strong style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--charcoal3);">Design note: </strong>' + esc(q.design_note) + '</div>';
-    h += '<div style="margin-top:10px;"><button class="copy-btn" onclick="copyText(this,' + JSON.stringify(q.quote) + ')">Copy Quote</button></div>';
-    h += '</div>';
-  });
-  h += '</div></div>';
-
-  h += '<div class="studio-footer">Tiffany Haynes &amp; Co. Content Studio - Internal Use Only</div>';
-
-  document.getElementById('results-studio').innerHTML = h;
-  document.getElementById('results-studio').style.display = 'block';
-  document.getElementById('results-studio').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ================================================================
-// TAB 2: LEARN FROM TRANSCRIPTS
-// ================================================================
 async function learnFromTranscripts() {
   if (!checkApiKey()) return;
   var transcripts = getAllTranscripts();
-  if (transcripts.length === 0) { alert('Please paste at least one transcript.'); return; }
+  if (!transcripts.length) { alert('Please paste at least one transcript.'); return; }
 
   document.getElementById('gen-btn-learn').disabled = true;
   document.getElementById('error-planner').style.display = 'none';
@@ -1464,89 +1329,64 @@ async function learnFromTranscripts() {
   startLoader('gen-msg-learn', learnMsgs);
 
   var profile = getProfile();
-  var existingTopics = profile.topics.length > 0 ? 'ALREADY COVERED TOPICS: ' + profile.topics.slice(-30).join(', ') : '';
+  var existingTopics = profile.topics.length > 0 ? 'ALREADY COVERED: ' + profile.topics.slice(-20).join(', ') : '';
+  var combined = transcripts.map(function(t,i) { return 'TRANSCRIPT ' + (i+1) + ':\n' + t; }).join('\n\n---\n\n');
 
-  var combined = transcripts.map(function(t, i) { return 'TRANSCRIPT ' + (i+1) + ':\n' + t; }).join('\n\n---\n\n');
-
-  var prompt = 'You are analyzing video transcripts for Tiffany Haynes and Co. to build her content profile.\n\n' +
-    'BRAND VOICE: ' + BRAND.voice + '\n' +
-    'CONTENT PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
+  var prompt = 'You are analyzing transcripts for Tiffany Haynes and Co. content planning.\n' +
+    'PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
     (existingTopics ? existingTopics + '\n' : '') +
     '\nTRANSCRIPTS:\n' + combined + '\n\n' +
-    'Return ONLY valid JSON. No markdown. No backticks.\n\n' +
+    'Return ONLY valid JSON. No markdown. Start with {.\n\n' +
     '{"transcript_count":' + transcripts.length + ',' +
-    '"topics_covered":["specific topic 1","specific topic 2"],' +
-    '"recurring_phrases":["exact phrase she uses","another phrase"],' +
-    '"themes":["core theme 1","core theme 2"],' +
-    '"pillar_hits":{"Business and Entrepreneurship":0,"Spiritual Development and God\'s Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality (Shenanigans)":0,"Community and Testimony":0},' +
-    '"key_insights":["what I learned about her audience","what topics resonate","what she returns to"],' +
-    '"content_gaps":["pillar or topic that is missing or underrepresented"],' +
-    '"suggested_angles":["new angle from these transcripts","another angle"],' +
-    '"week_summary":"2-3 sentences summarizing what these transcripts cover and what it means for the weekly content plan"}';
+    '"topics_covered":["topic1","topic2"],' +
+    '"recurring_phrases":["exact phrase","another phrase"],' +
+    '"themes":["theme1","theme2"],' +
+    '"pillar_hits":{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0},' +
+    '"key_insights":["insight1","insight2"],' +
+    '"content_gaps":["gap1","gap2"],' +
+    '"suggested_angles":["angle1","angle2"],' +
+    '"week_summary":"2-3 sentences on what these transcripts cover"}';
 
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 3000, messages: [{ role: 'user', content: prompt }] })
-    });
-    var data = await res.json();
-    var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
-    if (!raw) throw new Error('No response. Check API key.');
-    learnedData = JSON.parse(raw.text.replace(/```json|```/g,'').trim());
-
-    updateProfileFromLearning(learnedData);
-
+    var result = await callAPI(prompt, 3000);
+    learnedData = result;
+    updateProfileFromLearning(result);
     stopLoader('gen-msg-learn');
     document.getElementById('loading-learn').style.display = 'none';
-    renderProfilePreview(learnedData);
-
+    renderProfilePreview(result);
   } catch(e) {
     stopLoader('gen-msg-learn');
     document.getElementById('loading-learn').style.display = 'none';
     var el = document.getElementById('error-planner');
     el.style.display = 'block';
-    el.innerHTML = '<strong>Error:</strong> ' + e.message;
+    el.innerHTML = '<strong>Error:</strong> ' + escRaw(e.message);
     console.error(e);
   }
   document.getElementById('gen-btn-learn').disabled = false;
 }
 
 function renderProfilePreview(d) {
-  var h = '';
-
-  h += '<div class="learned-grid">';
-
+  var h = '<div class="learned-grid">';
   h += '<div class="learned-cell"><div class="learned-cell-label">Topics Covered</div>';
-  (d.topics_covered || []).forEach(function(t) { h += '<span class="learned-tag">' + esc(t) + '</span>'; });
+  (d.topics_covered||[]).forEach(function(t) { h += '<span class="learned-tag">' + escRaw(t) + '</span>'; });
   h += '</div>';
-
   h += '<div class="learned-cell"><div class="learned-cell-label">Her Phrases</div>';
-  (d.recurring_phrases || []).forEach(function(p) { h += '<span class="learned-tag">"' + esc(p) + '"</span>'; });
+  (d.recurring_phrases||[]).forEach(function(p) { h += '<span class="learned-tag">"' + escRaw(p) + '"</span>'; });
   h += '</div>';
-
   h += '<div class="learned-cell"><div class="learned-cell-label">Core Themes</div>';
-  (d.themes || []).forEach(function(t) { h += '<span class="learned-tag">' + esc(t) + '</span>'; });
+  (d.themes||[]).forEach(function(t) { h += '<span class="learned-tag">' + escRaw(t) + '</span>'; });
   h += '</div>';
-
-  h += '<div class="learned-cell"><div class="learned-cell-label">Content Gaps to Fill</div>';
-  (d.content_gaps || []).forEach(function(g) { h += '<div class="learned-item" style="color:var(--red);">- ' + esc(g) + '</div>'; });
-  h += '</div>';
-
-  h += '</div>';
-
+  h += '<div class="learned-cell"><div class="learned-cell-label">Content Gaps</div>';
+  (d.content_gaps||[]).forEach(function(g) { h += '<div class="learned-item" style="color:var(--red);">- ' + escRaw(g) + '</div>'; });
+  h += '</div></div>';
   if (d.week_summary) {
-    h += '<div style="background:var(--cream-1);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--charcoal);line-height:1.65;">' + esc(d.week_summary) + '</div>';
+    h += '<div style="background:var(--cream-1);border:1px solid var(--border);border-radius:8px;padding:12px 15px;margin-bottom:14px;font-size:13px;color:var(--charcoal);line-height:1.65;">' + escRaw(d.week_summary) + '</div>';
   }
-
   document.getElementById('learned-grid').innerHTML = h;
   document.getElementById('profile-preview').style.display = 'block';
-  document.getElementById('profile-preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('profile-preview').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-// ================================================================
-// TAB 2: GENERATE WEEKLY PLAN
-// ================================================================
 async function generateWeeklyPlan() {
   if (!checkApiKey()) return;
   if (!learnedData) { alert('Please analyze transcripts first.'); return; }
@@ -1557,219 +1397,135 @@ async function generateWeeklyPlan() {
   startLoader('gen-msg-week', weekMsgs);
 
   var profile = getProfile();
-  var transcripts = getAllTranscripts();
-
   var monday = getNextMonday();
   var weekDates = [];
   for (var i = 0; i < 7; i++) {
-    var d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    weekDates.push(d.toLocaleDateString('en-US', {weekday:'long',month:'short',day:'numeric'}));
+    var d = new Date(monday); d.setDate(monday.getDate()+i);
+    weekDates.push(d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}));
   }
 
-  var profileCtx = 'CLIENT PROFILE CONTEXT:\n' +
-    'Total transcripts fed: ' + profile.transcript_count + '\n' +
-    'Topics already covered: ' + (profile.topics.slice(-20).join(', ') || 'none yet') + '\n' +
-    'Her recurring phrases: ' + (profile.phrases.slice(-8).join(', ') || 'building') + '\n' +
-    'Pillar coverage: ' + JSON.stringify(profile.pillars) + '\n' +
-    'Content gaps: ' + (learnedData.content_gaps || []).join(', ');
+  var profileCtx = 'Topics covered: ' + profile.topics.slice(-15).join(', ') + '\nPillar coverage: ' + JSON.stringify(profile.pillars) + '\nContent gaps: ' + (learnedData.content_gaps||[]).join(', ');
 
-  var prompt = 'You are the content strategist for Tiffany Haynes and Co. Build the weekly content calendar.\n\n' +
-    'BRAND VOICE: ' + BRAND.voice + '\n' +
-    'PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
-    'AVOID: ' + BRAND.avoid + '\n' +
-    profileCtx + '\n\n' +
-    'WEEK BEING PLANNED: ' + weekDates[0] + ' through ' + weekDates[6] + '\n' +
+  var prompt = 'Content strategist for Tiffany Haynes and Co. Build the weekly content calendar.\n' +
+    'BRAND: ' + BRAND.voice + '\nAVOID: ' + BRAND.avoid + '\nPILLARS: ' + BRAND.pillars.join(', ') + '\n' +
+    profileCtx + '\n' +
+    'WEEK: ' + weekDates[0] + ' through ' + weekDates[6] + '\n' +
     'POSTING TIME: 3:00 PM CST daily\n' +
-    'VARIETY RULE: Same content type never appears back to back. Mix reels, carousels, quotes, lifestyle across the week.\n' +
-    'TEAM: Designer 1 does thumbnails (hook text over photo). Designer 2 does carousels and quote posts. Video editor handles reels.\n\n' +
-    'Available content from this week transcripts: ' + (learnedData.topics_covered || []).join(', ') + '\n' +
-    'Suggested angles: ' + (learnedData.suggested_angles || []).join(', ') + '\n\n' +
-    'Return ONLY valid JSON. No markdown. No backticks.\n\n' +
+    'RULE: Same content type never appears back to back.\n' +
+    'Available content: ' + (learnedData.topics_covered||[]).join(', ') + '\n' +
+    'Suggested angles: ' + (learnedData.suggested_angles||[]).join(', ') + '\n\n' +
+    'Return ONLY valid JSON. No markdown. Start with {.\n\n' +
     '{"week_of":"' + weekDates[0] + ' - ' + weekDates[6] + '",' +
-    '"planning_note":"One sentence on the strategic mix for this week",' +
-    '"pillar_balance":{"Business and Entrepreneurship":0,"Spiritual Development and God\'s Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality (Shenanigans)":0,"Community and Testimony":0},' +
-    '"gaps_addressed":["what gaps are filled this week"],' +
-    '"days":[' +
-    '{"day":"Monday","date":"' + weekDates[0] + '","post_type":"Reel or Carousel or Quote Post or Lifestyle or Shenanigans","pillar":"pillar name","title":"post title","hook":"exact hook or opening line","content_direction":"what this post covers in 2-3 sentences","designer_needed":"Designer 1 or Designer 2 or Video Editor or None","thumbnail_hook":"if reel - exact hook text overlay for Designer 1. Empty if not reel.","carousel_slides":[],"quote":"if quote post - exact quote. Empty otherwise."},' +
-    '{"day":"Tuesday","date":"' + weekDates[1] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
-    '{"day":"Wednesday","date":"' + weekDates[2] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
-    '{"day":"Thursday","date":"' + weekDates[3] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
-    '{"day":"Friday","date":"' + weekDates[4] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
-    '{"day":"Saturday","date":"' + weekDates[5] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""},' +
-    '{"day":"Sunday","date":"' + weekDates[6] + '","post_type":"","pillar":"","title":"","hook":"","content_direction":"","designer_needed":"","thumbnail_hook":"","carousel_slides":[],"quote":""}' +
-    '],' +
-    '"delivery":{"designer1":{"name":"Designer 1 - Thumbnails","tasks":"List every reel day with hook text and photo direction. One per line. Ready to paste into Notion task.","notion_copy":"Full copyable Notion task text for Designer 1"},"designer2":{"name":"Designer 2 - Carousels and Quotes","tasks":"List every carousel and quote post with all slide copy inline. One post per section. Ready to paste into Notion task.","notion_copy":"Full copyable Notion task text for Designer 2"},"video_editor":{"name":"Video Editor","tasks":"List every reel with the transcript source and any specific direction. One per line.","notion_copy":"Full copyable Notion task text for video editor"}}}';
+    '"planning_note":"one sentence on the strategic mix for this week",' +
+    '"pillar_balance":{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0},' +
+    '"gaps_addressed":["gap1","gap2"],' +
+    '"days":[{"day":"Monday","date":"' + weekDates[0] + '","post_type":"Reel or Carousel or Quote Post or Lifestyle","pillar":"pillar","title":"post title","hook":"exact hook","content_direction":"2-3 sentences","designer_needed":"Designer 1 or Designer 2 or Video Editor or None","thumbnail_hook":"if reel - hook text for Designer 1, else empty","carousel_slides":[],"quote":"if quote post - exact quote, else empty"}],' +
+    '"delivery":{"designer1":{"name":"Designer 1 - Thumbnails","notion_copy":"Full copyable Notion task text"},"designer2":{"name":"Designer 2 - Carousels and Quotes","notion_copy":"Full copyable Notion task text"},"video_editor":{"name":"Video Editor","notion_copy":"Full copyable Notion task text"}}}';
 
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 6000, messages: [{ role: 'user', content: prompt }] })
-    });
-    var data = await res.json();
-    var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
-    if (!raw) throw new Error('No response. Check API key.');
-    var plan = JSON.parse(raw.text.replace(/```json|```/g,'').trim());
-
+    var plan = await callAPI(prompt, 6000);
     stopLoader('gen-msg-week');
     document.getElementById('loading-week').style.display = 'none';
     renderWeeklyPlan(plan);
-
   } catch(e) {
     stopLoader('gen-msg-week');
     document.getElementById('loading-week').style.display = 'none';
     var el = document.getElementById('error-planner');
     el.style.display = 'block';
-    el.innerHTML = '<strong>Error generating weekly plan:</strong> ' + e.message;
+    el.innerHTML = '<strong>Error generating weekly plan:</strong> ' + escRaw(e.message);
     console.error(e);
   }
   document.getElementById('gen-btn-week').disabled = false;
 }
 
-// ================================================================
-// RENDER WEEKLY PLAN
-// ================================================================
 function renderWeeklyPlan(plan) {
   var h = '';
-
-  // WEEK HEADER
-  h += '<div style="margin-bottom:24px;">';
-  h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">Weekly Content Plan</div>';
-  h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:26px;font-weight:600;color:var(--charcoal);">' + (plan.week_of || '') + '</div>';
-  if (plan.planning_note) h += '<div style="font-size:13px;color:var(--charcoal2);margin-top:6px;line-height:1.6;">' + esc(plan.planning_note) + '</div>';
+  h += '<div style="margin-bottom:20px;"><div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">Weekly Content Plan</div>';
+  h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:24px;font-weight:600;color:var(--charcoal);">' + escRaw(plan.week_of||'') + '</div>';
+  if (plan.planning_note) h += '<div style="font-size:13px;color:var(--charcoal2);margin-top:6px;line-height:1.6;">' + escRaw(plan.planning_note) + '</div>';
   h += '</div>';
 
   // PILLAR TRACKER
   if (plan.pillar_balance) {
-    var total = Object.values(plan.pillar_balance).reduce(function(a,b) { return a+b; }, 0) || 1;
+    var total = Object.values(plan.pillar_balance).reduce(function(a,b){return a+b;},0)||1;
     h += '<div class="pillar-tracker"><div class="pillar-tracker-title">Pillar Balance This Week</div>';
     BRAND.pillars.forEach(function(pname) {
-      var count = plan.pillar_balance[pname] || 0;
-      var pct = Math.round((count / total) * 100);
-      var col = (BRAND.pillarColors[pname] || {color:'#999'}).color;
-      h += '<div class="pillar-row">';
-      h += '<div class="pillar-name">' + pname + '</div>';
-      h += '<div class="pillar-track"><div class="pillar-fill" style="width:' + pct + '%;background:' + col + ';"></div></div>';
-      h += '<div class="pillar-pct">' + count + '</div>';
-      h += '</div>';
+      var count = plan.pillar_balance[pname]||0;
+      var pct = Math.round((count/total)*100);
+      var col = (BRAND.pillarColors[pname]||{color:'#999'}).color;
+      h += '<div class="pillar-bar-row"><div class="pillar-bar-label">' + pname + '</div><div class="pillar-bar-track"><div class="pillar-bar-fill" style="width:' + pct + '%;background:' + col + ';"></div></div><div class="pillar-bar-count">' + count + '</div></div>';
     });
-    if (plan.gaps_addressed && plan.gaps_addressed.length) {
-      h += '<div class="gap-warning">Gaps addressed this week: ' + plan.gaps_addressed.join(', ') + '</div>';
-    }
     h += '</div>';
   }
 
   // CALENDAR
-  h += '<div class="out-eyebrow" style="margin-bottom:10px;">Mon-Sun Calendar</div>';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;">Mon-Sun Calendar</div>';
   h += '<div class="calendar-grid">';
-  (plan.days || []).forEach(function(day) {
-    var pc = BRAND.pillarColors[day.pillar] || {color:'#999',bg:'#F8F8F8'};
-    h += '<div class="cal-day">';
-    h += '<div class="cal-day-header">';
-    h += '<div class="cal-day-name">' + day.day + '</div>';
-    if (day.date) h += '<div style="font-size:10px;color:var(--charcoal3);">' + day.date + '</div>';
-    h += '</div>';
-    h += '<div class="cal-day-body">';
-    h += '<div class="cal-post-type" style="color:' + pc.color + ';">' + (day.post_type || '') + '</div>';
-    h += '<div class="cal-post-title">' + esc(day.title || '') + '</div>';
-    if (day.pillar) h += '<div class="cal-pillar-tag" style="background:' + pc.bg + ';color:' + pc.color + ';">' + day.pillar + '</div>';
-    if (day.designer_needed && day.designer_needed !== 'None') {
-      h += '<div style="font-size:9px;color:var(--charcoal3);margin-top:5px;font-weight:600;">' + day.designer_needed + '</div>';
-    }
-    h += '<div class="cal-time">3:00 PM CST</div>';
-    h += '</div></div>';
+  (plan.days||[]).forEach(function(day) {
+    var pc = BRAND.pillarColors[day.pillar]||{color:'#999',bg:'var(--cream-2)'};
+    h += '<div class="cal-day"><div class="cal-day-header"><div class="cal-day-name">' + day.day + '</div><div class="cal-day-date">' + (day.date||'') + '</div></div>';
+    h += '<div class="cal-day-body"><div class="cal-post-type" style="color:' + pc.color + ';">' + escRaw(day.post_type||'') + '</div>';
+    h += '<div class="cal-post-title">' + escRaw(day.title||'') + '</div>';
+    if (day.designer_needed && day.designer_needed !== 'None') h += '<div style="font-size:9px;color:var(--charcoal3);margin-top:3px;font-weight:600;">' + escRaw(day.designer_needed) + '</div>';
+    h += '<div class="cal-time">3:00 PM CST</div></div></div>';
   });
   h += '</div>';
 
   // POST DETAILS
-  h += '<div class="out-section"><div class="out-eyebrow" style="margin-bottom:6px;">Post Details</div><div class="out-title">Daily Content Breakdown</div>';
-  (plan.days || []).forEach(function(day) {
+  h += '<div style="margin-bottom:28px;">';
+  (plan.days||[]).forEach(function(day) {
     if (!day.title) return;
-    var pc = BRAND.pillarColors[day.pillar] || {color:'#999',bg:'#F8F8F8'};
-    h += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
-    h += '<div style="padding:12px 18px;background:var(--cream-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">';
-    h += '<div style="display:flex;align-items:center;gap:12px;">';
-    h += '<div style="font-size:11px;font-weight:700;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;">' + day.day + '</div>';
-    h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:600;color:var(--charcoal);">' + esc(day.title) + '</div>';
-    h += '</div>';
-    h += '<span style="font-size:9px;font-weight:600;padding:3px 9px;border-radius:12px;background:' + pc.bg + ';color:' + pc.color + ';">' + (day.post_type || '') + '</span>';
-    h += '</div>';
-    h += '<div style="padding:14px 18px;">';
-    if (day.hook) { h += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Hook</div>'; h += '<div style="font-size:13px;font-weight:600;color:var(--charcoal);font-style:italic;margin-bottom:10px;">"' + esc(day.hook) + '"</div>'; }
-    if (day.content_direction) { h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Direction</div>'; h += '<div style="font-size:12px;color:var(--charcoal2);line-height:1.6;margin-bottom:10px;">' + esc(day.content_direction) + '</div>'; }
-    if (day.thumbnail_hook) { h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Thumbnail Hook (Designer 1)</div>'; h += '<div style="font-size:12px;color:var(--charcoal2);font-style:italic;margin-bottom:10px;">' + esc(day.thumbnail_hook) + '</div>'; }
-    if (day.quote) { h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Quote (Designer 2)</div>'; h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:15px;font-style:italic;color:var(--charcoal);">' + esc(day.quote) + '</div>'; }
+    var pc = BRAND.pillarColors[day.pillar]||{color:'#999',bg:'var(--cream-2)'};
+    h += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
+    h += '<div style="padding:11px 16px;background:var(--cream-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">';
+    h += '<div style="display:flex;align-items:center;gap:10px;"><div style="font-size:11px;font-weight:700;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;">' + day.day + '</div>';
+    h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:600;color:var(--charcoal);">' + escRaw(day.title) + '</div></div>';
+    h += '<span style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:12px;background:' + (BRAND.pillarColors[day.pillar]||{bg:'var(--cream-3)'}).bg + ';color:' + pc.color + ';">' + escRaw(day.post_type||'') + '</span></div>';
+    h += '<div style="padding:13px 16px;">';
+    if (day.hook) { h += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Hook</div><div style="font-size:13px;font-weight:600;color:var(--charcoal);font-style:italic;margin-bottom:8px;">"' + escRaw(day.hook) + '"</div>'; }
+    if (day.content_direction) { h += '<div style="font-size:12px;color:var(--charcoal2);line-height:1.6;">' + escRaw(day.content_direction) + '</div>'; }
     h += '</div></div>';
   });
   h += '</div>';
 
   // DELIVERY CARDS
   h += '<div class="math-div">+ + +</div>';
-  h += '<div class="out-section"><div class="out-eyebrow">Team Delivery</div><div class="out-title">Notion Task Assignments</div>';
-  h += '<div class="out-sub">Copy the block below and paste directly into each team member\'s Notion task.</div>';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;">Team Delivery - Notion Task Assignments</div>';
   h += '<div class="delivery-grid">';
-
   if (plan.delivery) {
     [
-      {key:'designer1', color:'#B87830', bg:'#FFF8F0', label:'Designer 1', sub:'Thumbnails'},
-      {key:'designer2', color:'#3A6EA8', bg:'#F0F5FF', label:'Designer 2', sub:'Carousels + Quotes'},
-      {key:'video_editor', color:'#3A9E6E', bg:'#F5FAF7', label:'Video Editor', sub:'Reels'}
+      {key:'designer1',color:'#B87830',bg:'rgba(184,120,48,0.08)',label:'Designer 1',sub:'Thumbnails'},
+      {key:'designer2',color:'#3A6EA8',bg:'rgba(58,110,168,0.08)',label:'Designer 2',sub:'Carousels + Quotes'},
+      {key:'video_editor',color:'#3A9E6E',bg:'rgba(58,158,110,0.08)',label:'Video Editor',sub:'Reels'}
     ].forEach(function(role) {
-      var d = plan.delivery[role.key] || {};
-      var notionText = (d.notion_copy || d.tasks || '');
-      h += '<div class="delivery-card">';
-      h += '<div class="delivery-header" style="background:' + role.bg + ';border-bottom:1px solid ' + role.color + '20;">';
+      var d = plan.delivery[role.key]||{};
+      var notionText = d.notion_copy||d.tasks||'';
+      h += '<div class="delivery-card"><div class="delivery-header" style="background:' + role.bg + ';border-bottom:1px solid ' + role.color + '20;">';
       h += '<div class="delivery-role" style="color:' + role.color + ';">' + role.label + '</div>';
-      h += '<div class="delivery-person">' + role.sub + '</div>';
-      h += '</div>';
-      h += '<div class="delivery-body">';
-      h += '<div class="delivery-label">Notion Task Copy</div>';
-      h += '<div class="delivery-block">' + esc(notionText) + '</div>';
-      h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(notionText) + ')">Copy for Notion</button>';
-      h += '</div></div>';
+      h += '<div class="delivery-person">' + role.sub + '</div></div>';
+      h += '<div class="delivery-body"><div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Notion Task Copy</div>';
+      h += '<div class="delivery-block">' + escRaw(notionText) + '</div>';
+      h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(notionText) + ')">Copy for Notion</button></div></div>';
     });
   }
-  h += '</div></div>';
-
-  h += '<div class="studio-footer">Tiffany Haynes &amp; Co. Content Studio - Submission deadline Tuesday EOD - Not for distribution outside the media team</div>';
+  h += '</div>';
+  h += '<div class="studio-footer">Tiffany Haynes &amp; Co. Content Studio - Submit to Notion by Tuesday EOD</div>';
 
   document.getElementById('results-planner').innerHTML = h;
   document.getElementById('results-planner').style.display = 'block';
-  document.getElementById('results-planner').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ================================================================
-// UTILITIES
-// ================================================================
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+  document.getElementById('results-planner').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 function getNextMonday() {
-  var d = new Date();
-  var day = d.getDay();
-  var diff = (7 - day + 1) % 7;
-  if (diff === 0) diff = 7;
-  d.setDate(d.getDate() + diff);
-  d.setHours(0,0,0,0);
-  return d;
+  var d = new Date(); var day = d.getDay();
+  var diff = (7-day+1)%7; if (diff===0) diff=7;
+  d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d;
 }
-
-// Render profile on load
-window.addEventListener('DOMContentLoaded', function() {
-  renderProfilePanel();
-  renderKnowledgeBase();
-});
 
 // ================================================================
 // KNOWLEDGE BASE
 // ================================================================
-var kbLoaderMsgs = [
-  'Reading the document...','Extracting key insights...','Identifying performance data...',
-  'Finding strategic priorities...','Updating client profile...','Almost done...'
-];
+var kbMsgsList = ['Reading the document...','Extracting key insights...','Identifying performance data...','Updating client profile...','Almost done...'];
 
 function getKnowledgeBase() {
   var raw = localStorage.getItem('tiffany_knowledge_base');
@@ -1777,29 +1533,21 @@ function getKnowledgeBase() {
   try { return JSON.parse(raw); } catch(e) { return []; }
 }
 
-function saveKnowledgeBase(kb) {
-  localStorage.setItem('tiffany_knowledge_base', JSON.stringify(kb));
-}
+function saveKnowledgeBase(kb) { localStorage.setItem('tiffany_knowledge_base', JSON.stringify(kb)); }
 
 function handleKBUpload(e) {
   var file = e.target.files[0];
   if (!file) return;
   var docType = document.getElementById('kb-doc-type').value;
   var ext = file.name.split('.').pop().toLowerCase();
-
   if (ext === 'csv' || ext === 'txt') {
     var reader = new FileReader();
-    reader.onload = function(ev) {
-      processKBDocument(file.name, docType, 'text', null, ev.target.result);
-    };
+    reader.onload = function(ev) { processKBDocument(file.name, docType, 'text', null, ev.target.result); };
     reader.readAsText(file);
   } else if (ext === 'pdf') {
-    var reader = new FileReader();
-    reader.onload = function(ev) {
-      var base64 = ev.target.result.split(',')[1];
-      processKBDocument(file.name, docType, 'pdf', base64, null);
-    };
-    reader.readAsDataURL(file);
+    var reader2 = new FileReader();
+    reader2.onload = function(ev) { processKBDocument(file.name, docType, 'pdf', ev.target.result.split(',')[1], null); };
+    reader2.readAsDataURL(file);
   } else {
     alert('Please upload a PDF, CSV, or TXT file.');
   }
@@ -1808,106 +1556,65 @@ function handleKBUpload(e) {
 
 async function processKBDocument(filename, docType, fileType, base64, textContent) {
   if (!checkApiKey()) return;
-
   document.getElementById('loading-kb').style.display = 'block';
   document.getElementById('error-kb').style.display = 'none';
-  startLoader('gen-msg-kb', kbLoaderMsgs);
+  startLoader('gen-msg-kb', kbMsgsList);
 
-  var docTypeLabels = {
-    'meta-report': 'META Performance Report',
-    'strategy': '90-Day Strategic Plan',
-    'brand': 'Brand Guidelines',
-    'audience': 'Audience Research',
-    'calendar': 'Content Calendar',
-    'csv': 'CSV Data Export',
-    'other': 'Document'
-  };
+  var labels = {'meta-report':'META Performance Report','strategy':'90-Day Strategic Plan','brand':'Brand Guidelines','audience':'Audience Research','calendar':'Content Calendar','csv':'CSV Data Export','other':'Document'};
 
-  var systemPrompt = 'You are the data analyst for Tiffany Haynes and Co. social media team. ' +
-    'Extract all useful insights from this ' + docTypeLabels[docType] + ' and return them as structured JSON. ' +
-    'Focus on: performance metrics, audience insights, content strategy, what is working, what is not working, ' +
-    'strategic priorities, content themes, and any actionable recommendations. ' +
-    'Return ONLY valid JSON. No markdown. No backticks.';
-
-  var userPrompt = 'Extract all insights from this document for Tiffany Haynes and Co. content strategy.\n\n' +
-    'Return this exact JSON structure:\n' +
-    '{"document_title":"descriptive title for this document","document_type":"' + docTypeLabels[docType] + '",' +
-    '"period_covered":"date range if applicable, empty string if not",' +
-    '"key_metrics":[{"label":"metric name","value":"metric value","trend":"up or down or flat or N/A","note":"brief context"}],' +
-    '"audience_insights":["insight 1","insight 2"],' +
-    '"top_performing_content":["content piece 1 with context","content piece 2"],' +
-    '"what_is_working":["observation 1","observation 2"],' +
-    '"what_needs_attention":["issue 1","issue 2"],' +
-    '"strategic_priorities":["priority 1","priority 2"],' +
-    '"content_themes":["theme 1","theme 2"],' +
-    '"action_items":["specific action 1","specific action 2"],' +
-    '"profile_updates":{"topics_to_avoid":[],"audience_notes":[],"brand_direction":[],"content_gaps":[],"winning_formats":[]}}';
+  var userPrompt = 'Extract all insights from this ' + (labels[docType]||'document') + ' for Tiffany Haynes and Co. content strategy.\n\n' +
+    'Return ONLY valid JSON. No markdown. Start with {.\n\n' +
+    '{"document_title":"descriptive title","document_type":"' + (labels[docType]||'Document') + '",' +
+    '"period_covered":"date range if applicable, else empty",' +
+    '"key_metrics":[{"label":"metric","value":"value","trend":"up or down or flat","note":"context"}],' +
+    '"audience_insights":["insight1","insight2"],' +
+    '"top_performing_content":["content1","content2"],' +
+    '"what_is_working":["observation1","observation2"],' +
+    '"what_needs_attention":["issue1","issue2"],' +
+    '"strategic_priorities":["priority1","priority2"],' +
+    '"content_themes":["theme1","theme2"],' +
+    '"action_items":["action1","action2"],' +
+    '"profile_updates":{"audience_notes":[],"content_gaps":[],"winning_formats":[]}}';
 
   try {
     var messages;
     if (fileType === 'pdf') {
-      messages = [{
-        role: 'user',
-        content: [
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
-          { type: 'text', text: userPrompt }
-        ]
-      }];
+      messages = [{ role:'user', content:[
+        {type:'document', source:{type:'base64', media_type:'application/pdf', data:base64}},
+        {type:'text', text:userPrompt}
+      ]}];
     } else {
-      messages = [{
-        role: 'user',
-        content: userPrompt + '\n\nDOCUMENT CONTENT:\n' + textContent
-      }];
+      messages = [{ role:'user', content:userPrompt + '\n\nDOCUMENT:\n' + textContent }];
     }
 
+    if (!getApiKey()) throw new Error('No API key.');
     var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': getApiKey(),
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
-        system: systemPrompt,
-        messages: messages
-      })
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:messages})
     });
+    var bodyText = await res.text();
+    if (!res.ok) throw new Error('API error ' + res.status);
+    var data = JSON.parse(bodyText);
+    var raw = (data.content||[]).find(function(b){return b.type==='text';});
+    if (!raw) throw new Error('No response');
+    var extracted = safeParseJSON(raw.text);
 
-    var data = await res.json();
-    var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
-    if (!raw) throw new Error('No response. Check API key.');
-    var extracted = JSON.parse(raw.text.replace(/```json|```/g,'').trim());
-
-    // Auto-update client profile
     var p = getProfile();
     if (extracted.profile_updates) {
       var pu = extracted.profile_updates;
-      if (pu.audience_notes) pu.audience_notes.forEach(function(n) { if (p.themes.indexOf(n) === -1) p.themes.push(n); });
-      if (pu.content_gaps) pu.content_gaps.forEach(function(g) { if (p.themes.indexOf(g) === -1) p.themes.push(g); });
-      if (pu.winning_formats) pu.winning_formats.forEach(function(f) { if (p.phrases.indexOf(f) === -1) p.phrases.push(f); });
+      if (pu.audience_notes) pu.audience_notes.forEach(function(n){if(p.themes.indexOf(n)===-1)p.themes.push(n);});
+      if (pu.content_gaps) pu.content_gaps.forEach(function(g){if(p.themes.indexOf(g)===-1)p.themes.push(g);});
+      if (pu.winning_formats) pu.winning_formats.forEach(function(f){if(p.phrases.indexOf(f)===-1)p.phrases.push(f);});
     }
-    if (extracted.content_themes) {
-      extracted.content_themes.forEach(function(t) { if (p.themes.indexOf(t) === -1) p.themes.push(t); });
-    }
-    if (extracted.strategic_priorities) {
-      extracted.strategic_priorities.forEach(function(s) { if (p.topics.indexOf(s) === -1) p.topics.push(s); });
-    }
+    if (extracted.content_themes) extracted.content_themes.forEach(function(t){if(p.themes.indexOf(t)===-1)p.themes.push(t);});
+    if (extracted.strategic_priorities) extracted.strategic_priorities.forEach(function(s){if(p.topics.indexOf(s)===-1)p.topics.push(s);});
     p.last_updated = new Date().toISOString();
     saveProfile(p);
     renderProfilePanel();
 
-    // Save to knowledge base
     var kb = getKnowledgeBase();
-    kb.unshift({
-      id: Date.now(),
-      filename: filename,
-      uploaded: new Date().toISOString(),
-      docType: docType,
-      data: extracted
-    });
+    kb.unshift({id:Date.now(), filename:filename, uploaded:new Date().toISOString(), docType:docType, data:extracted});
     saveKnowledgeBase(kb);
 
     stopLoader('gen-msg-kb');
@@ -1919,14 +1626,14 @@ async function processKBDocument(filename, docType, fileType, base64, textConten
     document.getElementById('loading-kb').style.display = 'none';
     var el = document.getElementById('error-kb');
     el.style.display = 'block';
-    el.innerHTML = '<strong>Error reading document:</strong> ' + e.message;
+    el.innerHTML = '<strong>Error reading document:</strong> ' + escRaw(e.message);
     console.error(e);
   }
 }
 
 function deleteKBEntry(id) {
-  if (!confirm('Remove this document from the knowledge base?')) return;
-  var kb = getKnowledgeBase().filter(function(e) { return e.id !== id; });
+  if (!confirm('Remove this document?')) return;
+  var kb = getKnowledgeBase().filter(function(e){return e.id!==id;});
   saveKnowledgeBase(kb);
   renderKnowledgeBase();
 }
@@ -1935,113 +1642,70 @@ function renderKnowledgeBase() {
   var kb = getKnowledgeBase();
   var container = document.getElementById('kb-entries');
   if (!container) return;
-
-  if (kb.length === 0) {
-    container.innerHTML = '<div class="kb-empty">No documents uploaded yet.<br>Upload a META report, 90-day plan, or any brand document above to start building the knowledge base.</div>';
-    return;
-  }
+  if (!kb.length) { container.innerHTML = '<div class="kb-empty">No documents uploaded yet. Upload a META report, 90-day plan, or any brand document above to start building the knowledge base.</div>'; return; }
 
   var docColors = {
-    'meta-report': {color:'#A00605', bg:'#FFF5F5', label:'META Report'},
-    'strategy':    {color:'#3A6EA8', bg:'#F0F5FF', label:'Strategic Plan'},
-    'brand':       {color:'#6A50A8', bg:'#F8F5FF', label:'Brand Guide'},
-    'audience':    {color:'#3A9E6E', bg:'#F5FAF7', label:'Audience Research'},
-    'calendar':    {color:'#B87830', bg:'#FFF8F0', label:'Content Calendar'},
-    'csv':         {color:'#5A5A5A', bg:'#F5F5F5', label:'CSV Data'},
-    'other':       {color:'#8A8A8A', bg:'#F8F8F8', label:'Document'}
+    'meta-report':{color:'#A00605',bg:'rgba(160,6,5,0.08)',label:'META Report'},
+    'strategy':{color:'#3A6EA8',bg:'rgba(58,110,168,0.08)',label:'Strategic Plan'},
+    'brand':{color:'#6A50A8',bg:'rgba(106,80,168,0.08)',label:'Brand Guide'},
+    'audience':{color:'#3A9E6E',bg:'rgba(58,158,110,0.08)',label:'Audience Research'},
+    'calendar':{color:'#B87830',bg:'rgba(184,120,48,0.08)',label:'Content Calendar'},
+    'csv':{color:'#5A5A5A',bg:'rgba(90,90,90,0.08)',label:'CSV Data'},
+    'other':{color:'#8A8A8A',bg:'rgba(136,136,136,0.08)',label:'Document'}
   };
 
-  var h = '<div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">';
-  h += '<div><div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Knowledge Base</div>';
-  h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;font-weight:600;color:var(--charcoal);">' + kb.length + ' document' + (kb.length !== 1 ? 's' : '') + ' uploaded</div></div>';
-  h += '<div style="font-size:11px;color:var(--charcoal3);">Profile auto-updated with each upload</div></div>';
+  var h = '<div style="margin-bottom:18px;"><div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Knowledge Base</div>';
+  h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;font-weight:600;color:var(--charcoal);">' + kb.length + ' document' + (kb.length!==1?'s':'') + ' uploaded</div></div>';
 
   kb.forEach(function(entry) {
-    var d = entry.data || {};
-    var dc = docColors[entry.docType] || docColors['other'];
-    var uploadDate = new Date(entry.uploaded).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    var d = entry.data||{};
+    var dc = docColors[entry.docType]||docColors['other'];
+    var uploadDate = new Date(entry.uploaded).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 
     h += '<div class="kb-entry">';
-
-    // HEADER
     h += '<div class="kb-entry-header">';
-    h += '<div><div class="kb-entry-title">' + esc(d.document_title || entry.filename) + '</div>';
-    h += '<div class="kb-entry-meta">' + entry.filename + ' &bull; Uploaded ' + uploadDate + (d.period_covered ? ' &bull; Period: ' + esc(d.period_covered) : '') + '</div></div>';
-    h += '<div style="display:flex;align-items:center;gap:8px;">';
-    h += '<span class="kb-doc-type" style="background:' + dc.bg + ';color:' + dc.color + ';">' + dc.label + '</span>';
-    h += '<button class="copy-btn" onclick="deleteKBEntry(' + entry.id + ')" style="color:var(--red);border-color:rgba(160,6,5,0.2);">Remove</button>';
-    h += '</div></div>';
+    h += '<div><div class="kb-entry-title">' + escRaw(d.document_title||entry.filename) + '</div>';
+    h += '<div class="kb-entry-meta">' + escRaw(entry.filename) + ' - Uploaded ' + uploadDate + (d.period_covered?' - Period: '+escRaw(d.period_covered):'') + '</div></div>';
+    h += '<div style="display:flex;align-items:center;gap:8px;"><span class="kb-doc-type" style="background:' + dc.bg + ';color:' + dc.color + ';">' + dc.label + '</span>';
+    h += '<button class="copy-btn" style="color:var(--red);border-color:rgba(160,6,5,0.2);" onclick="deleteKBEntry(' + entry.id + ')">Remove</button></div></div>';
 
-    // BODY
-    h += '<div class="kb-entry-body">';
+    h += '<div class="kb-body">';
 
-    // KEY METRICS
-    if (d.key_metrics && d.key_metrics.length > 0) {
-      h += '<div class="kb-insight-group">';
-      h += '<div class="kb-insight-label">Key Metrics</div>';
+    if (d.key_metrics && d.key_metrics.length) {
+      h += '<div class="kb-label">Key Metrics</div>';
       h += '<div class="kb-stat-grid">';
       d.key_metrics.slice(0,6).forEach(function(m) {
-        var trendColor = m.trend === 'up' ? 'var(--green)' : m.trend === 'down' ? 'var(--red)' : 'var(--charcoal3)';
-        var trendArrow = m.trend === 'up' ? ' up' : m.trend === 'down' ? ' dn' : '';
-        h += '<div class="kb-stat">';
-        h += '<div class="kb-stat-num" style="color:' + trendColor + ';font-size:16px;">' + esc(m.value) + '</div>';
-        h += '<div class="kb-stat-label">' + esc(m.label) + '</div>';
-        if (m.note) h += '<div style="font-size:9px;color:var(--charcoal3);margin-top:3px;">' + esc(m.note) + '</div>';
-        h += '</div>';
-      });
-      h += '</div></div>';
-    }
-
-    // WHAT IS WORKING + WHAT NEEDS ATTENTION
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">';
-
-    if (d.what_is_working && d.what_is_working.length > 0) {
-      h += '<div class="kb-insight-group" style="margin-bottom:0;">';
-      h += '<div class="kb-insight-label" style="color:var(--green);">What is Working</div>';
-      d.what_is_working.forEach(function(item) {
-        h += '<div class="kb-insight-item">' + esc(item) + '</div>';
+        var tc = m.trend==='up'?'var(--green)':m.trend==='down'?'var(--red)':'var(--charcoal3)';
+        h += '<div class="kb-stat"><div class="kb-stat-num" style="color:' + tc + ';font-size:14px;">' + escRaw(m.value) + '</div><div class="kb-stat-label">' + escRaw(m.label) + '</div></div>';
       });
       h += '</div>';
     }
 
-    if (d.what_needs_attention && d.what_needs_attention.length > 0) {
-      h += '<div class="kb-insight-group" style="margin-bottom:0;">';
-      h += '<div class="kb-insight-label" style="color:var(--red);">Needs Attention</div>';
-      d.what_needs_attention.forEach(function(item) {
-        h += '<div class="kb-insight-item">' + esc(item) + '</div>';
-      });
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;">';
+    if (d.what_is_working && d.what_is_working.length) {
+      h += '<div><div class="kb-label" style="color:var(--green);">What is Working</div>';
+      d.what_is_working.forEach(function(item) { h += '<div class="kb-item">' + escRaw(item) + '</div>'; });
+      h += '</div>';
+    }
+    if (d.what_needs_attention && d.what_needs_attention.length) {
+      h += '<div><div class="kb-label" style="color:var(--red);">Needs Attention</div>';
+      d.what_needs_attention.forEach(function(item) { h += '<div class="kb-item">' + escRaw(item) + '</div>'; });
       h += '</div>';
     }
     h += '</div>';
 
-    // STRATEGIC PRIORITIES
-    if (d.strategic_priorities && d.strategic_priorities.length > 0) {
-      h += '<div class="kb-insight-group">';
-      h += '<div class="kb-insight-label">Strategic Priorities</div>';
-      d.strategic_priorities.forEach(function(p, i) {
-        h += '<div class="kb-insight-item" style="display:flex;gap:10px;"><span style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:700;color:var(--red);flex-shrink:0;line-height:1.4;">' + (i+1) + '</span><span>' + esc(p) + '</span></div>';
+    if (d.strategic_priorities && d.strategic_priorities.length) {
+      h += '<div class="kb-label">Strategic Priorities</div>';
+      d.strategic_priorities.forEach(function(p,i) {
+        h += '<div class="kb-item" style="display:flex;gap:8px;"><span style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:700;color:var(--red);flex-shrink:0;line-height:1.4;">' + (i+1) + '</span><span>' + escRaw(p) + '</span></div>';
       });
-      h += '</div>';
     }
 
-    // AUDIENCE INSIGHTS
-    if (d.audience_insights && d.audience_insights.length > 0) {
-      h += '<div class="kb-insight-group">';
-      h += '<div class="kb-insight-label">Audience Insights</div>';
-      d.audience_insights.forEach(function(item) {
-        h += '<span class="kb-tag">' + esc(item) + '</span>';
-      });
-      h += '</div>';
-    }
-
-    // ACTION ITEMS
-    if (d.action_items && d.action_items.length > 0) {
-      h += '<div class="kb-insight-group">';
-      h += '<div class="kb-insight-label">Action Items</div>';
+    if (d.action_items && d.action_items.length) {
+      h += '<div class="kb-label">Action Items</div>';
       d.action_items.forEach(function(item) {
-        h += '<div class="kb-insight-item" style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--red);font-weight:700;flex-shrink:0;">&rarr;</span><span>' + esc(item) + '</span></div>';
+        h += '<div class="kb-item" style="display:flex;gap:6px;"><span style="color:var(--red);font-weight:700;flex-shrink:0;">&rarr;</span><span>' + escRaw(item) + '</span></div>';
       });
-      h += '</div>';
     }
 
     h += '</div></div>';
@@ -2049,7 +1713,6 @@ function renderKnowledgeBase() {
 
   container.innerHTML = h;
 }
-
 </script>
 </body>
 </html>
