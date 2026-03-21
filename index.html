@@ -1964,10 +1964,11 @@ async function approveAndSchedule() {
   };
 
   // Try to save to GitHub repo as approved_topics.json
-  var saved = false;
+  var saveResult = { ok: false, error: '' };
   if (token) {
-    saved = await saveToGitHub(token, payload);
+    saveResult = await saveToGitHub(token, payload);
   }
+  var saved = saveResult.ok;
 
   // Update UI regardless
   document.getElementById('ep-approved-badge').style.display = 'inline-block';
@@ -1995,7 +1996,7 @@ async function approveAndSchedule() {
   } else if (token) {
     confirmEl.style.display = 'none';
     errorEl.style.display = 'block';
-    document.getElementById('ep-schedule-error-text').innerHTML = 'GitHub save failed. Make sure the <strong>GitHub Repo</strong> field above is filled in as <strong>username/THCO-Social-Media-Manager</strong>, then try again. You can still send a test email.';
+    document.getElementById('ep-schedule-error-text').innerHTML = (saveResult.error || 'GitHub save failed. Check your token and repo field above.') + '<br><br>You can still send a test email below.';
     document.getElementById('ep-status-note').textContent = 'GitHub save failed. Check repo field.';
   } else {
     errorEl.style.display = 'none';
@@ -2031,8 +2032,8 @@ async function sendTestEmail() {
       topics: epCurrentData ? (epCurrentData.topics || []) : []
     };
 
-    var saved = await saveToGitHub(token, payload);
-    if (!saved) throw new Error('Could not save to GitHub. Check your token has repo scope.');
+    var saveResult = await saveToGitHub(token, payload);
+    if (!saveResult.ok) throw new Error(saveResult.error || 'Could not save to GitHub.');
 
     // Trigger the workflow immediately
     var triggered = await triggerWorkflow(token);
@@ -2084,40 +2085,45 @@ function getGitHubRepo() {
 }
 
 async function saveToGitHub(token, payload) {
-  try {
-    var repoFull = getGitHubRepo();
-    if (!repoFull) {
-      var input = prompt('Enter your GitHub repo (format: username/repo-name):\nExample: ebeprstudios/THCO-Social-Media-Manager');
-      if (!input) return false;
-      repoFull = input.trim();
-      localStorage.setItem('tiffany_ep_github_repo', repoFull);
-      var repoEl = document.getElementById('ep-github-repo');
-      if (repoEl) repoEl.value = repoFull;
-    }
+  var repoFull = getGitHubRepo();
+  if (!repoFull) {
+    var input = prompt('Enter your GitHub repo:\nExample: ebeprstudios/THCO-Social-Media-Manager');
+    if (!input) return { ok: false, error: 'No repo entered.' };
+    repoFull = input.trim();
+    localStorage.setItem('tiffany_ep_github_repo', repoFull);
+    var repoEl = document.getElementById('ep-github-repo');
+    if (repoEl) repoEl.value = repoFull;
+  }
 
+  try {
     var parts = repoFull.split('/');
     var repoOwner = parts[0]; var repoName = parts[1];
+    if (!repoOwner || !repoName) return { ok: false, error: 'Repo format wrong. Use: username/repo-name' };
+
     var apiUrl = 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contents/approved_topics.json';
     var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
 
     var sha = null;
     var checkRes = await fetch(apiUrl, { headers: headers });
+    if (checkRes.status === 401) return { ok: false, error: 'Token rejected (401). Your token may be expired or missing repo scope. Go to github.com/settings/tokens, regenerate your token, check the repo box, and paste the new token in the GitHub Token field.' };
+    if (checkRes.status === 403) return { ok: false, error: 'Access denied (403). Token does not have repo scope. Go to github.com/settings/tokens and regenerate with repo + workflow scopes checked.' };
+    if (checkRes.status === 404) return { ok: false, error: 'Repo not found (404). Check your GitHub Repo field. It should be: ' + repoFull + '. Make sure the spelling matches exactly.' };
     if (checkRes.ok) { var ex = await checkRes.json(); sha = ex.sha; }
 
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-    var body = { message: 'Approved voiceover topics for ' + (payload.recording_week || 'this week'), content: content };
+    var body = { message: 'Approved voiceover topics', content: content };
     if (sha) body.sha = sha;
 
     var putRes = await fetch(apiUrl, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
     if (!putRes.ok) {
-      var errBody = await putRes.text();
-      console.error('GitHub save error:', putRes.status, errBody);
-      return false;
+      var errText = await putRes.text();
+      var errJ = {}; try { errJ = JSON.parse(errText); } catch(x) {}
+      var msg = errJ.message || errText.slice(0,200);
+      return { ok: false, error: 'GitHub write failed (' + putRes.status + '): ' + msg };
     }
-    return true;
+    return { ok: true };
   } catch(e) {
-    console.error('GitHub save exception:', e);
-    return false;
+    return { ok: false, error: 'Network error: ' + e.message };
   }
 }
 
