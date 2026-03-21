@@ -417,6 +417,29 @@ body::before {
   #topbar,#tab-bar,.btn-primary,.tb-btn,.copy-btn,.add-transcript-btn,#profile-panel,#upload-zone { display:none !important; }
   body { background:white; }
 }
+/* KMDB FILE LIST */
+.kb-file-row {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 18px; border-bottom:1px solid var(--border);
+  cursor:pointer; transition:background 0.12s;
+}
+.kb-file-row:last-child { border-bottom:none; }
+.kb-file-row:hover { background:var(--cream-2); }
+.kb-file-row.active { background:var(--red-dim); border-left:3px solid var(--red); }
+.kb-file-icon {
+  width:32px; height:32px; border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700; flex-shrink:0;
+}
+.kb-file-name { font-size:12px; font-weight:600; color:var(--charcoal); line-height:1.3; }
+.kb-file-sub { font-size:10px; color:var(--charcoal3); margin-top:1px; }
+.kb-file-actions { margin-left:auto; display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.kb-expand-arrow { font-size:10px; color:var(--charcoal3); transition:transform 0.2s; }
+.kb-file-row.active .kb-expand-arrow { transform:rotate(90deg); color:var(--red); }
+
+@media (max-width:768px) {
+  #tab-knowledge .panel { margin-bottom:0; }
+}
 </style>
 </head>
 <body>
@@ -743,36 +766,64 @@ body::before {
 
     <!-- TAB: KNOWLEDGE BASE -->
     <div id="tab-knowledge" class="tab-pane">
-      <div class="panel">
-        <div class="panel-eyebrow">Knowledge Base</div>
-        <div class="panel-title">Upload Documents &amp; Reports</div>
-        <div class="panel-sub">Upload META performance reports, 90-day plans, brand guidelines, audience research, content calendars, or CSV files. The AI reads each one and automatically updates Tiffany's client profile.</div>
-        <div id="upload-zone" onclick="document.getElementById('kb-file-input').click()">
-          <div style="font-size:28px;margin-bottom:10px;">+</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--charcoal);margin-bottom:6px;">Drop a file or click to upload</div>
-          <div style="font-size:11px;color:var(--charcoal3);">PDF, CSV, TXT supported</div>
+
+      <!-- TWO COLUMN LAYOUT: Upload + List -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;align-items:start;">
+
+        <!-- LEFT: UPLOAD PANEL -->
+        <div class="panel" style="margin-bottom:0;">
+          <div class="panel-eyebrow">Knowledge Base</div>
+          <div class="panel-title">Upload Documents</div>
+          <div class="panel-sub">PDF, CSV, and TXT supported. The AI reads each one and updates Tiffany's client profile automatically.</div>
+          <div id="upload-zone" onclick="document.getElementById('kb-file-input').click()">
+            <div style="font-size:28px;margin-bottom:10px;">+</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--charcoal);margin-bottom:5px;">Drop a file or click to upload</div>
+            <div style="font-size:11px;color:var(--charcoal3);">META reports, 90-day plans, brand guides, audience research, CSV exports</div>
+          </div>
+          <input type="file" id="kb-file-input" accept=".pdf,.csv,.txt" style="display:none" onchange="handleKBUpload(event)" />
+          <div class="input-row" style="margin-top:10px;">
+            <select class="select" id="kb-doc-type">
+              <option value="meta-report">META Performance Report</option>
+              <option value="strategy">90-Day Strategic Plan</option>
+              <option value="brand">Brand Guidelines</option>
+              <option value="audience">Audience Research</option>
+              <option value="calendar">Content Calendar</option>
+              <option value="csv">CSV Data Export</option>
+              <option value="other">Other Document</option>
+            </select>
+          </div>
         </div>
-        <input type="file" id="kb-file-input" accept=".pdf,.csv,.txt" style="display:none" onchange="handleKBUpload(event)" />
-        <div class="input-row" style="margin-top:8px;">
-          <select class="select" id="kb-doc-type">
-            <option value="meta-report">META Performance Report</option>
-            <option value="strategy">90-Day Strategic Plan</option>
-            <option value="brand">Brand Guidelines</option>
-            <option value="audience">Audience Research</option>
-            <option value="calendar">Content Calendar</option>
-            <option value="csv">CSV Data Export</option>
-            <option value="other">Other Document</option>
-          </select>
-          <span style="font-size:11px;color:var(--charcoal3);">Select document type before uploading</span>
+
+        <!-- RIGHT: KMDB FILE LIST -->
+        <div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px var(--shadow);">
+          <div style="background:var(--charcoal);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;">KMDB</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:white;">Knowledge Base Files</div>
+            </div>
+            <div id="kb-file-count" style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:rgba(196,158,60,1);">0</div>
+          </div>
+          <div id="kb-file-list" style="min-height:120px;max-height:380px;overflow-y:auto;">
+            <div class="kb-empty" style="padding:32px 18px;">No documents uploaded yet.</div>
+          </div>
         </div>
+
       </div>
+
+      <!-- LOADING -->
       <div class="gen-loading" id="loading-kb">
         <div class="gen-label">Reading document...</div>
         <div class="gen-track"></div>
         <div class="gen-msg" id="gen-msg-kb">Extracting insights...</div>
       </div>
       <div class="gen-error" id="error-kb"></div>
-      <div id="kb-entries"></div>
+
+      <!-- EXPANDED DOCUMENT VIEW -->
+      <div id="kb-expanded" style="display:none;animation:appear 0.3s ease;"></div>
+
+      <!-- ALL ENTRIES (hidden, rendered on demand) -->
+      <div id="kb-entries" style="display:none;"></div>
+
     </div>
 
     <!-- TAB: EMAIL PREVIEW -->
@@ -2815,53 +2866,143 @@ function deleteKBEntry(id) {
   if (!confirm('Remove this document?')) return;
   var kb = getKnowledgeBase().filter(function(e){return e.id!==id;});
   saveKnowledgeBase(kb);
+  document.getElementById('kb-expanded').style.display = 'none';
   renderKnowledgeBase();
 }
 
+var kbActiveId = null;
+
 function renderKnowledgeBase() {
   var kb = getKnowledgeBase();
-  var container = document.getElementById('kb-entries');
-  if (!container) return;
-  if (!kb.length) { container.innerHTML = '<div class="kb-empty">No documents uploaded yet. Upload a META report, 90-day plan, or any brand document above to start building the knowledge base.</div>'; return; }
 
   var docColors = {
-    'meta-report':{color:'#A00605',bg:'rgba(160,6,5,0.08)',label:'META Report'},
-    'strategy':{color:'#3A6EA8',bg:'rgba(58,110,168,0.08)',label:'Strategic Plan'},
-    'brand':{color:'#6A50A8',bg:'rgba(106,80,168,0.08)',label:'Brand Guide'},
-    'audience':{color:'#3A9E6E',bg:'rgba(58,158,110,0.08)',label:'Audience Research'},
-    'calendar':{color:'#B87830',bg:'rgba(184,120,48,0.08)',label:'Content Calendar'},
-    'csv':{color:'#5A5A5A',bg:'rgba(90,90,90,0.08)',label:'CSV Data'},
-    'other':{color:'#8A8A8A',bg:'rgba(136,136,136,0.08)',label:'Document'}
+    'meta-report': {color:'#A00605', bg:'rgba(160,6,5,0.08)', label:'META Report'},
+    'strategy':    {color:'#3A6EA8', bg:'rgba(58,110,168,0.08)', label:'Strategic Plan'},
+    'brand':       {color:'#6A50A8', bg:'rgba(106,80,168,0.08)', label:'Brand Guide'},
+    'audience':    {color:'#3A9E6E', bg:'rgba(58,158,110,0.08)', label:'Audience Research'},
+    'calendar':    {color:'#B87830', bg:'rgba(184,120,48,0.08)', label:'Content Calendar'},
+    'csv':         {color:'#5A5A5A', bg:'rgba(90,90,90,0.08)', label:'CSV Data'},
+    'other':       {color:'#8A8A8A', bg:'rgba(136,136,136,0.08)', label:'Document'}
   };
 
-  var h = '<div style="margin-bottom:18px;"><div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Knowledge Base</div>';
-  h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;font-weight:600;color:var(--charcoal);">' + kb.length + ' document' + (kb.length!==1?'s':'') + ' uploaded</div></div>';
+  // Update file count
+  var countEl = document.getElementById('kb-file-count');
+  if (countEl) countEl.textContent = kb.length;
 
+  // Render file list
+  var listEl = document.getElementById('kb-file-list');
+  if (!listEl) return;
+
+  if (!kb.length) {
+    listEl.innerHTML = '<div class="kb-empty" style="padding:32px 18px;">No documents uploaded yet. Upload a file on the left to get started.</div>';
+    var exp = document.getElementById('kb-expanded');
+    if (exp) exp.style.display = 'none';
+    kbActiveId = null;
+    return;
+  }
+
+  var listH = '';
   kb.forEach(function(entry) {
-    var d = entry.data||{};
-    var dc = docColors[entry.docType]||docColors['other'];
-    var uploadDate = new Date(entry.uploaded).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    var d = entry.data || {};
+    var dc = docColors[entry.docType] || docColors['other'];
+    var uploadDate = new Date(entry.uploaded).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    var isActive = kbActiveId === entry.id;
+    var initial = (d.document_title || entry.filename || 'D').charAt(0).toUpperCase();
 
-    h += '<div class="kb-entry">';
-    h += '<div class="kb-entry-header">';
-    h += '<div><div class="kb-entry-title">' + escRaw(d.document_title||entry.filename) + '</div>';
-    h += '<div class="kb-entry-meta">' + escRaw(entry.filename) + ' - Uploaded ' + uploadDate + (d.period_covered?' - Period: '+escRaw(d.period_covered):'') + '</div></div>';
-    h += '<div style="display:flex;align-items:center;gap:8px;"><span class="kb-doc-type" style="background:' + dc.bg + ';color:' + dc.color + ';">' + dc.label + '</span>';
-    h += '<button class="copy-btn" style="color:var(--red);border-color:rgba(160,6,5,0.2);" onclick="deleteKBEntry(' + entry.id + ')">Remove</button></div></div>';
+    listH += '<div class="kb-file-row' + (isActive?' active':'') + '" onclick="toggleKBEntry(' + entry.id + ')">';
+    listH += '<div class="kb-file-icon" style="background:' + dc.bg + ';color:' + dc.color + ';">' + initial + '</div>';
+    listH += '<div style="flex:1;min-width:0;">';
+    listH += '<div class="kb-file-name">' + escRaw(d.document_title || entry.filename) + '</div>';
+    listH += '<div class="kb-file-sub">' + dc.label + ' &bull; ' + uploadDate + (d.period_covered ? ' &bull; ' + escRaw(d.period_covered) : '') + '</div>';
+    listH += '</div>';
+    listH += '<div class="kb-file-actions">';
+    listH += '<button class="copy-btn" style="color:var(--red);border-color:rgba(160,6,5,0.2);font-size:9px;" onclick="event.stopPropagation();deleteKBEntry(' + entry.id + ')">Remove</button>';
+    listH += '<span class="kb-expand-arrow">&#9654;</span>';
+    listH += '</div></div>';
+  });
 
-    h += '<div class="kb-body">';
+  listEl.innerHTML = listH;
 
-    if (d.key_metrics && d.key_metrics.length) {
-      h += '<div class="kb-label">Key Metrics</div>';
-      h += '<div class="kb-stat-grid">';
-      d.key_metrics.slice(0,6).forEach(function(m) {
-        var tc = m.trend==='up'?'var(--green)':m.trend==='down'?'var(--red)':'var(--charcoal3)';
-        h += '<div class="kb-stat"><div class="kb-stat-num" style="color:' + tc + ';font-size:14px;">' + escRaw(m.value) + '</div><div class="kb-stat-label">' + escRaw(m.label) + '</div></div>';
-      });
+  // If something was active, re-render its expanded view
+  if (kbActiveId !== null) {
+    var activeEntry = kb.find(function(e) { return e.id === kbActiveId; });
+    if (activeEntry) renderKBExpanded(activeEntry, docColors[activeEntry.docType] || docColors['other']);
+  }
+}
+
+function toggleKBEntry(id) {
+  var kb = getKnowledgeBase();
+  var docColors = {
+    'meta-report': {color:'#A00605', bg:'rgba(160,6,5,0.08)', label:'META Report'},
+    'strategy':    {color:'#3A6EA8', bg:'rgba(58,110,168,0.08)', label:'Strategic Plan'},
+    'brand':       {color:'#6A50A8', bg:'rgba(106,80,168,0.08)', label:'Brand Guide'},
+    'audience':    {color:'#3A9E6E', bg:'rgba(58,158,110,0.08)', label:'Audience Research'},
+    'calendar':    {color:'#B87830', bg:'rgba(184,120,48,0.08)', label:'Content Calendar'},
+    'csv':         {color:'#5A5A5A', bg:'rgba(90,90,90,0.08)', label:'CSV Data'},
+    'other':       {color:'#8A8A8A', bg:'rgba(136,136,136,0.08)', label:'Document'}
+  };
+
+  if (kbActiveId === id) {
+    // Collapse
+    kbActiveId = null;
+    document.getElementById('kb-expanded').style.display = 'none';
+    renderKnowledgeBase();
+    return;
+  }
+
+  kbActiveId = id;
+  var entry = kb.find(function(e) { return e.id === id; });
+  if (!entry) return;
+
+  renderKnowledgeBase(); // Re-render list to show active state
+  var dc = docColors[entry.docType] || docColors['other'];
+  renderKBExpanded(entry, dc);
+
+  // Scroll to expanded view
+  setTimeout(function() {
+    var exp = document.getElementById('kb-expanded');
+    if (exp) exp.scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 100);
+}
+
+function renderKBExpanded(entry, dc) {
+  var d = entry.data || {};
+  var uploadDate = new Date(entry.uploaded).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+  var exp = document.getElementById('kb-expanded');
+  if (!exp) return;
+
+  var h = '';
+
+  // Header
+  h += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px var(--shadow);margin-bottom:6px;">';
+  h += '<div style="background:' + dc.bg + ';padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">';
+  h += '<div>';
+  h += '<div style="font-size:11px;font-weight:700;color:' + dc.color + ';letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">' + dc.label + '</div>';
+  h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:20px;font-weight:600;color:var(--charcoal);">' + escRaw(d.document_title || entry.filename) + '</div>';
+  h += '<div style="font-size:11px;color:var(--charcoal3);margin-top:2px;">' + escRaw(entry.filename) + ' &bull; Uploaded ' + uploadDate + (d.period_covered ? ' &bull; Period: ' + escRaw(d.period_covered) : '') + '</div>';
+  h += '</div>';
+  h += '<button class="btn-secondary" onclick="toggleKBEntry(' + entry.id + ')" style="flex-shrink:0;">Close</button>';
+  h += '</div>';
+
+  h += '<div class="kb-body">';
+
+  // Key metrics
+  if (d.key_metrics && d.key_metrics.length) {
+    h += '<div class="kb-label">Key Metrics</div>';
+    h += '<div class="kb-stat-grid">';
+    d.key_metrics.slice(0,6).forEach(function(m) {
+      var tc = m.trend==='up' ? 'var(--green)' : m.trend==='down' ? 'var(--red)' : 'var(--charcoal3)';
+      h += '<div class="kb-stat"><div class="kb-stat-num" style="color:' + tc + ';font-size:14px;">' + escRaw(m.value) + '</div>';
+      h += '<div class="kb-stat-label">' + escRaw(m.label) + '</div>';
+      if (m.note) h += '<div style="font-size:9px;color:var(--charcoal3);margin-top:2px;">' + escRaw(m.note) + '</div>';
       h += '</div>';
-    }
+    });
+    h += '</div>';
+  }
 
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;">';
+  // What working / needs attention
+  if ((d.what_is_working && d.what_is_working.length) || (d.what_needs_attention && d.what_needs_attention.length)) {
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">';
     if (d.what_is_working && d.what_is_working.length) {
       h += '<div><div class="kb-label" style="color:var(--green);">What is Working</div>';
       d.what_is_working.forEach(function(item) { h += '<div class="kb-item">' + escRaw(item) + '</div>'; });
@@ -2873,26 +3014,52 @@ function renderKnowledgeBase() {
       h += '</div>';
     }
     h += '</div>';
+  }
 
-    if (d.strategic_priorities && d.strategic_priorities.length) {
-      h += '<div class="kb-label">Strategic Priorities</div>';
-      d.strategic_priorities.forEach(function(p,i) {
-        h += '<div class="kb-item" style="display:flex;gap:8px;"><span style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:700;color:var(--red);flex-shrink:0;line-height:1.4;">' + (i+1) + '</span><span>' + escRaw(p) + '</span></div>';
-      });
-    }
+  // Strategic priorities
+  if (d.strategic_priorities && d.strategic_priorities.length) {
+    h += '<div class="kb-label">Strategic Priorities</div>';
+    d.strategic_priorities.forEach(function(p, i) {
+      h += '<div class="kb-item" style="display:flex;gap:8px;align-items:flex-start;">';
+      h += '<span style="font-family:\'Cormorant Garamond\',serif;font-size:18px;font-weight:700;color:var(--red);flex-shrink:0;line-height:1.3;">' + (i+1) + '</span>';
+      h += '<span>' + escRaw(p) + '</span></div>';
+    });
+  }
 
-    if (d.action_items && d.action_items.length) {
-      h += '<div class="kb-label">Action Items</div>';
-      d.action_items.forEach(function(item) {
-        h += '<div class="kb-item" style="display:flex;gap:6px;"><span style="color:var(--red);font-weight:700;flex-shrink:0;">&rarr;</span><span>' + escRaw(item) + '</span></div>';
-      });
-    }
+  // Audience insights
+  if (d.audience_insights && d.audience_insights.length) {
+    h += '<div class="kb-label">Audience Insights</div>';
+    d.audience_insights.forEach(function(item) {
+      h += '<div class="kb-item">' + escRaw(item) + '</div>';
+    });
+  }
 
-    h += '</div></div>';
-  });
+  // Action items
+  if (d.action_items && d.action_items.length) {
+    h += '<div class="kb-label">Action Items</div>';
+    d.action_items.forEach(function(item) {
+      h += '<div class="kb-item" style="display:flex;gap:6px;">';
+      h += '<span style="color:var(--red);font-weight:700;flex-shrink:0;">&rarr;</span>';
+      h += '<span>' + escRaw(item) + '</span></div>';
+    });
+  }
 
-  container.innerHTML = h;
+  // Content themes
+  if (d.content_themes && d.content_themes.length) {
+    h += '<div class="kb-label">Content Themes</div>';
+    h += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    d.content_themes.forEach(function(t) {
+      h += '<span style="font-size:10px;background:var(--cream-2);border:1px solid var(--border);color:var(--charcoal2);padding:3px 9px;border-radius:12px;">' + escRaw(t) + '</span>';
+    });
+    h += '</div>';
+  }
+
+  h += '</div></div>';
+
+  exp.innerHTML = h;
+  exp.style.display = 'block';
 }
+
 </script>
 <script>
 // Load jsPDF dynamically only when needed
