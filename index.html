@@ -2490,9 +2490,12 @@ function buildHTMLEmailPreview(data) {
     topicsHtml += '<div style="padding:12px 16px;border-bottom:1px solid #E3D3C8;">';
     topicsHtml += '<div style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;">WHAT TO COVER</div>';
     topicsHtml += '<ul style="margin:0;padding-left:18px;color:#5A5A5A;font-size:13px;line-height:1.7;">' + liHtml + '</ul>' + scriptureHtml + '</div>';
-    topicsHtml += '<div style="padding:10px 16px;background:#F4F0EB;">';
-    topicsHtml += '<span style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">WHY THIS WORKS: </span>';
-    topicsHtml += '<span style="font-size:12px;color:#5A5A5A;">' + (t.why_this_works||'') + '</span></div></div>';
+    topicsHtml += '<div style="padding:10px 16px;background:#F4F0EB;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">';
+    topicsHtml += '<div><span style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">WHY THIS WORKS: </span>';
+    topicsHtml += '<span style="font-size:12px;color:#5A5A5A;">' + (t.why_this_works||'') + '</span></div>';
+    var uploadUrl = 'https://ebeprstudios.github.io/THCO-Social-Media-Manager/upload.html?topic=' + encodeURIComponent(t.title||'') + '&cloud=dgq3ahq1m&preset=tiffany_voiceovers';
+    topicsHtml += '<a href="' + uploadUrl + '" style="display:inline-block;background:#A00605;color:white;font-family:Georgia,serif;font-size:13px;font-weight:700;padding:9px 18px;border-radius:8px;text-decoration:none;white-space:nowrap;">Submit Voiceover</a>';
+    topicsHtml += '</div></div>';
   });
 
   var html = '<div style="font-family:Georgia,serif;background:#F4F0EB;padding:24px 20px;">';
@@ -2704,7 +2707,7 @@ function renderVoiceovers(list) {
         h += '<audio controls style="width:100%;height:36px;outline:none;" preload="none"><source src="' + v.url + '" type="audio/mp4"><source src="' + v.url + '" type="audio/m4a">Audio not supported.</audio>';
       }
       h += '<div style="display:flex;gap:6px;margin-top:8px;">';
-      h += '<a href="' + (v.url||'#') + '" download="' + escRaw(v.filename||'voiceover') + '" style="font-size:10px;padding:4px 10px;border:1px solid var(--border-md);border-radius:4px;color:var(--charcoal2);text-decoration:none;font-family:Inter,sans-serif;">Download</a>';
+      h += '<button onclick="downloadVoiceover(\'' + escRaw(v.url) + '\',\'' + escRaw(v.filename||'voiceover.m4a') + '\')" style="font-size:10px;padding:4px 10px;border:1px solid var(--border-md);border-radius:4px;color:var(--charcoal2);background:transparent;cursor:pointer;font-family:Inter,sans-serif;">Download</button>';
       h += '<button onclick="deleteVoiceover(\'' + escRaw(v.id) + '\')" style="font-size:10px;padding:4px 10px;border:1px solid rgba(160,6,5,0.2);border-radius:4px;color:var(--red);background:transparent;cursor:pointer;font-family:Inter,sans-serif;">Remove</button>';
       h += '</div></div></div>';
     });
@@ -2718,6 +2721,24 @@ function renderVoiceovers(list) {
 }
 
 function setVOWeek(week) { voActiveWeek = week; renderVoiceovers(voiceoverCache); }
+
+async function downloadVoiceover(url, filename) {
+  if (!url) return;
+  try {
+    var res = await fetch(url);
+    if (!res.ok) throw new Error('Could not fetch file');
+    var blob = await res.blob();
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename || 'voiceover.m4a';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() { document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 1000);
+  } catch(e) {
+    // Fallback: open in new tab so user can save manually
+    window.open(url, '_blank');
+  }
+}
 
 function deleteVoiceover(id) {
   if (!confirm('Remove this voiceover from the list?')) return;

@@ -114,6 +114,8 @@ def build_html(data, rec_week, pub_week, is_test=False):
         li = "".join(f"<li style='margin-bottom:5px;'>{pt}</li>" for pt in pts)
         scr = t.get("scripture_angle","")
         scr_html = f'<div style="margin-top:10px;padding:8px 12px;border-left:3px solid {p["border"]};background:{p["bg"]};font-style:italic;font-size:12px;color:{p["text"]};">{scr}</div>' if scr else ""
+        from urllib.parse import quote
+        upload_topic = quote(t.get("title",""), safe="")
         cards += f"""<div style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid #E3D3C8;">
           <div style="background:{p['bg']};padding:12px 16px;border-bottom:1px solid {p['border']}33;display:flex;align-items:flex-start;gap:12px;">
             <div style="width:26px;height:26px;border-radius:50%;background:{p['border']};color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{t.get('number','')}</div>
@@ -128,9 +130,12 @@ def build_html(data, rec_week, pub_week, is_test=False):
             <div style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;">WHAT TO COVER</div>
             <ul style="margin:0;padding-left:18px;color:#5A5A5A;font-size:13px;line-height:1.7;">{li}</ul>{scr_html}
           </div>
-          <div style="padding:10px 16px;background:#F4F0EB;">
-            <span style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">WHY THIS WORKS: </span>
-            <span style="font-size:12px;color:#5A5A5A;">{t.get('why_this_works','')}</span>
+          <div style="padding:10px 16px;background:#F4F0EB;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <span style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">WHY THIS WORKS: </span>
+              <span style="font-size:12px;color:#5A5A5A;">{t.get('why_this_works','')}</span>
+            </div>
+            <a href="https://ebeprstudios.github.io/THCO-Social-Media-Manager/upload.html?topic={upload_topic}&cloud=dgq3ahq1m&preset=tiffany_voiceovers" style="display:inline-block;background:#A00605;color:white;font-family:Georgia,serif;font-size:13px;font-weight:700;padding:9px 18px;border-radius:8px;text-decoration:none;white-space:nowrap;">Submit Voiceover</a>
           </div>
         </div>"""
     note_html = f'<p style="font-style:italic;color:#5A5A5A;font-size:13px;margin:0 0 12px;">{planning_note}</p>' if planning_note else ""
