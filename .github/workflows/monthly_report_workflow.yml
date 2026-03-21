@@ -1,0 +1,37 @@
+name: Monthly Client Report
+
+on:
+  schedule:
+    # 20th of every month at 9AM CST (3PM UTC)
+    - cron: '0 15 20 * *'
+  workflow_dispatch:
+    # Manual trigger from GitHub UI or Send Report Now button
+
+jobs:
+  send-monthly-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Send monthly report
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EMAIL_FROM:        ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD:    ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO:          ${{ secrets.EMAIL_TO }}
+          EMAIL_CC:          ${{ secrets.EMAIL_CC }}
+          REPORT_EMAIL:      ${{ secrets.REPORT_EMAIL }}
+          REPORT_CC:         ${{ secrets.REPORT_CC }}
+          GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python monthly_report.py
