@@ -829,13 +829,13 @@ body::before {
     <!-- TAB: EMAIL PREVIEW -->
     <div id="tab-emailpreview" class="tab-pane">
 
-      <!-- EMAIL SETTINGS (remembered) -->
+      <!-- SETTINGS PANEL -->
       <div id="ep-settings-panel" style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:16px 20px;margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Email Recipients</div>
-          <span style="font-size:10px;color:var(--green);font-weight:600;" id="ep-emails-saved-note" style="display:none;"></span>
+          <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Settings</div>
+          <span style="font-size:10px;color:var(--green);font-weight:600;display:none;" id="ep-emails-saved-note">Saved</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Tiffany's Email</div>
             <input id="ep-email-tiffany" type="email" placeholder="tiffany@example.com" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
@@ -844,6 +844,13 @@ body::before {
             <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Team Emails <span style="font-weight:400;font-style:italic;text-transform:none;">(comma separated)</span></div>
             <input id="ep-email-team" type="text" placeholder="diana@example.com, erica@example.com" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
           </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">GitHub Token <span style="font-weight:400;font-style:italic;text-transform:none;">(for auto-send)</span></div>
+            <input id="ep-github-token" type="password" placeholder="ghp_xxxxxxxxxxxx" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--charcoal3);line-height:1.6;">
+          GitHub token needs <strong>repo</strong> scope. Create one at github.com/settings/tokens. Needed to save approved topics so GitHub Actions can send the email on Friday at 1PM CST.
         </div>
       </div>
 
@@ -855,10 +862,9 @@ body::before {
           <div style="font-size:11px;color:var(--charcoal3);margin-top:3px;" id="ep-status-note"></div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <div id="ep-approved-badge" style="display:none;background:rgba(58,158,110,0.1);border:1px solid rgba(58,158,110,0.25);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;">Approved</div>
-          <button class="btn-secondary" id="ep-retry-btn" onclick="generateEmailPreview(true)">Retry</button>
-          <button class="btn-primary" id="ep-approve-btn" onclick="approveAndGeneratePDF()" style="background:var(--charcoal);">Approve + Generate PDF</button>
-          <button class="btn-primary" id="ep-send-btn" onclick="sendEmailDraft()" style="background:var(--red);display:none;">Send Email</button>
+          <div id="ep-approved-badge" style="display:none;background:rgba(58,158,110,0.1);border:1px solid rgba(58,158,110,0.25);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;">Approved - Sends Friday 1PM CST</div>
+          <button class="btn-secondary" id="ep-retry-btn" onclick="generateEmailPreview(true)">Generate</button>
+          <button class="btn-primary" id="ep-approve-btn" onclick="approveAndSchedule()" style="background:var(--charcoal);" disabled>Approve + Schedule</button>
         </div>
       </div>
 
@@ -890,25 +896,22 @@ body::before {
         <!-- 12 TOPIC CARDS -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px;" id="ep-cards-grid"></div>
 
-        <!-- PDF DOWNLOAD STATUS -->
-        <div id="ep-pdf-status" style="display:none;background:var(--green-bg);border:1px solid rgba(58,158,110,0.25);border-radius:8px;padding:14px 18px;margin-bottom:16px;display:none;align-items:center;gap:12px;">
-          <div style="font-size:18px;">&#10003;</div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--green);">PDF Downloaded</div>
-            <div style="font-size:11px;color:var(--charcoal2);margin-top:2px;">Attach the downloaded PDF to your email before sending.</div>
+        <!-- APPROVAL CONFIRMATION -->
+        <div id="ep-approval-confirm" style="display:none;background:var(--green-bg);border:1px solid rgba(58,158,110,0.25);border-radius:10px;padding:18px 22px;margin-bottom:20px;">
+          <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="font-size:24px;flex-shrink:0;">&#10003;</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px;">Topics Approved and Scheduled</div>
+              <div style="font-size:12px;color:var(--charcoal2);line-height:1.7;" id="ep-confirm-text">GitHub Actions will send the email this Friday at 1PM CST.</div>
+            </div>
           </div>
         </div>
 
-        <!-- EMAIL DRAFT PREVIEW -->
-        <div id="ep-email-draft-wrap" style="display:none;background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);margin-bottom:20px;">
-          <div style="background:var(--cream-2);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
-            <div>
-              <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Email Draft</div>
-              <div style="font-size:10px;color:var(--charcoal3);margin-top:1px;">Brief email to accompany the PDF attachment</div>
-            </div>
-            <button class="copy-btn" id="ep-copy-btn" onclick="copyEmailDraftText()">Copy Email Body</button>
-          </div>
-          <div id="ep-email-draft-text" style="padding:18px 20px;font-size:13px;color:var(--charcoal2);line-height:1.8;white-space:pre-wrap;font-family:'Inter',sans-serif;"></div>
+        <!-- SCHEDULE ERROR -->
+        <div id="ep-schedule-error" style="display:none;background:rgba(160,6,5,0.06);border:1px solid rgba(160,6,5,0.2);border-radius:10px;padding:18px 22px;margin-bottom:20px;">
+          <div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:6px;">Could not save to GitHub</div>
+          <div style="font-size:12px;color:var(--charcoal2);line-height:1.65;" id="ep-schedule-error-text"></div>
+          <div style="font-size:11px;color:var(--charcoal3);margin-top:8px;">Make sure your GitHub token has <strong>repo</strong> scope and your repo name is correct in the setup guide.</div>
         </div>
 
         <div style="text-align:center;margin-top:20px;font-size:10px;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Tiffany Haynes &amp; Co. Media Team &bull; Internal Use Only</div>
@@ -1842,8 +1845,10 @@ var epCurrentData = null;
 function saveEmailSettings() {
   var t = (document.getElementById('ep-email-tiffany')||{}).value || '';
   var team = (document.getElementById('ep-email-team')||{}).value || '';
+  var token = (document.getElementById('ep-github-token')||{}).value || '';
   if (t) localStorage.setItem('tiffany_ep_email_tiffany', t);
   if (team) localStorage.setItem('tiffany_ep_email_team', team);
+  if (token && token !== '****saved****') localStorage.setItem('tiffany_ep_github_token', token);
   var note = document.getElementById('ep-emails-saved-note');
   if (note) { note.textContent = 'Saved'; note.style.display = 'inline'; setTimeout(function() { note.style.display = 'none'; }, 2000); }
 }
@@ -1851,10 +1856,143 @@ function saveEmailSettings() {
 function loadEmailSettings() {
   var t = localStorage.getItem('tiffany_ep_email_tiffany') || '';
   var team = localStorage.getItem('tiffany_ep_email_team') || '';
+  var token = localStorage.getItem('tiffany_ep_github_token') || '';
   var tf = document.getElementById('ep-email-tiffany');
   var te = document.getElementById('ep-email-team');
+  var tg = document.getElementById('ep-github-token');
   if (tf && t) tf.value = t;
   if (te && team) te.value = team;
+  if (tg && token) tg.value = '****saved****';
+}
+
+function getGithubToken() { return localStorage.getItem('tiffany_ep_github_token') || ''; }
+
+async function approveAndSchedule() {
+  if (!epCurrentData) { alert('Please generate topics first.'); return; }
+
+  var token = getGithubToken();
+  var tiffanyEmail = localStorage.getItem('tiffany_ep_email_tiffany') || '';
+  var teamEmails = localStorage.getItem('tiffany_ep_email_team') || '';
+
+  if (!tiffanyEmail) { alert('Please enter Tiffany\'s email in the settings above.'); return; }
+
+  var btn = document.getElementById('ep-approve-btn');
+  btn.disabled = true; btn.textContent = 'Scheduling...';
+
+  var weekKey = getEPWeekKey();
+  localStorage.setItem('tiffany_ep_approved_' + weekKey, '1');
+
+  var payload = {
+    approved: true,
+    approved_at: new Date().toISOString(),
+    recording_week: epCurrentData.recording_week || getRecordingWeek(),
+    publishing_week: epCurrentData.publishing_week || getPublishingWeek(),
+    planning_note: epCurrentData.planning_note || '',
+    to_email: tiffanyEmail,
+    cc_emails: teamEmails,
+    topics: epCurrentData.topics || []
+  };
+
+  // Try to save to GitHub repo as approved_topics.json
+  var saved = false;
+  if (token) {
+    saved = await saveToGitHub(token, payload);
+  }
+
+  // Update UI regardless
+  document.getElementById('ep-approved-badge').style.display = 'inline-block';
+  btn.textContent = 'Re-approve + Reschedule';
+  btn.disabled = false;
+
+  var confirmEl = document.getElementById('ep-approval-confirm');
+  var confirmText = document.getElementById('ep-confirm-text');
+  var errorEl = document.getElementById('ep-schedule-error');
+
+  if (saved) {
+    errorEl.style.display = 'none';
+    confirmEl.style.display = 'block';
+    var nextFriday = getNextFriday();
+    confirmText.textContent = 'Saved to GitHub. The GitHub Actions workflow will send the email to ' + tiffanyEmail + (teamEmails ? ' + team' : '') + ' this Friday (' + nextFriday + ') at 1:00 PM CST.';
+    document.getElementById('ep-status-note').textContent = 'Approved. Scheduled for Friday 1PM CST.';
+  } else if (token) {
+    confirmEl.style.display = 'none';
+    errorEl.style.display = 'block';
+    document.getElementById('ep-schedule-error-text').textContent = 'Could not write to GitHub. Check that your token has repo scope and try again. Topics are saved locally.';
+    document.getElementById('ep-status-note').textContent = 'Approved locally. GitHub save failed.';
+  } else {
+    errorEl.style.display = 'none';
+    confirmEl.style.display = 'block';
+    confirmText.innerHTML = 'Topics approved locally. Add your GitHub token above to enable automatic Friday sending. <br>Without it the GitHub Actions workflow will generate fresh topics instead of these approved ones.';
+    document.getElementById('ep-status-note').textContent = 'Approved locally (no GitHub token).';
+  }
+
+  confirmEl.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+async function saveToGitHub(token, payload) {
+  try {
+    // Detect repo from the current page URL (works for GitHub Pages)
+    var repoOwner = '';
+    var repoName = '';
+    var hostname = window.location.hostname;
+    if (hostname.endsWith('.github.io')) {
+      repoOwner = hostname.replace('.github.io', '');
+      var pathParts = window.location.pathname.split('/').filter(Boolean);
+      repoName = pathParts[0] || 'content-studio';
+    }
+
+    if (!repoOwner) {
+      // Fallback: ask user - store in localStorage
+      var stored = localStorage.getItem('tiffany_ep_github_repo');
+      if (stored) {
+        var parts = stored.split('/');
+        repoOwner = parts[0]; repoName = parts[1];
+      } else {
+        var input = prompt('Enter your GitHub repo (format: username/repo-name):');
+        if (!input) return false;
+        localStorage.setItem('tiffany_ep_github_repo', input.trim());
+        var parts2 = input.trim().split('/');
+        repoOwner = parts2[0]; repoName = parts2[1];
+      }
+    }
+
+    var filePath = 'approved_topics.json';
+    var apiUrl = 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contents/' + filePath;
+
+    // Check if file already exists to get its SHA
+    var sha = null;
+    var checkRes = await fetch(apiUrl, {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (checkRes.ok) {
+      var existing = await checkRes.json();
+      sha = existing.sha;
+    }
+
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+    var body = { message: 'Approved voiceover topics for ' + payload.recording_week, content: content };
+    if (sha) body.sha = sha;
+
+    var putRes = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    return putRes.ok || putRes.status === 201;
+  } catch(e) {
+    console.error('GitHub save error:', e);
+    return false;
+  }
+}
+
+function getNextFriday() {
+  var d = new Date();
+  var day = d.getDay();
+  var diff = (5 - day + 7) % 7;
+  if (diff === 0) diff = 7;
+  d.setDate(d.getDate() + diff);
+  return d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 }
 
 function getEPCache() {
@@ -1911,7 +2049,7 @@ function initEmailPreview() {
     generateEmailPreview(false);
   } else {
     document.getElementById('ep-week-label').textContent = 'Topics for ' + getRecordingWeek();
-    document.getElementById('ep-status-note').textContent = 'Auto-generates on Thursdays. Click Retry to generate now.';
+    document.getElementById('ep-status-note').textContent = 'Auto-generates on Thursdays. Click Generate to create topics now.';
   }
 }
 
@@ -1931,7 +2069,8 @@ async function generateEmailPreview(isRetry) {
   document.getElementById('ep-topics-grid').style.display = 'none';
   document.getElementById('ep-error').style.display = 'none';
   document.getElementById('ep-approved-badge').style.display = 'none';
-  document.getElementById('ep-send-btn').style.display = 'none';
+  document.getElementById('ep-approval-confirm').style.display = 'none';
+  document.getElementById('ep-schedule-error').style.display = 'none';
   document.getElementById('ep-week-label').textContent = 'Generating topics...';
   document.getElementById('ep-status-note').textContent = '';
   document.getElementById('ep-retry-btn').disabled = true;
@@ -1945,11 +2084,11 @@ async function generateEmailPreview(isRetry) {
 
   var profileCtx = '';
   if (profile.transcript_count > 0) {
-    profileCtx = 'TIFFANY\'S CONTENT HISTORY (never repeat any of these):\n' +
+    profileCtx = 'TIFFANY\'S CONTENT HISTORY (never repeat these):\n' +
       'Topics covered: ' + (profile.topics.slice(-30).join(', ') || 'none yet') + '\n' +
-      'Her phrases and voice patterns: ' + (profile.phrases.slice(-10).join(', ') || 'building') + '\n' +
+      'Her phrases and voice: ' + (profile.phrases.slice(-10).join(', ') || 'building') + '\n' +
       'Core themes: ' + (profile.themes.slice(-10).join(', ') || 'building') + '\n' +
-      'Pillar usage history: ' + JSON.stringify(profile.pillars) + '\n' +
+      'Pillar usage: ' + JSON.stringify(profile.pillars) + '\n' +
       'Total scripts analyzed: ' + profile.transcript_count + '\n\n';
   }
 
@@ -1970,12 +2109,13 @@ async function generateEmailPreview(isRetry) {
     profileCtx + kbCtx +
     'PRIORITIZE UNDERUSED PILLARS: ' + (underusedPillars.join(', ') || 'all balanced') + '\n\n' +
     'Recording window: ' + recWeek + '\nPublishing window: ' + pubWeek + '\n\n' +
-    'Generate exactly 12 FRESH ORIGINAL voiceover topics. Never repeat history. Cover all pillars. Specific enough to record, open enough for her own experience. Vary content types.\n\n' +
+    'Generate exactly 12 FRESH ORIGINAL voiceover topics. Never repeat history. Cover all 5 pillars. Vary content types.\n\n' +
     'Return ONLY valid JSON. No markdown. Start with {.\n\n' +
     '{"recording_week":"' + recWeek + '","publishing_week":"' + pubWeek + '",' +
     '"planning_note":"One sentence on why this mix serves Tiffany right now.",' +
-    '"topics":[{"number":1,"title":"5-8 word title","pillar":"pillar","content_type":"Talking Head or B-Roll with Text or Teaching or Testimony or Lifestyle or Shenanigans",' +
-    '"hook":"Exact first 3 seconds in her voice",' +
+    '"topics":[{"number":1,"title":"5-8 word title","pillar":"pillar",' +
+    '"content_type":"Talking Head or B-Roll with Text or Teaching or Testimony or Lifestyle or Shenanigans",' +
+    '"hook":"Exact first 3 seconds in her voice. Stops the scroll.",' +
     '"what_to_cover":["point 1","point 2","point 3"],' +
     '"why_this_works":"One sentence on why this resonates.",' +
     '"scripture_angle":"scripture if applicable else empty",' +
@@ -2002,32 +2142,16 @@ async function generateEmailPreview(isRetry) {
   } catch(e) {
     stopLoader('ep-loading-msg');
     document.getElementById('ep-loading').style.display = 'none';
-    var el = document.getElementById('ep-error');
-    el.style.display = 'block';
-    el.innerHTML = '<strong>Error generating topics:</strong> ' + escRaw(e.message);
+    var errEl = document.getElementById('ep-error');
+    errEl.style.display = 'block';
+    errEl.innerHTML = '<strong>Error generating topics:</strong> ' + escRaw(e.message);
     document.getElementById('ep-week-label').textContent = 'Generation failed';
     console.error(e);
   }
+
   document.getElementById('ep-retry-btn').disabled = false;
   document.getElementById('ep-approve-btn').disabled = false;
 }
-
-// ================================================================
-// PDF GENERATION
-// ================================================================
-function approveAndGeneratePDF() {
-  if (!epCurrentData) { alert('Please generate topics first.'); return; }
-  var weekKey = getEPWeekKey();
-  localStorage.setItem('tiffany_ep_approved_' + weekKey, '1');
-  document.getElementById('ep-approved-badge').style.display = 'inline-block';
-  document.getElementById('ep-approve-btn').textContent = 'Regenerate PDF';
-  generatePDF(epCurrentData);
-  buildEmailDraft(epCurrentData);
-  document.getElementById('ep-send-btn').style.display = 'inline-block';
-  document.getElementById('ep-email-draft-wrap').style.display = 'block';
-}
-
-function generatePDF(data) {
   loadJsPDF(function(jsPDF) {
     if (!jsPDF) {
       console.warn('jsPDF not available, using fallback');
@@ -2308,453 +2432,7 @@ function generatePDFFallback(data) {
   win.print();
 }
 
-// ================================================================
-// EMAIL DRAFT
-// ================================================================
-function buildEmailDraft(data) {
-  var recWeek = data.recording_week || getRecordingWeek();
-  var pubWeek = data.publishing_week || getPublishingWeek();
-  var dateStr = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
-  var topicTitles = (data.topics || []).map(function(t) { return t.number + '. ' + t.title; }).join('\n');
 
-  var draft = 'Subject: Your 12 Voiceover Topics - Week of ' + recWeek + '\n\n' +
-    'Hi Tiffany,\n\n' +
-    'Your voiceover topics for the week of ' + recWeek + ' are attached.\n\n' +
-    'The PDF includes 12 topic ideas with hooks, what to cover, and scripture angles. Choose the ones that speak to you. You do not need to record all 12.\n\n' +
-    'Recording window: ' + recWeek + '\n' +
-    'Publishing window: ' + pubWeek + '\n\n' +
-    'Topics at a glance:\n' + topicTitles + '\n\n' +
-    'The team will begin editing the following week for publishing the week of ' + pubWeek + '.\n\n' +
-    '1 + 1 = 10,000\n\n' +
-    'Tiffany Haynes & Co. Media Team';
-
-  document.getElementById('ep-email-draft-text').textContent = draft;
-  document.getElementById('ep-email-draft-wrap').style.display = 'block';
-}
-
-function copyEmailDraftText() {
-  var el = document.getElementById('ep-email-draft-text');
-  if (!el) return;
-  navigator.clipboard.writeText(el.textContent).then(function() {
-    var btn = document.getElementById('ep-copy-btn');
-    if (btn) { btn.textContent = 'Copied'; btn.classList.add('copied'); setTimeout(function() { btn.textContent = 'Copy Email Body'; btn.classList.remove('copied'); }, 2500); }
-  });
-}
-
-function sendEmailDraft() {
-  if (!epCurrentData) return;
-  var tiffany = (document.getElementById('ep-email-tiffany')||{}).value || '';
-  var team = (document.getElementById('ep-email-team')||{}).value || '';
-  if (!tiffany) { alert('Please enter Tiffany\'s email address above.'); return; }
-
-  var recWeek = epCurrentData.recording_week || getRecordingWeek();
-  var pubWeek = epCurrentData.publishing_week || getPublishingWeek();
-  var topicTitles = (epCurrentData.topics || []).map(function(t) { return t.number + '. ' + t.title; }).join('%0A');
-
-  var subject = encodeURIComponent('Your 12 Voiceover Topics - Week of ' + recWeek);
-  var body = encodeURIComponent(
-    'Hi Tiffany,' + '\n\n' +
-    'Your voiceover topics for the week of ' + recWeek + ' are attached.' + '\n\n' +
-    'The PDF includes 12 topic ideas with hooks, what to cover, and scripture angles. Choose the ones that speak to you. You do not need to record all 12.' + '\n\n' +
-    'Recording window: ' + recWeek + '\n' +
-    'Publishing window: ' + pubWeek + '\n\n' +
-    'Topics at a glance:\n' + (epCurrentData.topics || []).map(function(t) { return t.number + '. ' + t.title; }).join('\n') + '\n\n' +
-    'The team will begin editing the following week for publishing the week of ' + pubWeek + '.' + '\n\n' +
-    '1 + 1 = 10,000' + '\n\n' +
-    'Tiffany Haynes & Co. Media Team'
-  );
-
-  var ccList = team.split(',').map(function(e) { return e.trim(); }).filter(Boolean).join(',');
-  var mailto = 'mailto:' + encodeURIComponent(tiffany) + (ccList ? '?cc=' + encodeURIComponent(ccList) + '&subject=' + subject + '&body=' + body : '?subject=' + subject + '&body=' + body);
-
-  window.location.href = mailto;
-}
-
-function renderEmailPreview(data, approved) {
-  epCurrentData = data;
-  document.getElementById('ep-week-label').textContent = 'Topics for ' + (data.recording_week || getRecordingWeek());
-  document.getElementById('ep-status-note').textContent = approved ? 'Approved. PDF generated. Ready to send.' : 'Review topics then click Approve + Generate PDF.';
-
-  if (approved) {
-    document.getElementById('ep-approved-badge').style.display = 'inline-block';
-    document.getElementById('ep-approve-btn').textContent = 'Regenerate PDF';
-    document.getElementById('ep-send-btn').style.display = 'inline-block';
-    buildEmailDraft(data);
-    document.getElementById('ep-email-draft-wrap').style.display = 'block';
-  } else {
-    document.getElementById('ep-approved-badge').style.display = 'none';
-    document.getElementById('ep-approve-btn').textContent = 'Approve + Generate PDF';
-    document.getElementById('ep-send-btn').style.display = 'none';
-  }
-
-  var topics = data.topics || [];
-  var pillarCounts = {};
-  topics.forEach(function(t) { pillarCounts[t.pillar] = (pillarCounts[t.pillar] || 0) + 1; });
-  var psHtml = '';
-  Object.keys(pillarCounts).forEach(function(p) {
-    var pc = BRAND.pillarColors[p] || { color:'#888', bg:'rgba(136,136,136,0.1)' };
-    psHtml += '<span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:12px;background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(p) + ' (' + pillarCounts[p] + ')</span>';
-  });
-  if (data.planning_note) psHtml += '<span style="font-size:11px;color:var(--charcoal2);font-style:italic;padding:3px 6px;">' + escRaw(data.planning_note) + '</span>';
-  document.getElementById('ep-pillar-summary').innerHTML = psHtml;
-
-  var cardsHtml = '';
-  topics.forEach(function(t) {
-    var pc = BRAND.pillarColors[t.pillar] || { color:'#888', bg:'rgba(136,136,136,0.1)' };
-    var coverPoints = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover || '').split('\n').filter(Boolean);
-
-    cardsHtml += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
-    cardsHtml += '<div style="background:' + pc.bg + ';padding:11px 14px;border-bottom:1px solid rgba(65,65,65,0.08);display:flex;align-items:flex-start;gap:10px;">';
-    cardsHtml += '<div style="width:24px;height:24px;border-radius:50%;background:' + pc.color + ';color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">' + (t.number || '') + '</div>';
-    cardsHtml += '<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--charcoal);line-height:1.3;margin-bottom:3px;">' + escRaw(t.title || '') + '</div>';
-    cardsHtml += '<div style="font-size:9px;font-weight:700;color:' + pc.color + ';letter-spacing:1px;text-transform:uppercase;">' + escRaw(t.pillar||'') + '</div>';
-    if (t.content_type || t.estimated_length) cardsHtml += '<div style="font-size:9px;color:var(--charcoal3);margin-top:1px;">' + escRaw(t.content_type||'') + (t.estimated_length?' &bull; '+escRaw(t.estimated_length):'') + '</div>';
-    cardsHtml += '</div></div>';
-
-    cardsHtml += '<div style="padding:11px 14px;background:#FFFDF5;border-bottom:1px solid var(--border);">';
-    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Hook</div>';
-    cardsHtml += '<div style="font-size:12px;font-weight:600;color:var(--charcoal);font-style:italic;line-height:1.4;">"' + escRaw(t.hook||'') + '"</div>';
-    cardsHtml += '</div>';
-
-    cardsHtml += '<div style="padding:11px 14px;border-bottom:1px solid var(--border);">';
-    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">What to Cover</div>';
-    cardsHtml += '<ul style="margin:0;padding-left:15px;color:var(--charcoal2);font-size:11px;line-height:1.7;">';
-    coverPoints.forEach(function(pt) { cardsHtml += '<li style="margin-bottom:2px;">' + escRaw(pt) + '</li>'; });
-    cardsHtml += '</ul>';
-    if (t.scripture_angle && t.scripture_angle.trim()) {
-      cardsHtml += '<div style="margin-top:7px;padding:7px 10px;border-left:3px solid var(--red);background:var(--red-dim);font-size:10px;font-style:italic;color:var(--red);line-height:1.5;">' + escRaw(t.scripture_angle) + '</div>';
-    }
-    cardsHtml += '</div>';
-
-    cardsHtml += '<div style="padding:8px 14px;background:var(--cream-2);">';
-    cardsHtml += '<span style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Why this works: </span>';
-    cardsHtml += '<span style="font-size:11px;color:var(--charcoal2);">' + escRaw(t.why_this_works||'') + '</span>';
-    cardsHtml += '</div></div>';
-  });
-
-  document.getElementById('ep-cards-grid').innerHTML = cardsHtml;
-  document.getElementById('ep-topics-grid').style.display = 'block';
-}
-
-var epLoaderMsgs = [
-  'Reading the content profile...',
-  'Reviewing all past scripts and topics...',
-  'Identifying content gaps...',
-  'Developing fresh voiceover angles...',
-  'Balancing content pillars...',
-  'Writing topic directions...',
-  'Almost ready...'
-];
-
-function getEPCache() {
-  var raw = localStorage.getItem('tiffany_ep_cache');
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch(e) { return null; }
-}
-
-function saveEPCache(data) {
-  data.generated_at = Date.now();
-  data.week_key = getEPWeekKey();
-  localStorage.setItem('tiffany_ep_cache', JSON.stringify(data));
-}
-
-function getEPWeekKey() {
-  var monday = getNextMonday();
-  return monday.toISOString().split('T')[0];
-}
-
-function isThursday() {
-  var et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-  return et.getDay() === 4;
-}
-
-function getRecordingWeek() {
-  var monday = getNextMonday();
-  var sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
-  return monday.toLocaleDateString('en-US', {month:'long', day:'numeric'}) + ' - ' +
-    sunday.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
-}
-
-function getPublishingWeek() {
-  var monday = getNextMonday();
-  var pubMonday = new Date(monday); pubMonday.setDate(monday.getDate() + 14);
-  var pubSunday = new Date(pubMonday); pubSunday.setDate(pubMonday.getDate() + 6);
-  return pubMonday.toLocaleDateString('en-US', {month:'long', day:'numeric'}) + ' - ' +
-    pubSunday.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
-}
-
-function initEmailPreview() {
-  var cache = getEPCache();
-  var weekKey = getEPWeekKey();
-  var approved = localStorage.getItem('tiffany_ep_approved_' + weekKey) === '1';
-
-  updateEPHorizonNote();
-
-  if (approved && cache && cache.week_key === weekKey) {
-    renderEmailPreview(cache, true);
-    return;
-  }
-
-  if (cache && cache.week_key === weekKey) {
-    renderEmailPreview(cache, false);
-    return;
-  }
-
-  if (isThursday()) {
-    generateEmailPreview(false);
-  } else {
-    document.getElementById('ep-week-label').textContent = 'Topics for ' + getRecordingWeek();
-    document.getElementById('ep-status-note').textContent = 'Auto-generates on Thursday. Click Retry to generate now.';
-    document.getElementById('ep-loading').style.display = 'none';
-    document.getElementById('ep-topics-grid').style.display = 'none';
-  }
-}
-
-function updateEPHorizonNote() {
-  var recWeek = getRecordingWeek();
-  var pubWeek = getPublishingWeek();
-  var note = document.getElementById('ep-horizon-note');
-  if (note) note.textContent = 'Topics sent this Friday are for recording the week of ' + recWeek + '. Editing happens the following week. Publishing begins the week of ' + pubWeek + '.';
-}
-
-async function generateEmailPreview(isRetry) {
-  if (!checkApiKey()) return;
-
-  var weekKey = getEPWeekKey();
-  localStorage.removeItem('tiffany_ep_approved_' + weekKey);
-
-  document.getElementById('ep-loading').style.display = 'block';
-  document.getElementById('ep-topics-grid').style.display = 'none';
-  document.getElementById('ep-error').style.display = 'none';
-  document.getElementById('ep-approved-badge').style.display = 'none';
-  document.getElementById('ep-week-label').textContent = 'Generating topics...';
-  document.getElementById('ep-status-note').textContent = '';
-  document.getElementById('ep-retry-btn').disabled = true;
-  document.getElementById('ep-approve-btn').disabled = true;
-  startLoader('ep-loading-msg', epLoaderMsgs);
-
-  var profile = getProfile();
-  var kb = getKnowledgeBase();
-  var recWeek = getRecordingWeek();
-  var pubWeek = getPublishingWeek();
-
-  var profileCtx = '';
-  if (profile.transcript_count > 0) {
-    profileCtx = 'TIFFANY\'S CONTENT HISTORY (do not repeat any of these topics or angles):\n' +
-      'Topics already covered: ' + (profile.topics.slice(-30).join(', ') || 'none yet') + '\n' +
-      'Her recurring phrases and voice patterns: ' + (profile.phrases.slice(-10).join(', ') || 'building') + '\n' +
-      'Core themes she returns to: ' + (profile.themes.slice(-10).join(', ') || 'building') + '\n' +
-      'Pillar history (how many times each pillar has been used): ' + JSON.stringify(profile.pillars) + '\n' +
-      'Total scripts analyzed: ' + profile.transcript_count + '\n\n';
-  }
-
-  var kbCtx = '';
-  if (kb.length > 0) {
-    var latest = kb[0].data || {};
-    kbCtx = 'PERFORMANCE DATA FROM KNOWLEDGE BASE:\n' +
-      'What is resonating with her audience: ' + (latest.what_is_working || []).slice(0, 3).join(', ') + '\n' +
-      'Top performing content types: ' + (latest.top_performing_content || []).slice(0, 3).join(', ') + '\n' +
-      'Audience insights: ' + (latest.audience_insights || []).slice(0, 3).join(', ') + '\n' +
-      'Strategic priorities right now: ' + (latest.strategic_priorities || []).slice(0, 3).join(', ') + '\n\n';
-  }
-
-  var underusedPillars = BRAND.pillars.filter(function(p) {
-    return (profile.pillars[p] || 0) < 3;
-  });
-
-  var prompt = 'You are the lead content strategist for Tiffany Haynes and Co.\n\n' +
-    'BRAND VOICE: ' + BRAND.voice + '\n' +
-    'STRICT AVOID: ' + BRAND.avoid + '\n' +
-    'ALL CONTENT PILLARS: ' + BRAND.pillars.join(', ') + '\n\n' +
-    profileCtx +
-    kbCtx +
-    'UNDERUSED PILLARS (prioritize these): ' + (underusedPillars.join(', ') || 'all pillars are balanced') + '\n\n' +
-    'PLANNING CONTEXT:\n' +
-    'Recording window: Week of ' + recWeek + '\n' +
-    'Publishing window: Week of ' + pubWeek + '\n' +
-    'This is a 2-week ahead planning system.\n\n' +
-    'TASK: Generate exactly 12 voiceover topic ideas for Tiffany to choose from.\n' +
-    'Rules:\n' +
-    '- Every topic must be FRESH and ORIGINAL. Not a repeat or variation of anything in her content history.\n' +
-    '- Cover all 5 content pillars across the 12 topics. Rotate through them.\n' +
-    '- Topics should feel like something Tiffany would genuinely want to talk about, not a content brief assignment.\n' +
-    '- Specific enough that she knows exactly what to record. Open enough that she speaks from her own experience.\n' +
-    '- Vary the content type: mix Talking Head, B-Roll with text, Teaching, Testimony, Lifestyle, Shenanigans.\n' +
-    '- Every hook must stop the scroll in the first 3 seconds.\n\n' +
-    'Return ONLY valid JSON. No markdown. No backticks. Start with {.\n\n' +
-    '{"recording_week":"' + recWeek + '",' +
-    '"publishing_week":"' + pubWeek + '",' +
-    '"planning_note":"One sentence on the strategic mix and why these 12 topics serve Tiffany right now.",' +
-    '"topics":[' +
-    '{"number":1,"title":"Short compelling title 5-8 words","pillar":"pillar name","content_type":"Talking Head or B-Roll with Text or Teaching or Testimony or Lifestyle or Shenanigans",' +
-    '"hook":"Exact first 3 seconds. What she says or what appears on screen. Stops the scroll.",' +
-    '"what_to_cover":["specific point 1","specific point 2","specific point 3"],' +
-    '"why_this_works":"One sentence on why this resonates with her audience right now.",' +
-    '"scripture_angle":"Relevant scripture if applicable. Empty string if not.",' +
-    '"estimated_length":"15 sec or 30 sec or 60 sec"}' +
-    ']}';
-
-  try {
-    var result = await callAPI(prompt, 4000);
-
-    if (result.topics) {
-      var pl = { topics_covered: [], recurring_phrases: [], themes: [], pillar_hits: {}, transcript_count: 0 };
-      result.topics.forEach(function(t) {
-        if (t.title) pl.topics_covered.push(t.title);
-        if (t.pillar) { pl.pillar_hits[t.pillar] = (pl.pillar_hits[t.pillar] || 0) + 1; }
-      });
-      updateProfileFromLearning(pl);
-    }
-
-    saveEPCache(result);
-    stopLoader('ep-loading-msg');
-    document.getElementById('ep-loading').style.display = 'none';
-    renderEmailPreview(result, false);
-
-  } catch(e) {
-    stopLoader('ep-loading-msg');
-    document.getElementById('ep-loading').style.display = 'none';
-    var el = document.getElementById('ep-error');
-    el.style.display = 'block';
-    el.innerHTML = '<strong>Error generating topics:</strong> ' + escRaw(e.message);
-    document.getElementById('ep-week-label').textContent = 'Generation failed';
-    console.error(e);
-  }
-
-  document.getElementById('ep-retry-btn').disabled = false;
-  document.getElementById('ep-approve-btn').disabled = false;
-}
-
-function approveTopics() {
-  var weekKey = getEPWeekKey();
-  localStorage.setItem('tiffany_ep_approved_' + weekKey, '1');
-  var cache = getEPCache();
-  if (cache) renderEmailPreview(cache, true);
-  copyEmailText();
-}
-
-function copyEmailText() {
-  var el = document.getElementById('ep-email-text');
-  if (!el) return;
-  var text = el.textContent || el.innerText;
-  navigator.clipboard.writeText(text).then(function() {
-    var btn = document.getElementById('ep-copy-btn');
-    if (btn) { btn.textContent = 'Copied'; btn.classList.add('copied'); setTimeout(function() { btn.textContent = 'Copy Email'; btn.classList.remove('copied'); }, 2500); }
-  });
-}
-
-function renderEmailPreview(data, approved) {
-  var weekKey = getEPWeekKey();
-
-  document.getElementById('ep-week-label').textContent = 'Topics for ' + (data.recording_week || getRecordingWeek());
-  document.getElementById('ep-status-note').textContent = approved ? 'Approved and ready to send.' : 'Review topics and approve when ready.';
-
-  if (approved) {
-    document.getElementById('ep-approved-badge').style.display = 'inline-block';
-    document.getElementById('ep-approve-btn').textContent = 'Approved - Copy Again';
-    document.getElementById('ep-approve-btn').style.background = 'var(--green)';
-  } else {
-    document.getElementById('ep-approved-badge').style.display = 'none';
-    document.getElementById('ep-approve-btn').textContent = 'Approve + Copy Email';
-    document.getElementById('ep-approve-btn').style.background = 'var(--green)';
-  }
-
-  var topics = data.topics || [];
-
-  // PILLAR SUMMARY CHIPS
-  var pillarCounts = {};
-  topics.forEach(function(t) { pillarCounts[t.pillar] = (pillarCounts[t.pillar] || 0) + 1; });
-  var psHtml = '';
-  Object.keys(pillarCounts).forEach(function(p) {
-    var pc = BRAND.pillarColors[p] || { color: '#888', bg: 'rgba(136,136,136,0.1)' };
-    psHtml += '<span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:12px;background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(p) + ' (' + pillarCounts[p] + ')</span>';
-  });
-  if (data.planning_note) psHtml += '<span style="font-size:11px;color:var(--charcoal2);font-style:italic;padding:3px 6px;">' + escRaw(data.planning_note) + '</span>';
-  document.getElementById('ep-pillar-summary').innerHTML = psHtml;
-
-  // TOPIC CARDS
-  var cardsHtml = '';
-  topics.forEach(function(t) {
-    var pc = BRAND.pillarColors[t.pillar] || { color: '#888', bg: 'rgba(136,136,136,0.1)' };
-    var coverPoints = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover || '').split('\n').filter(Boolean);
-
-    cardsHtml += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
-
-    // card header
-    cardsHtml += '<div style="background:' + pc.bg + ';padding:11px 14px;border-bottom:1px solid rgba(65,65,65,0.08);display:flex;align-items:flex-start;gap:10px;">';
-    cardsHtml += '<div style="width:24px;height:24px;border-radius:50%;background:' + pc.color + ';color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">' + (t.number || '') + '</div>';
-    cardsHtml += '<div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--charcoal);line-height:1.3;margin-bottom:3px;">' + escRaw(t.title || '') + '</div>';
-    cardsHtml += '<div style="display:flex;gap:6px;flex-wrap:wrap;">';
-    cardsHtml += '<span style="font-size:9px;font-weight:600;color:' + pc.color + ';letter-spacing:1px;text-transform:uppercase;">' + escRaw(t.pillar || '') + '</span>';
-    if (t.content_type) cardsHtml += '<span style="font-size:9px;color:var(--charcoal3);">&bull; ' + escRaw(t.content_type) + '</span>';
-    if (t.estimated_length) cardsHtml += '<span style="font-size:9px;color:var(--charcoal3);">&bull; ' + escRaw(t.estimated_length) + '</span>';
-    cardsHtml += '</div></div></div>';
-
-    // hook
-    cardsHtml += '<div style="padding:12px 14px;background:#FFFDF5;border-bottom:1px solid var(--border);">';
-    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Hook - First 3 Seconds</div>';
-    cardsHtml += '<div style="font-size:13px;font-weight:600;color:var(--charcoal);font-style:italic;line-height:1.4;">"' + escRaw(t.hook || '') + '"</div>';
-    cardsHtml += '</div>';
-
-    // what to cover
-    cardsHtml += '<div style="padding:12px 14px;border-bottom:1px solid var(--border);">';
-    cardsHtml += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">What to Cover</div>';
-    cardsHtml += '<ul style="margin:0;padding-left:16px;color:var(--charcoal2);font-size:12px;line-height:1.7;">';
-    coverPoints.forEach(function(pt) { cardsHtml += '<li style="margin-bottom:3px;">' + escRaw(pt) + '</li>'; });
-    cardsHtml += '</ul>';
-    if (t.scripture_angle) cardsHtml += '<div style="margin-top:8px;padding:7px 10px;border-left:3px solid var(--red);background:var(--red-dim);font-size:11px;font-style:italic;color:var(--red);line-height:1.5;">' + escRaw(t.scripture_angle) + '</div>';
-    cardsHtml += '</div>';
-
-    // why this works
-    cardsHtml += '<div style="padding:9px 14px;background:var(--cream-2);">';
-    cardsHtml += '<span style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Why this works: </span>';
-    cardsHtml += '<span style="font-size:11px;color:var(--charcoal2);">' + escRaw(t.why_this_works || '') + '</span>';
-    cardsHtml += '</div>';
-
-    cardsHtml += '</div>';
-  });
-  document.getElementById('ep-cards-grid').innerHTML = cardsHtml;
-
-  // BUILD PLAIN TEXT EMAIL
-  var now = new Date();
-  var dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-  var emailLines = [];
-  emailLines.push('TIFFANY HAYNES & CO. MEDIA TEAM');
-  emailLines.push('12 Voiceover Topics - Week of ' + (data.recording_week || ''));
-  emailLines.push('Sent: ' + dateStr);
-  emailLines.push('Publishing Window: ' + (data.publishing_week || getPublishingWeek()));
-  emailLines.push('');
-  if (data.planning_note) { emailLines.push(data.planning_note); emailLines.push(''); }
-  emailLines.push('HOW TO USE: Choose the topics that resonate. Record them this week at your own pace. The media team begins editing the following week for publishing the week of ' + (data.publishing_week || '') + '. You do not need to record all 12. Pick what speaks to you.');
-  emailLines.push('');
-  emailLines.push('+ + +');
-  emailLines.push('');
-
-  topics.forEach(function(t) {
-    var coverPoints = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover || '').split('\n').filter(Boolean);
-    emailLines.push(t.number + '. ' + (t.title || '').toUpperCase());
-    emailLines.push('Pillar: ' + (t.pillar || '') + '   Type: ' + (t.content_type || '') + '   Length: ' + (t.estimated_length || ''));
-    emailLines.push('');
-    emailLines.push('HOOK (First 3 seconds):');
-    emailLines.push('"' + (t.hook || '') + '"');
-    emailLines.push('');
-    emailLines.push('WHAT TO COVER:');
-    coverPoints.forEach(function(pt) { emailLines.push('- ' + pt); });
-    if (t.scripture_angle) { emailLines.push(''); emailLines.push('Scripture: ' + t.scripture_angle); }
-    emailLines.push('');
-    emailLines.push('Why this works: ' + (t.why_this_works || ''));
-    emailLines.push('');
-    emailLines.push('---');
-    emailLines.push('');
-  });
-
-  emailLines.push('1 + 1 = 10,000');
-  emailLines.push('Tiffany Haynes & Co. Media Team');
-  emailLines.push('Not for distribution outside the media team.');
-
-  document.getElementById('ep-email-text').textContent = emailLines.join('\n');
-  document.getElementById('ep-topics-grid').style.display = 'block';
-}
 
 var kbMsgsList = ['Reading the document...','Extracting key insights...','Identifying performance data...','Updating client profile...','Almost done...'];
 
