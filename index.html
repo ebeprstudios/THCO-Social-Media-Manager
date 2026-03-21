@@ -1047,24 +1047,34 @@ var lastDashScript = '';
 // PASSWORD
 // ================================================================
 (function() {
-  var HASH = '3766ec8ba93ed294163faf5799fd58e7ca0922bd73b65c6d15b5598e89e7cbc3';
-  function sha256(str) {
-    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function(buf) {
-      return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
-    });
+  // Simple hash - works on HTTP and HTTPS, no crypto.subtle dependency
+  function simpleHash(str) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      var chr = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + chr;
+      hash |= 0;
+    }
+    // Secondary hash for extra collision resistance
+    var hash2 = 5381;
+    for (var j = 0; j < str.length; j++) {
+      hash2 = ((hash2 << 5) + hash2) + str.charCodeAt(j);
+      hash2 |= 0;
+    }
+    return (hash >>> 0).toString(16) + (hash2 >>> 0).toString(16);
   }
+  // Hash of 'TiffanyHaynes2026'
+  var HASH = simpleHash('TiffanyHaynes2026');
   window.checkPassword = function() {
     var val = document.getElementById('gate-input').value;
-    sha256(val).then(function(h) {
-      if (h === HASH) {
-        sessionStorage.setItem('unlocked','1');
-        document.getElementById('password-gate').style.display = 'none';
-      } else {
-        document.getElementById('gate-error').style.display = 'block';
-        document.getElementById('gate-input').value = '';
-        document.getElementById('gate-input').focus();
-      }
-    });
+    if (simpleHash(val) === HASH) {
+      sessionStorage.setItem('unlocked','1');
+      document.getElementById('password-gate').style.display = 'none';
+    } else {
+      document.getElementById('gate-error').style.display = 'block';
+      document.getElementById('gate-input').value = '';
+      document.getElementById('gate-input').focus();
+    }
   };
   window.addEventListener('DOMContentLoaded', function() {
     if (sessionStorage.getItem('unlocked') === '1') {
@@ -2556,7 +2566,7 @@ function buildHTMLEmailPreview(data) {
     var card = '';
     card += '<div style="border-radius:8px;overflow:hidden;border:1px solid #E3D3C8;background:#FFFDF5;display:flex;flex-direction:column;height:100%;">';
     card += '<div style="background:' + p.bg + ';padding:12px 16px;border-bottom:1px solid ' + p.border + '33;display:flex;align-items:flex-start;gap:12px;">';
-    card += '<div style="width:26px;height:26px;border-radius:50%;background:' + p.border + ';color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (t.number||'') + '</div>';
+    card += '<div style="width:28px;height:28px;min-width:28px;min-height:28px;border-radius:14px;background:' + p.border + ';color:white;font-size:12px;font-weight:700;line-height:28px;text-align:center;flex-shrink:0;display:inline-block;">' + (t.number||'') + '</div>';
     card += '<div><div style="font-size:14px;font-weight:700;color:#414141;margin-bottom:3px;">' + (t.title||'') + '</div>';
     card += '<div style="font-size:10px;font-weight:700;color:' + p.text + ';letter-spacing:1px;text-transform:uppercase;">' + (t.pillar||'') + ' &bull; ' + (t.content_type||'') + ' &bull; ' + (t.estimated_length||'') + '</div></div></div>';
     card += '<div style="padding:10px 14px;border-bottom:1px solid #E3D3C8;background:#FFFDF5;">';

@@ -123,9 +123,11 @@ def build_html(data, rec_week, pub_week, is_test=False):
         card = f'''
 <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #E3D3C8;border-radius:8px;overflow:hidden;background:#FFFDF5;">
   <tr><td style="background:{p["bg"]};padding:10px 14px;border-bottom:1px solid {p["border"]}33;">
-    <table cellpadding="0" cellspacing="0"><tr>
-      <td style="width:24px;height:24px;background:{p["border"]};border-radius:50%;text-align:center;vertical-align:middle;color:white;font-size:11px;font-weight:700;font-family:Georgia,serif;">{t.get("number","")}</td>
-      <td style="padding-left:10px;">
+    <table cellpadding="0" cellspacing="0" width="100%"><tr>
+      <td width="32" valign="top" style="padding-right:10px;">
+        <div style="width:28px;height:28px;min-width:28px;min-height:28px;background:{p["border"]};border-radius:14px;text-align:center;line-height:28px;color:white;font-size:11px;font-weight:700;font-family:Georgia,serif;display:block;">{t.get("number","")}</div>
+      </td>
+      <td valign="top">
         <div style="font-size:13px;font-weight:700;color:#414141;margin-bottom:2px;">{t.get("title","")}</div>
         <div style="font-size:9px;font-weight:700;color:{p["text"]};letter-spacing:1px;text-transform:uppercase;">{t.get("pillar","")} &bull; {t.get("estimated_length","")}</div>
       </td>
