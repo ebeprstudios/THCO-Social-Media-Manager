@@ -719,15 +719,66 @@ body::before {
   letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px;
 }
 
-/* PRINT */
-@media print {
-  #topbar, #tab-bar, .generate-btn, .tb-btn, .copy-btn, .add-transcript-btn, #profile-panel { display: none !important; }
-  body { background: white; }
-  .cal-day, .carousel-card, .quote-card, .delivery-card { break-inside: avoid; }
+/* KNOWLEDGE BASE */
+.kb-entry {
+  background: var(--cream-1); border: 1px solid var(--border-md);
+  border-radius: 10px; overflow: hidden;
+  box-shadow: 0 2px 10px var(--shadow); margin-bottom: 16px;
+}
+.kb-entry-header {
+  background: var(--cream-2); padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.kb-entry-title { font-size: 13px; font-weight: 600; color: var(--charcoal); }
+.kb-entry-meta { font-size: 10px; color: var(--charcoal3); margin-top: 2px; }
+.kb-doc-type {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; padding: 3px 9px; border-radius: 12px;
+}
+.kb-entry-body { padding: 18px 20px; }
+.kb-insight-group { margin-bottom: 16px; }
+.kb-insight-label {
+  font-size: 9px; font-weight: 700; color: var(--red);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 7px;
+}
+.kb-insight-item {
+  font-size: 12px; color: var(--charcoal2); line-height: 1.6;
+  padding: 5px 0; border-bottom: 1px solid var(--border);
+}
+.kb-insight-item:last-child { border-bottom: none; }
+.kb-tag {
+  display: inline-block; font-size: 10px; color: var(--charcoal2);
+  background: var(--cream-2); border: 1px solid var(--border);
+  padding: 2px 9px; border-radius: 12px; margin: 2px 3px 2px 0;
+}
+.kb-stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.kb-stat {
+  background: var(--cream-2); border: 1px solid var(--border);
+  border-radius: 7px; padding: 11px 13px; text-align: center;
+}
+.kb-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 700; color: var(--red); line-height: 1;
+}
+.kb-stat-label { font-size: 9px; color: var(--charcoal3); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+.kb-empty {
+  text-align: center; padding: 40px 20px;
+  color: var(--charcoal3); font-size: 13px; line-height: 1.7;
+}
+#upload-zone:hover {
+  border-color: var(--red); background: var(--cream-1);
 }
 
-/* FOOTER */
-.studio-footer {
+/* PRINT */
+@media print {
+  #topbar, #tab-bar, .generate-btn, .tb-btn, .copy-btn,
+  .add-transcript-btn, #profile-panel, #upload-zone,
+  .content-type-select, #kb-file-input { display: none !important; }
+  body { background: white; }
+}
+
+</style>
   text-align: center; padding: 28px;
   color: var(--charcoal4); font-size: 10px; letter-spacing: 2px;
   text-transform: uppercase; border-top: 1px solid var(--border); margin-top: 48px;
@@ -790,6 +841,7 @@ body::before {
 <div id="tab-bar" style="display:none;">
   <button class="tab-btn active" onclick="switchTab('studio')">Transcript to Content</button>
   <button class="tab-btn" onclick="switchTab('planner')">Weekly Planner</button>
+  <button class="tab-btn" onclick="switchTab('knowledge')">Knowledge Base</button>
 </div>
 
 <!-- MAIN -->
@@ -907,6 +959,51 @@ body::before {
       </div>
 
       <div class="results-wrap" id="results-planner"></div>
+
+    </div>
+
+    <!-- TAB 3: KNOWLEDGE BASE -->
+    <div id="tab-knowledge" class="tab-pane">
+
+      <div class="input-panel">
+        <div class="input-eyebrow">Knowledge Base</div>
+        <div class="input-title">Upload Documents &amp; Reports</div>
+        <div style="font-size:13px;color:var(--charcoal2);line-height:1.65;margin-bottom:20px;">Upload META performance reports, 90-day plans, brand guidelines, audience research, content calendars, or CSV files. The AI reads each one and automatically updates Tiffany's client profile with every insight.</div>
+
+        <!-- UPLOAD ZONE -->
+        <div id="upload-zone" onclick="document.getElementById('kb-file-input').click()" style="border:2px dashed var(--border-md);border-radius:10px;padding:36px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--cream-2);margin-bottom:16px;">
+          <div style="font-size:28px;margin-bottom:10px;">+</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--charcoal);margin-bottom:6px;">Drop a file or click to upload</div>
+          <div style="font-size:11px;color:var(--charcoal3);">PDF, CSV, TXT supported &bull; META reports, brand guides, 90-day plans, audience research</div>
+        </div>
+        <input type="file" id="kb-file-input" accept=".pdf,.csv,.txt" style="display:none" onchange="handleKBUpload(event)" />
+
+        <!-- DOC TYPE SELECTOR -->
+        <div class="input-row" style="margin-top:8px;">
+          <select class="content-type-select" id="kb-doc-type">
+            <option value="meta-report">META Performance Report</option>
+            <option value="strategy">90-Day Strategic Plan</option>
+            <option value="brand">Brand Guidelines</option>
+            <option value="audience">Audience Research</option>
+            <option value="calendar">Content Calendar</option>
+            <option value="csv">CSV Data Export</option>
+            <option value="other">Other Document</option>
+          </select>
+          <span style="font-size:11px;color:var(--charcoal3);flex:1;">Select the document type before uploading for best extraction.</span>
+        </div>
+      </div>
+
+      <!-- PROCESSING STATE -->
+      <div class="gen-loading" id="loading-kb">
+        <div class="gen-label">Reading document...</div>
+        <div class="gen-track"></div>
+        <div class="gen-msg" id="gen-msg-kb">Extracting insights...</div>
+      </div>
+
+      <div class="gen-error" id="error-kb"></div>
+
+      <!-- KNOWLEDGE BASE ENTRIES -->
+      <div id="kb-entries"></div>
 
     </div>
 
@@ -1118,8 +1215,9 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
   document.getElementById('tab-' + tab).classList.add('active');
-  var idx = tab === 'studio' ? 0 : 1;
+  var idx = tab === 'studio' ? 0 : tab === 'planner' ? 1 : 2;
   document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  if (tab === 'knowledge') renderKnowledgeBase();
 }
 
 // ================================================================
@@ -1662,7 +1760,296 @@ function getNextMonday() {
 // Render profile on load
 window.addEventListener('DOMContentLoaded', function() {
   renderProfilePanel();
+  renderKnowledgeBase();
 });
+
+// ================================================================
+// KNOWLEDGE BASE
+// ================================================================
+var kbLoaderMsgs = [
+  'Reading the document...','Extracting key insights...','Identifying performance data...',
+  'Finding strategic priorities...','Updating client profile...','Almost done...'
+];
+
+function getKnowledgeBase() {
+  var raw = localStorage.getItem('tiffany_knowledge_base');
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch(e) { return []; }
+}
+
+function saveKnowledgeBase(kb) {
+  localStorage.setItem('tiffany_knowledge_base', JSON.stringify(kb));
+}
+
+function handleKBUpload(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var docType = document.getElementById('kb-doc-type').value;
+  var ext = file.name.split('.').pop().toLowerCase();
+
+  if (ext === 'csv' || ext === 'txt') {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      processKBDocument(file.name, docType, 'text', null, ev.target.result);
+    };
+    reader.readAsText(file);
+  } else if (ext === 'pdf') {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var base64 = ev.target.result.split(',')[1];
+      processKBDocument(file.name, docType, 'pdf', base64, null);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    alert('Please upload a PDF, CSV, or TXT file.');
+  }
+  e.target.value = '';
+}
+
+async function processKBDocument(filename, docType, fileType, base64, textContent) {
+  if (!checkApiKey()) return;
+
+  document.getElementById('loading-kb').style.display = 'block';
+  document.getElementById('error-kb').style.display = 'none';
+  startLoader('gen-msg-kb', kbLoaderMsgs);
+
+  var docTypeLabels = {
+    'meta-report': 'META Performance Report',
+    'strategy': '90-Day Strategic Plan',
+    'brand': 'Brand Guidelines',
+    'audience': 'Audience Research',
+    'calendar': 'Content Calendar',
+    'csv': 'CSV Data Export',
+    'other': 'Document'
+  };
+
+  var systemPrompt = 'You are the data analyst for Tiffany Haynes and Co. social media team. ' +
+    'Extract all useful insights from this ' + docTypeLabels[docType] + ' and return them as structured JSON. ' +
+    'Focus on: performance metrics, audience insights, content strategy, what is working, what is not working, ' +
+    'strategic priorities, content themes, and any actionable recommendations. ' +
+    'Return ONLY valid JSON. No markdown. No backticks.';
+
+  var userPrompt = 'Extract all insights from this document for Tiffany Haynes and Co. content strategy.\n\n' +
+    'Return this exact JSON structure:\n' +
+    '{"document_title":"descriptive title for this document","document_type":"' + docTypeLabels[docType] + '",' +
+    '"period_covered":"date range if applicable, empty string if not",' +
+    '"key_metrics":[{"label":"metric name","value":"metric value","trend":"up or down or flat or N/A","note":"brief context"}],' +
+    '"audience_insights":["insight 1","insight 2"],' +
+    '"top_performing_content":["content piece 1 with context","content piece 2"],' +
+    '"what_is_working":["observation 1","observation 2"],' +
+    '"what_needs_attention":["issue 1","issue 2"],' +
+    '"strategic_priorities":["priority 1","priority 2"],' +
+    '"content_themes":["theme 1","theme 2"],' +
+    '"action_items":["specific action 1","specific action 2"],' +
+    '"profile_updates":{"topics_to_avoid":[],"audience_notes":[],"brand_direction":[],"content_gaps":[],"winning_formats":[]}}';
+
+  try {
+    var messages;
+    if (fileType === 'pdf') {
+      messages = [{
+        role: 'user',
+        content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+          { type: 'text', text: userPrompt }
+        ]
+      }];
+    } else {
+      messages = [{
+        role: 'user',
+        content: userPrompt + '\n\nDOCUMENT CONTENT:\n' + textContent
+      }];
+    }
+
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': getApiKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system: systemPrompt,
+        messages: messages
+      })
+    });
+
+    var data = await res.json();
+    var raw = (data.content || []).find(function(b) { return b.type === 'text'; });
+    if (!raw) throw new Error('No response. Check API key.');
+    var extracted = JSON.parse(raw.text.replace(/```json|```/g,'').trim());
+
+    // Auto-update client profile
+    var p = getProfile();
+    if (extracted.profile_updates) {
+      var pu = extracted.profile_updates;
+      if (pu.audience_notes) pu.audience_notes.forEach(function(n) { if (p.themes.indexOf(n) === -1) p.themes.push(n); });
+      if (pu.content_gaps) pu.content_gaps.forEach(function(g) { if (p.themes.indexOf(g) === -1) p.themes.push(g); });
+      if (pu.winning_formats) pu.winning_formats.forEach(function(f) { if (p.phrases.indexOf(f) === -1) p.phrases.push(f); });
+    }
+    if (extracted.content_themes) {
+      extracted.content_themes.forEach(function(t) { if (p.themes.indexOf(t) === -1) p.themes.push(t); });
+    }
+    if (extracted.strategic_priorities) {
+      extracted.strategic_priorities.forEach(function(s) { if (p.topics.indexOf(s) === -1) p.topics.push(s); });
+    }
+    p.last_updated = new Date().toISOString();
+    saveProfile(p);
+    renderProfilePanel();
+
+    // Save to knowledge base
+    var kb = getKnowledgeBase();
+    kb.unshift({
+      id: Date.now(),
+      filename: filename,
+      uploaded: new Date().toISOString(),
+      docType: docType,
+      data: extracted
+    });
+    saveKnowledgeBase(kb);
+
+    stopLoader('gen-msg-kb');
+    document.getElementById('loading-kb').style.display = 'none';
+    renderKnowledgeBase();
+
+  } catch(e) {
+    stopLoader('gen-msg-kb');
+    document.getElementById('loading-kb').style.display = 'none';
+    var el = document.getElementById('error-kb');
+    el.style.display = 'block';
+    el.innerHTML = '<strong>Error reading document:</strong> ' + e.message;
+    console.error(e);
+  }
+}
+
+function deleteKBEntry(id) {
+  if (!confirm('Remove this document from the knowledge base?')) return;
+  var kb = getKnowledgeBase().filter(function(e) { return e.id !== id; });
+  saveKnowledgeBase(kb);
+  renderKnowledgeBase();
+}
+
+function renderKnowledgeBase() {
+  var kb = getKnowledgeBase();
+  var container = document.getElementById('kb-entries');
+  if (!container) return;
+
+  if (kb.length === 0) {
+    container.innerHTML = '<div class="kb-empty">No documents uploaded yet.<br>Upload a META report, 90-day plan, or any brand document above to start building the knowledge base.</div>';
+    return;
+  }
+
+  var docColors = {
+    'meta-report': {color:'#A00605', bg:'#FFF5F5', label:'META Report'},
+    'strategy':    {color:'#3A6EA8', bg:'#F0F5FF', label:'Strategic Plan'},
+    'brand':       {color:'#6A50A8', bg:'#F8F5FF', label:'Brand Guide'},
+    'audience':    {color:'#3A9E6E', bg:'#F5FAF7', label:'Audience Research'},
+    'calendar':    {color:'#B87830', bg:'#FFF8F0', label:'Content Calendar'},
+    'csv':         {color:'#5A5A5A', bg:'#F5F5F5', label:'CSV Data'},
+    'other':       {color:'#8A8A8A', bg:'#F8F8F8', label:'Document'}
+  };
+
+  var h = '<div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">';
+  h += '<div><div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Knowledge Base</div>';
+  h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:22px;font-weight:600;color:var(--charcoal);">' + kb.length + ' document' + (kb.length !== 1 ? 's' : '') + ' uploaded</div></div>';
+  h += '<div style="font-size:11px;color:var(--charcoal3);">Profile auto-updated with each upload</div></div>';
+
+  kb.forEach(function(entry) {
+    var d = entry.data || {};
+    var dc = docColors[entry.docType] || docColors['other'];
+    var uploadDate = new Date(entry.uploaded).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+
+    h += '<div class="kb-entry">';
+
+    // HEADER
+    h += '<div class="kb-entry-header">';
+    h += '<div><div class="kb-entry-title">' + esc(d.document_title || entry.filename) + '</div>';
+    h += '<div class="kb-entry-meta">' + entry.filename + ' &bull; Uploaded ' + uploadDate + (d.period_covered ? ' &bull; Period: ' + esc(d.period_covered) : '') + '</div></div>';
+    h += '<div style="display:flex;align-items:center;gap:8px;">';
+    h += '<span class="kb-doc-type" style="background:' + dc.bg + ';color:' + dc.color + ';">' + dc.label + '</span>';
+    h += '<button class="copy-btn" onclick="deleteKBEntry(' + entry.id + ')" style="color:var(--red);border-color:rgba(160,6,5,0.2);">Remove</button>';
+    h += '</div></div>';
+
+    // BODY
+    h += '<div class="kb-entry-body">';
+
+    // KEY METRICS
+    if (d.key_metrics && d.key_metrics.length > 0) {
+      h += '<div class="kb-insight-group">';
+      h += '<div class="kb-insight-label">Key Metrics</div>';
+      h += '<div class="kb-stat-grid">';
+      d.key_metrics.slice(0,6).forEach(function(m) {
+        var trendColor = m.trend === 'up' ? 'var(--green)' : m.trend === 'down' ? 'var(--red)' : 'var(--charcoal3)';
+        var trendArrow = m.trend === 'up' ? ' up' : m.trend === 'down' ? ' dn' : '';
+        h += '<div class="kb-stat">';
+        h += '<div class="kb-stat-num" style="color:' + trendColor + ';font-size:16px;">' + esc(m.value) + '</div>';
+        h += '<div class="kb-stat-label">' + esc(m.label) + '</div>';
+        if (m.note) h += '<div style="font-size:9px;color:var(--charcoal3);margin-top:3px;">' + esc(m.note) + '</div>';
+        h += '</div>';
+      });
+      h += '</div></div>';
+    }
+
+    // WHAT IS WORKING + WHAT NEEDS ATTENTION
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">';
+
+    if (d.what_is_working && d.what_is_working.length > 0) {
+      h += '<div class="kb-insight-group" style="margin-bottom:0;">';
+      h += '<div class="kb-insight-label" style="color:var(--green);">What is Working</div>';
+      d.what_is_working.forEach(function(item) {
+        h += '<div class="kb-insight-item">' + esc(item) + '</div>';
+      });
+      h += '</div>';
+    }
+
+    if (d.what_needs_attention && d.what_needs_attention.length > 0) {
+      h += '<div class="kb-insight-group" style="margin-bottom:0;">';
+      h += '<div class="kb-insight-label" style="color:var(--red);">Needs Attention</div>';
+      d.what_needs_attention.forEach(function(item) {
+        h += '<div class="kb-insight-item">' + esc(item) + '</div>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
+
+    // STRATEGIC PRIORITIES
+    if (d.strategic_priorities && d.strategic_priorities.length > 0) {
+      h += '<div class="kb-insight-group">';
+      h += '<div class="kb-insight-label">Strategic Priorities</div>';
+      d.strategic_priorities.forEach(function(p, i) {
+        h += '<div class="kb-insight-item" style="display:flex;gap:10px;"><span style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:700;color:var(--red);flex-shrink:0;line-height:1.4;">' + (i+1) + '</span><span>' + esc(p) + '</span></div>';
+      });
+      h += '</div>';
+    }
+
+    // AUDIENCE INSIGHTS
+    if (d.audience_insights && d.audience_insights.length > 0) {
+      h += '<div class="kb-insight-group">';
+      h += '<div class="kb-insight-label">Audience Insights</div>';
+      d.audience_insights.forEach(function(item) {
+        h += '<span class="kb-tag">' + esc(item) + '</span>';
+      });
+      h += '</div>';
+    }
+
+    // ACTION ITEMS
+    if (d.action_items && d.action_items.length > 0) {
+      h += '<div class="kb-insight-group">';
+      h += '<div class="kb-insight-label">Action Items</div>';
+      d.action_items.forEach(function(item) {
+        h += '<div class="kb-insight-item" style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--red);font-weight:700;flex-shrink:0;">&rarr;</span><span>' + esc(item) + '</span></div>';
+      });
+      h += '</div>';
+    }
+
+    h += '</div></div>';
+  });
+
+  container.innerHTML = h;
+}
+
 </script>
 </body>
 </html>
