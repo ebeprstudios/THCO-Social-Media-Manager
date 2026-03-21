@@ -903,6 +903,7 @@ body::before {
           <div id="ep-approved-badge" style="display:none;background:rgba(58,158,110,0.1);border:1px solid rgba(58,158,110,0.25);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;">Scheduled</div>
           <button class="btn-secondary" id="ep-retry-btn" onclick="generateEmailPreview(true)">Generate</button>
           <button class="btn-secondary" id="ep-test-btn" onclick="sendTestEmail()" style="display:none;border-color:var(--amber);color:var(--amber);">Send Test Email</button>
+          <button class="btn-secondary" id="ep-publish-btn" onclick="publishTopicsPage()" style="display:none;border-color:var(--green);color:var(--green);" title="Publishes topics to the This Week page so Tiffany can browse them">Publish Topics Page</button>
           <button class="btn-primary" id="ep-approve-btn" onclick="approveAndSchedule()" style="background:var(--charcoal);" disabled>Schedule Email</button>
         </div>
       </div>
@@ -2106,6 +2107,75 @@ async function sendTestEmail() {
   }
 }
 
+async function publishTopicsPage() {
+  if (!epCurrentData || !epCurrentData.topics || !epCurrentData.topics.length) {
+    alert('No topics generated yet. Click Generate first.');
+    return;
+  }
+  var token = getGithubToken();
+  if (!token) { alert('No GitHub token saved. Enter your token in the settings above.'); return; }
+
+  var btn = document.getElementById('ep-publish-btn');
+  btn.disabled = true; btn.textContent = 'Publishing...';
+
+  var payload = {
+    recording_week: epCurrentData.recording_week || getRecordingWeek(),
+    publishing_week: epCurrentData.publishing_week || getPublishingWeek(),
+    saved_at: new Date().toISOString(),
+    topics: epCurrentData.topics || []
+  };
+
+  try {
+    var repoFull = getGitHubRepo();
+    if (!repoFull) throw new Error('GitHub repo not set. Fill in the GitHub Repo field in settings.');
+    var parts = repoFull.split('/');
+    var apiUrl = 'https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/contents/current_topics.json';
+    var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
+
+    var sha = null;
+    var check = await fetch(apiUrl, { headers: headers });
+    if (check.ok) { sha = (await check.json()).sha; }
+
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+    var body = { message: 'Publish topics page - ' + payload.recording_week, content: content };
+    if (sha) body.sha = sha;
+
+    var res = await fetch(apiUrl, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+    if (!res.ok) {
+      var j = {}; try { j = await res.json(); } catch(x) {}
+      throw new Error('GitHub returned ' + res.status + ': ' + (j.message || ''));
+    }
+
+    btn.textContent = 'Published!';
+    btn.style.background = 'var(--green)';
+    btn.style.color = 'white';
+    btn.style.borderColor = 'var(--green)';
+
+    // Show the topics page URL
+    var topicsUrl = 'https://' + parts[0] + '.github.io/' + parts[1] + '/topics.html';
+    var confirmEl = document.getElementById('ep-approval-confirm');
+    var confirmText = document.getElementById('ep-confirm-text');
+    if (confirmEl && confirmText) {
+      confirmEl.style.display = 'block';
+      confirmText.innerHTML = (confirmText.innerHTML || '') +
+        '<br><span style="color:var(--green);font-weight:600;">Topics page published. Tiffany can view topics at: <a href="' + topicsUrl + '" target="_blank" style="color:var(--green);">' + topicsUrl + '</a></span>';
+    }
+
+    setTimeout(function() {
+      btn.disabled = false;
+      btn.textContent = 'Publish Topics Page';
+      btn.style.background = '';
+      btn.style.color = 'var(--green)';
+      btn.style.borderColor = 'var(--green)';
+    }, 5000);
+  } catch(e) {
+    alert('Publish failed: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'Publish Topics Page';
+    console.error(e);
+  }
+}
+
 async function triggerWorkflow(token) {
   try {
     var repoFull = getGitHubRepo();
@@ -2382,6 +2452,8 @@ function renderEmailPreview(data, approved) {
 
   // Always show test button once topics exist
   if (testBtn) testBtn.style.display = 'inline-block';
+  var pubBtn = document.getElementById('ep-publish-btn');
+  if (pubBtn) pubBtn.style.display = 'inline-block';
 
   if (approved) {
     document.getElementById('ep-approved-badge').style.display = 'inline-block';
@@ -2501,9 +2573,9 @@ function buildHTMLEmailPreview(data) {
     cardItems.push(card);
   });
 
-  // Wrap in 2-column grid
-  var topicsHtml = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">';
-  cardItems.forEach(function(card) { topicsHtml += '<div>' + card + '</div>'; });
+  // Wrap in single-column layout
+  var topicsHtml = '<div style="display:flex;flex-direction:column;gap:14px;">';
+  cardItems.forEach(function(card) { topicsHtml += card; });
   topicsHtml += '</div>';
 
   var html = '<div style="font-family:Georgia,serif;background:#F4F0EB;padding:24px 20px;">';

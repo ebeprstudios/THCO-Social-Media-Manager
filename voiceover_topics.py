@@ -146,17 +146,10 @@ def build_html(data, rec_week, pub_week, is_test=False):
 </table>'''
         card_cells.append(card)
 
-    # Build 2-column table rows (Gmail-safe)
+    # Build single-column rows
     rows_html = ""
-    for i in range(0, len(card_cells), 2):
-        left = card_cells[i]
-        right = card_cells[i+1] if i+1 < len(card_cells) else "<table width='100%'><tr><td></td></tr></table>"
-        rows_html += f'''
-<tr>
-  <td width="48%" valign="top" style="padding:6px 4px 6px 0;">{left}</td>
-  <td width="4%"></td>
-  <td width="48%" valign="top" style="padding:6px 0 6px 4px;">{right}</td>
-</tr>'''
+    for card in card_cells:
+        rows_html += f'<tr><td style="padding:6px 0;">{card}</td></tr>'
 
     note_html = f'<p style="font-style:italic;color:#5A5A5A;font-size:13px;margin:0 0 12px;">{planning_note}</p>' if planning_note else ""
 

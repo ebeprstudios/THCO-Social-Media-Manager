@@ -413,7 +413,7 @@ body {
     <div class="progress-label" id="progress-label">Uploading...</div>
     <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
   </div>
-  <button class="send-btn" id="send-btn" onclick="submitVoiceover()">Send to Media Team</button>
+  <button class="send-btn" id="send-btn" onclick="submitVoiceover()">Send to The Creative Theologian Media Group</button>
 
   <!-- SUCCESS -->
   <div class="success-card" id="success-card">
@@ -663,13 +663,13 @@ function submitVoiceover() {
     } else {
       var j = {}; try { j = JSON.parse(xhr.responseText); } catch(x) {}
       showError('Send failed: ' + (j.error && j.error.message ? j.error.message : 'Please try again.'));
-      btn.disabled = false; btn.textContent = 'Send to Media Team';
+      btn.disabled = false; btn.textContent = 'Send to The Creative Theologian Media Group';
     }
   };
 
   xhr.onerror = function() {
     showError('Network error. Check your connection and try again.');
-    btn.disabled = false; btn.textContent = 'Send to Media Team';
+    btn.disabled = false; btn.textContent = 'Send to The Creative Theologian Media Group';
   };
 
   xhr.send(formData);
