@@ -473,12 +473,27 @@ body::before {
     <div class="logo-brand">Content Studio</div>
     <div class="logo-title">Tiffany Haynes <span class="logo-accent">&amp;</span> Co.</div>
   </div>
-  <div class="topbar-right">
-    <button class="tb-btn" onclick="exportProfile()">Export Profile</button>
-    <button class="tb-btn" onclick="importProfileClick()">Import Profile</button>
-    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importProfile(event)" />
-    <button class="tb-btn" onclick="showKeyModal()">API Key</button>
-    <button class="tb-btn" onclick="window.print()">Print</button>
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <!-- CLOCKS -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="text-align:center;background:rgba(65,65,65,0.06);border:1px solid var(--border-md);border-radius:8px;padding:5px 12px;min-width:90px;">
+        <div style="font-size:8px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">EST</div>
+        <div id="clock-est" style="font-size:14px;font-weight:700;color:var(--charcoal);font-variant-numeric:tabular-nums;letter-spacing:0.5px;">--:--</div>
+        <div id="date-est" style="font-size:9px;color:var(--charcoal3);margin-top:1px;"></div>
+      </div>
+      <div style="text-align:center;background:rgba(65,65,65,0.06);border:1px solid var(--border-md);border-radius:8px;padding:5px 12px;min-width:90px;">
+        <div style="font-size:8px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">CST</div>
+        <div id="clock-cst" style="font-size:14px;font-weight:700;color:var(--charcoal);font-variant-numeric:tabular-nums;letter-spacing:0.5px;">--:--</div>
+        <div id="date-cst" style="font-size:9px;color:var(--charcoal3);margin-top:1px;"></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="tb-btn" onclick="exportProfile()">Export Profile</button>
+      <button class="tb-btn" onclick="importProfileClick()">Import Profile</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importProfile(event)" />
+      <button class="tb-btn" onclick="showKeyModal()">API Key</button>
+      <button class="tb-btn" onclick="window.print()">Print</button>
+    </div>
   </div>
 </div>
 
@@ -678,9 +693,25 @@ body::before {
           <input id="week-theme" type="text" placeholder="e.g. God's Math week, family focus, entrepreneurship push, back to basics..." style="width:100%;background:var(--cream-2);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:13px;padding:10px 14px;border-radius:6px;outline:none;" />
         </div>
 
+        <!-- PILLAR BALANCE TRACKER -->
+        <div id="planner-balance-panel" style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;">Cumulative Pillar Balance</div>
+              <div style="font-size:11px;color:var(--charcoal3);">Based on approved plans only. Regenerations don't count.</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button onclick="autoSelectPillars()" style="font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--green);color:var(--green);background:transparent;cursor:pointer;font-family:Inter,sans-serif;font-weight:600;">Auto-Select Underused</button>
+              <button onclick="clearApprovedHistory()" style="font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--border-md);color:var(--charcoal3);background:transparent;cursor:pointer;font-family:Inter,sans-serif;">Reset History</button>
+            </div>
+          </div>
+          <div id="balance-bars"></div>
+          <div id="balance-recommendation" style="margin-top:10px;display:none;"></div>
+        </div>
+
         <!-- PILLAR PRIORITY -->
         <div style="margin-bottom:16px;">
-          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Prioritize These Pillars This Week <span style="font-weight:400;font-style:italic;">(select all that apply)</span></div>
+          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Prioritize These Pillars This Week <span style="font-weight:400;font-style:italic;">(auto-selected based on balance — adjust as needed)</span></div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;" id="pillar-checkboxes">
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Business and Entrepreneurship" class="pillar-cb" style="accent-color:var(--red);"> Business &amp; Entrepreneurship</label>
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Spiritual Development and Gods Math Teaching" class="pillar-cb" style="accent-color:var(--red);"> God's Math Teaching</label>
@@ -1095,12 +1126,36 @@ var lastDashScript = '';
     });
     renderProfilePanel();
     renderKnowledgeBase();
+    startClocks();
   });
 })();
 
 // ================================================================
-// API KEY
+// LIVE CLOCKS - EST & CST
 // ================================================================
+function startClocks() {
+  function updateClocks() {
+    var now = new Date();
+
+    var estOptions = { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
+    var estDateOptions = { timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric' };
+    var cstOptions = { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
+    var cstDateOptions = { timeZone: 'America/Chicago', weekday: 'short', month: 'short', day: 'numeric' };
+
+    var estEl = document.getElementById('clock-est');
+    var estDateEl = document.getElementById('date-est');
+    var cstEl = document.getElementById('clock-cst');
+    var cstDateEl = document.getElementById('date-cst');
+
+    if (estEl) estEl.textContent = now.toLocaleTimeString('en-US', estOptions);
+    if (estDateEl) estDateEl.textContent = now.toLocaleDateString('en-US', estDateOptions);
+    if (cstEl) cstEl.textContent = now.toLocaleTimeString('en-US', cstOptions);
+    if (cstDateEl) cstDateEl.textContent = now.toLocaleDateString('en-US', cstDateOptions);
+  }
+  updateClocks();
+  setInterval(updateClocks, 1000);
+}
+
 function getApiKey() { return localStorage.getItem('anthropic_api_key') || ''; }
 function showKeyModal() {
   document.getElementById('api-key-input').value = '';
@@ -1139,6 +1194,7 @@ function switchTab(tab) {
   if (tab === 'knowledge') renderKnowledgeBase();
   if (tab === 'emailpreview') initEmailPreview();
   if (tab === 'voiceovers') initVoiceovers();
+  if (tab === 'planner') initPlannerBalance();
 }
 
 // ================================================================
@@ -1349,6 +1405,183 @@ var loaderTimers = {};
 var studioMsgs = ['Reading the transcript...','Finding the most powerful lines...','Writing captions in Tiffany\'s voice...','Building thumbnail briefs...','Writing carousel copy...','Pulling quote moments...','Almost ready...'];
 var learnMsgs = ['Reading all transcripts...','Building Tiffany\'s content profile...','Identifying recurring themes...','Mapping pillar coverage...','Extracting her phrases...','Almost done...'];
 var weekMsgs = ['Arranging content across the week...','Balancing the content pillars...','Writing Mon-Sun assignments...','Building designer delivery briefs...','Almost ready...'];
+
+// ================================================================
+// PILLAR BALANCE SYSTEM - Approved plans only
+// ================================================================
+var PILLAR_TARGETS = {
+  "Business and Entrepreneurship": 20,
+  "Spiritual Development and Gods Math Teaching": 20,
+  "Family and Lifestyle": 20,
+  "Humor and Personality Shenanigans": 20,
+  "Community and Testimony": 20
+};
+
+function getApprovedPlanHistory() {
+  var raw = localStorage.getItem('tiffany_approved_plans');
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch(e) { return []; }
+}
+
+function saveApprovedPlanHistory(history) {
+  localStorage.setItem('tiffany_approved_plans', JSON.stringify(history));
+}
+
+function getCumulativeBalance() {
+  var history = getApprovedPlanHistory();
+  var totals = {};
+  BRAND.pillars.forEach(function(p) { totals[p] = 0; });
+  history.forEach(function(plan) {
+    var pb = plan.pillar_balance || {};
+    Object.keys(pb).forEach(function(p) {
+      if (totals[p] !== undefined) totals[p] += (pb[p] || 0);
+    });
+  });
+  return totals;
+}
+
+function getUnderusedPillars() {
+  var balance = getCumulativeBalance();
+  var total = Object.values(balance).reduce(function(a,b){return a+b;},0) || 0;
+  if (total === 0) return BRAND.pillars; // no history yet - use all
+  var avg = total / BRAND.pillars.length;
+  var underused = BRAND.pillars.filter(function(p) { return balance[p] < avg * 0.85; });
+  return underused.length > 0 ? underused : BRAND.pillars.filter(function(p) {
+    return balance[p] === Math.min.apply(null, Object.values(balance));
+  });
+}
+
+function getOverusedPillars() {
+  var balance = getCumulativeBalance();
+  var total = Object.values(balance).reduce(function(a,b){return a+b;},0) || 0;
+  if (total === 0) return [];
+  var avg = total / BRAND.pillars.length;
+  return BRAND.pillars.filter(function(p) { return balance[p] > avg * 1.3; });
+}
+
+function renderBalanceBars() {
+  var el = document.getElementById('balance-bars');
+  var recEl = document.getElementById('balance-recommendation');
+  if (!el) return;
+
+  var balance = getCumulativeBalance();
+  var total = Object.values(balance).reduce(function(a,b){return a+b;},0) || 1;
+  var history = getApprovedPlanHistory();
+
+  if (history.length === 0) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--charcoal3);text-align:center;padding:8px 0;">No approved plans yet. Generate and approve your first plan to start tracking.</div>';
+    if (recEl) recEl.style.display = 'none';
+    return;
+  }
+
+  var avg = total / BRAND.pillars.length;
+  var h = '';
+  BRAND.pillars.forEach(function(p) {
+    var count = balance[p] || 0;
+    var pct = Math.round((count / total) * 100);
+    var targetPct = 20; // equal split target
+    var col = (BRAND.pillarColors[p]||{color:'#999'}).color;
+    var isUnder = count < avg * 0.85;
+    var isOver = count > avg * 1.3;
+    var statusIcon = isUnder ? ' <span style="color:var(--amber);font-weight:700;">- Under</span>' : isOver ? ' <span style="color:var(--red);font-weight:700;">- Over</span>' : ' <span style="color:var(--green);">OK</span>';
+    var shortName = p.replace('and Entrepreneurship','').replace('and Gods Math Teaching','').replace('and Lifestyle','').replace('and Personality Shenanigans','').replace('and Testimony','').trim();
+    h += '<div style="margin-bottom:7px;">';
+    h += '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px;">';
+    h += '<span style="color:var(--charcoal2);font-weight:600;">' + escRaw(shortName) + statusIcon + '</span>';
+    h += '<span style="color:var(--charcoal3);">' + count + ' posts (' + pct + '%)</span>';
+    h += '</div>';
+    h += '<div style="height:6px;background:var(--cream-3);border-radius:3px;overflow:hidden;position:relative;">';
+    h += '<div style="height:100%;width:' + Math.min(100,pct) + '%;background:' + col + ';border-radius:3px;transition:width 0.3s;' + (isUnder?'opacity:0.6;':'') + '"></div>';
+    h += '<div style="position:absolute;top:0;left:' + targetPct + '%;width:1px;height:100%;background:rgba(65,65,65,0.25);"></div>';
+    h += '</div></div>';
+  });
+  h += '<div style="font-size:9px;color:var(--charcoal3);margin-top:4px;">Based on ' + history.length + ' approved plan' + (history.length!==1?'s':'') + ' | Vertical line = 20% target per pillar</div>';
+  el.innerHTML = h;
+
+  // Recommendation banner
+  var underused = getUnderusedPillars();
+  var overused = getOverusedPillars();
+  if (recEl) {
+    if (underused.length > 0 || overused.length > 0) {
+      var recHtml = '<div style="background:var(--blue-bg);border:1px solid rgba(58,110,168,0.2);border-radius:7px;padding:10px 14px;font-size:11px;color:var(--charcoal2);line-height:1.7;">';
+      recHtml += '<span style="font-weight:700;color:var(--charcoal);">AI Recommendation for this week: </span>';
+      if (underused.length) recHtml += 'Prioritize <strong>' + underused.map(function(p){return p.split(' ')[0];}).join(', ') + '</strong>. ';
+      if (overused.length) recHtml += 'Ease back on <strong>' + overused.map(function(p){return p.split(' ')[0];}).join(', ') + '</strong>.';
+      recHtml += ' <button onclick="autoSelectPillars()" style="margin-left:8px;font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid var(--blue);color:var(--blue);background:transparent;cursor:pointer;font-family:Inter,sans-serif;">Apply Now</button>';
+      recHtml += '</div>';
+      recEl.innerHTML = recHtml;
+      recEl.style.display = 'block';
+    } else {
+      recEl.style.display = 'none';
+    }
+  }
+}
+
+function autoSelectPillars() {
+  var underused = getUnderusedPillars();
+  document.querySelectorAll('.pillar-cb').forEach(function(cb) {
+    cb.checked = underused.indexOf(cb.value) !== -1;
+  });
+  // Visual feedback
+  var btn = document.querySelector('[onclick="autoSelectPillars()"]');
+  if (btn) { btn.textContent = 'Applied!'; btn.style.color = 'var(--green)'; setTimeout(function(){ btn.textContent = 'Auto-Select Underused'; btn.style.color = 'var(--green)'; }, 2000); }
+}
+
+function clearApprovedHistory() {
+  if (!confirm('Reset all pillar balance history? This cannot be undone.')) return;
+  localStorage.removeItem('tiffany_approved_plans');
+  renderBalanceBars();
+}
+
+var currentGeneratedPlan = null; // holds the latest generated plan but NOT approved yet
+
+function approveWeeklyPlan() {
+  if (!currentGeneratedPlan) { alert('No plan to approve. Generate a plan first.'); return; }
+
+  var history = getApprovedPlanHistory();
+  var entry = {
+    approved_at: new Date().toISOString(),
+    week_of: currentGeneratedPlan.week_of || '',
+    pillar_balance: currentGeneratedPlan.pillar_balance || {},
+    mode: currentGeneratedPlan.mode || 'fresh'
+  };
+  history.push(entry);
+  saveApprovedPlanHistory(history);
+
+  // NOW update client profile - only on approval
+  if (currentGeneratedPlan.days) {
+    var pl = { topics_covered:[], recurring_phrases:[], themes:[], pillar_hits:{}, transcript_count:0 };
+    currentGeneratedPlan.days.forEach(function(day) {
+      if (day.title) pl.topics_covered.push(day.title);
+      if (day.pillar) pl.pillar_hits[day.pillar] = (pl.pillar_hits[day.pillar] || 0) + 1;
+    });
+    updateProfileFromLearning(pl);
+  }
+
+  // Update the approve button to confirmed state
+  var wrap = document.getElementById('plan-approve-wrap');
+  if (wrap) {
+    wrap.innerHTML = '<div style="background:var(--green-bg);border:1px solid rgba(58,158,110,0.25);border-radius:10px;padding:14px 20px;text-align:center;">' +
+      '<div style="font-size:22px;margin-bottom:6px;">&#10003;</div>' +
+      '<div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:4px;">Plan Approved</div>' +
+      '<div style="font-size:12px;color:var(--charcoal3);">Pillar balance updated. Week of ' + escRaw(entry.week_of) + ' is locked in.</div>' +
+      '<button onclick="generateWeeklyPlan()" style="margin-top:12px;background:transparent;color:var(--charcoal3);border:1px solid var(--border-md);padding:8px 20px;border-radius:7px;font-family:Georgia,serif;font-size:13px;cursor:pointer;">Generate Next Week</button>' +
+      '</div>';
+  }
+
+  // Refresh the balance bars
+  renderBalanceBars();
+}
+
+function initPlannerBalance() {
+  renderBalanceBars();
+  // Auto-select underused pillars on load if history exists
+  var history = getApprovedPlanHistory();
+  if (history.length > 0) {
+    autoSelectPillars();
+  }
+}
+
 var kbMsgs = ['Reading the document...','Extracting key insights...','Identifying performance data...','Updating client profile...','Almost done...'];
 var dashMsgs = ['Reading the script...','Extracting quotes...','Writing captions...','Building hooks...','Generating carousels...','Almost ready...'];
 
@@ -1772,11 +2005,23 @@ async function generateWeeklyPlan() {
     ? 'Generate completely FRESH, ORIGINAL content concepts. Do NOT pull from or reference any existing transcripts. Every idea must be brand new, drawn from her profile, performance data, and the week direction above. Each post concept should feel like something Tiffany has not said before but absolutely would say.'
     : 'Build the first ' + scripts.length + ' day(s) around the recorded scripts provided. For the remaining days generate completely fresh original concepts. Mix the two seamlessly so the week feels cohesive.';
 
+  var underused = getUnderusedPillars();
+  var overused = getOverusedPillars();
+  var history = getApprovedPlanHistory();
+  var balanceCtx = '';
+  if (history.length > 0) {
+    balanceCtx = 'PILLAR BALANCE DIRECTIVE (based on ' + history.length + ' approved plans):\n' +
+      'UNDERUSED - MUST prioritize these: ' + (underused.join(', ') || 'none') + '\n' +
+      'OVERUSED - reduce these: ' + (overused.join(', ') || 'none') + '\n' +
+      'This balance data is AUTHORITATIVE. Weight the week accordingly.\n\n';
+  }
+
   var prompt = 'You are the lead content strategist for Tiffany Haynes and Co.\n\n' +
     'BRAND VOICE: ' + BRAND.voice + '\n' +
     'STRICT AVOID: ' + BRAND.avoid + '\n' +
     'ALL PILLARS: ' + BRAND.pillars.join(', ') + '\n' +
     'SOP RULES: Same content type never back to back. Variety is not optional. Post at 3:00 PM CST. Instagram cross-posts to Facebook. TikTok is separate upload.\n\n' +
+    balanceCtx +
     profileCtx + '\n' +
     kbCtx + '\n' +
     weekCtx + '\n' +
@@ -1810,15 +2055,8 @@ async function generateWeeklyPlan() {
   try {
     var plan = await callAPI(prompt, 6000);
 
-    if (plan.days) {
-      var pl = { topics_covered:[], recurring_phrases:[], themes:[], pillar_hits:{}, transcript_count:0 };
-      plan.days.forEach(function(day) {
-        if (day.title) pl.topics_covered.push(day.title);
-        if (day.pillar && pl.pillar_hits[day.pillar] !== undefined) pl.pillar_hits[day.pillar]++;
-        else if (day.pillar) pl.pillar_hits[day.pillar] = 1;
-      });
-      updateProfileFromLearning(pl);
-    }
+    // Store plan but DON'T update profile yet - only approved plans count
+    currentGeneratedPlan = plan;
 
     stopLoader('gen-msg-week');
     document.getElementById('loading-week').style.display = 'none';
@@ -1939,6 +2177,13 @@ function renderWeeklyPlan(plan) {
   }
   h += '</div>';
   h += '<div class="studio-footer">Tiffany Haynes &amp; Co. Content Studio - Submit to Notion by Tuesday EOD - Not for distribution outside the media team</div>';
+
+  // APPROVE PLAN BUTTON
+  h += '<div id="plan-approve-wrap" style="margin-top:20px;text-align:center;">';
+  h += '<div style="font-size:12px;color:var(--charcoal3);margin-bottom:10px;">Happy with this plan? Approve it to lock in the pillar balance and update the tracker.</div>';
+  h += '<button onclick="approveWeeklyPlan()" style="background:var(--charcoal);color:white;border:none;padding:13px 32px;border-radius:8px;font-family:Georgia,serif;font-size:15px;font-weight:700;cursor:pointer;margin-right:10px;">Approve This Plan</button>';
+  h += '<button onclick="generateWeeklyPlan()" style="background:transparent;color:var(--charcoal3);border:1px solid var(--border-md);padding:13px 24px;border-radius:8px;font-family:Georgia,serif;font-size:14px;cursor:pointer;">Regenerate</button>';
+  h += '</div>';
 
   document.getElementById('results-planner').innerHTML = h;
   document.getElementById('results-planner').style.display = 'block';
