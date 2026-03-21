@@ -832,25 +832,62 @@ body::before {
       <!-- SETTINGS PANEL -->
       <div id="ep-settings-panel" style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:16px 20px;margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Settings</div>
+          <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Email Settings</div>
           <span style="font-size:10px;color:var(--green);font-weight:600;display:none;" id="ep-emails-saved-note">Saved</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Tiffany's Email</div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Tiffany's Email <span style="color:var(--red);">*</span></div>
             <input id="ep-email-tiffany" type="email" placeholder="tiffany@example.com" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+            <div style="font-size:10px;color:var(--charcoal3);margin-top:3px;">Scheduled emails go here every Friday</div>
           </div>
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Team Emails <span style="font-weight:400;font-style:italic;text-transform:none;">(comma separated)</span></div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Team CC <span style="font-weight:400;font-style:italic;text-transform:none;">(comma separated)</span></div>
             <input id="ep-email-team" type="text" placeholder="diana@example.com, erica@example.com" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+            <div style="font-size:10px;color:var(--charcoal3);margin-top:3px;">CC'd on scheduled emails</div>
           </div>
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">GitHub Token <span style="font-weight:400;font-style:italic;text-transform:none;">(for auto-send)</span></div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Your Test Email <span style="color:var(--red);">*</span></div>
+            <input id="ep-email-test" type="email" placeholder="you@example.com" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+            <div style="font-size:10px;color:var(--charcoal3);margin-top:3px;">Test emails go only here — not to Tiffany</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">GitHub Token</div>
             <input id="ep-github-token" type="password" placeholder="ghp_xxxxxxxxxxxx" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+            <div style="font-size:10px;color:var(--charcoal3);margin-top:3px;">Needs <strong>repo</strong> + <strong>workflow</strong> scopes</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">GitHub Repo</div>
+            <input id="ep-github-repo" type="text" placeholder="username/THCO-Social-Media-Manager" onchange="saveEmailSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+            <div style="font-size:10px;color:var(--charcoal3);margin-top:3px;">Your GitHub username / repo name</div>
           </div>
         </div>
-        <div style="margin-top:10px;font-size:10px;color:var(--charcoal3);line-height:1.6;">
-          GitHub token needs <strong>repo</strong> scope. Create one at github.com/settings/tokens. Needed to save approved topics so GitHub Actions can send the email on Friday at 1PM CST.
+        <div style="border-top:1px solid var(--border);padding-top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:180px;">
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Scheduled Send Time</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <select id="ep-send-day" onchange="saveEmailSettings()" style="background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:7px 10px;border-radius:6px;outline:none;">
+                <option value="5">Friday</option>
+                <option value="4">Thursday</option>
+                <option value="3">Wednesday</option>
+                <option value="1">Monday</option>
+              </select>
+              <select id="ep-send-hour" onchange="saveEmailSettings()" style="background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:7px 10px;border-radius:6px;outline:none;">
+                <option value="7">7:00 AM CST</option>
+                <option value="8">8:00 AM CST</option>
+                <option value="9">9:00 AM CST</option>
+                <option value="10">10:00 AM CST</option>
+                <option value="11">11:00 AM CST</option>
+                <option value="12">12:00 PM CST</option>
+                <option value="13" selected>1:00 PM CST</option>
+                <option value="14">2:00 PM CST</option>
+                <option value="15">3:00 PM CST</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--charcoal3);line-height:1.65;flex:2;min-width:200px;">
+            To change the actual send time in GitHub Actions, open your repo, go to <strong>.github/workflows/voiceover_workflow.yml</strong>, and update the cron line. The dropdowns above just show you what it's set to — they don't change the workflow file automatically.
+          </div>
         </div>
       </div>
 
@@ -862,9 +899,10 @@ body::before {
           <div style="font-size:11px;color:var(--charcoal3);margin-top:3px;" id="ep-status-note"></div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <div id="ep-approved-badge" style="display:none;background:rgba(58,158,110,0.1);border:1px solid rgba(58,158,110,0.25);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;">Approved - Sends Friday 1PM CST</div>
+          <div id="ep-approved-badge" style="display:none;background:rgba(58,158,110,0.1);border:1px solid rgba(58,158,110,0.25);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;">Scheduled</div>
           <button class="btn-secondary" id="ep-retry-btn" onclick="generateEmailPreview(true)">Generate</button>
-          <button class="btn-primary" id="ep-approve-btn" onclick="approveAndSchedule()" style="background:var(--charcoal);" disabled>Approve + Schedule</button>
+          <button class="btn-secondary" id="ep-test-btn" onclick="sendTestEmail()" style="display:none;border-color:var(--amber);color:var(--amber);">Send Test Email</button>
+          <button class="btn-primary" id="ep-approve-btn" onclick="approveAndSchedule()" style="background:var(--charcoal);" disabled>Schedule Email</button>
         </div>
       </div>
 
@@ -899,7 +937,7 @@ body::before {
         <!-- APPROVAL CONFIRMATION -->
         <div id="ep-approval-confirm" style="display:none;background:var(--green-bg);border:1px solid rgba(58,158,110,0.25);border-radius:10px;padding:18px 22px;margin-bottom:20px;">
           <div style="display:flex;align-items:flex-start;gap:14px;">
-            <div style="font-size:24px;flex-shrink:0;">&#10003;</div>
+            <div style="font-size:22px;flex-shrink:0;">&#10003;</div>
             <div>
               <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px;">Topics Approved and Scheduled</div>
               <div style="font-size:12px;color:var(--charcoal2);line-height:1.7;" id="ep-confirm-text">GitHub Actions will send the email this Friday at 1PM CST.</div>
@@ -911,10 +949,22 @@ body::before {
         <div id="ep-schedule-error" style="display:none;background:rgba(160,6,5,0.06);border:1px solid rgba(160,6,5,0.2);border-radius:10px;padding:18px 22px;margin-bottom:20px;">
           <div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:6px;">Could not save to GitHub</div>
           <div style="font-size:12px;color:var(--charcoal2);line-height:1.65;" id="ep-schedule-error-text"></div>
-          <div style="font-size:11px;color:var(--charcoal3);margin-top:8px;">Make sure your GitHub token has <strong>repo</strong> scope and your repo name is correct in the setup guide.</div>
+          <div style="font-size:11px;color:var(--charcoal3);margin-top:8px;">Make sure your GitHub token has <strong>repo</strong> scope and try again.</div>
         </div>
 
-        <div style="text-align:center;margin-top:20px;font-size:10px;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Tiffany Haynes &amp; Co. Media Team &bull; Internal Use Only</div>
+        <!-- HTML EMAIL PREVIEW -->
+        <div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:12px;overflow:hidden;box-shadow:0 2px 12px var(--shadow);margin-bottom:20px;">
+          <div style="background:var(--cream-2);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Email Preview</div>
+              <div style="font-size:10px;color:var(--charcoal3);margin-top:1px;">This is exactly what Tiffany and the team will receive on Friday</div>
+            </div>
+          </div>
+          <!-- Rendered HTML email inside an iframe-like container -->
+          <div id="ep-email-preview" style="padding:0;background:#F4F0EB;"></div>
+        </div>
+
+        <div style="text-align:center;margin-bottom:20px;font-size:10px;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;">Tiffany Haynes &amp; Co. Media Team &bull; Internal Use Only</div>
 
       </div>
 
@@ -1852,25 +1902,36 @@ var epLoaderMsgs = [
 var epCurrentData = null;
 
 function saveEmailSettings() {
-  var t = (document.getElementById('ep-email-tiffany')||{}).value || '';
-  var team = (document.getElementById('ep-email-team')||{}).value || '';
+  var fields = ['ep-email-tiffany','ep-email-team','ep-email-test','ep-send-day','ep-send-hour','ep-github-repo'];
+  var keys   = ['tiffany_ep_email_tiffany','tiffany_ep_email_team','tiffany_ep_email_test','tiffany_ep_send_day','tiffany_ep_send_hour','tiffany_ep_github_repo'];
+  fields.forEach(function(id, i) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var v = el.value.trim();
+    if (v) localStorage.setItem(keys[i], v);
+  });
   var token = (document.getElementById('ep-github-token')||{}).value || '';
-  if (t) localStorage.setItem('tiffany_ep_email_tiffany', t);
-  if (team) localStorage.setItem('tiffany_ep_email_team', team);
   if (token && token !== '****saved****') localStorage.setItem('tiffany_ep_github_token', token);
   var note = document.getElementById('ep-emails-saved-note');
-  if (note) { note.textContent = 'Saved'; note.style.display = 'inline'; setTimeout(function() { note.style.display = 'none'; }, 2000); }
+  if (note) { note.style.display = 'inline'; note.textContent = 'Saved'; setTimeout(function() { note.style.display = 'none'; }, 2000); }
 }
 
 function loadEmailSettings() {
-  var t = localStorage.getItem('tiffany_ep_email_tiffany') || '';
-  var team = localStorage.getItem('tiffany_ep_email_team') || '';
-  var token = localStorage.getItem('tiffany_ep_github_token') || '';
-  var tf = document.getElementById('ep-email-tiffany');
-  var te = document.getElementById('ep-email-team');
+  var map = {
+    'ep-email-tiffany': 'tiffany_ep_email_tiffany',
+    'ep-email-team':    'tiffany_ep_email_team',
+    'ep-email-test':    'tiffany_ep_email_test',
+    'ep-send-day':      'tiffany_ep_send_day',
+    'ep-send-hour':     'tiffany_ep_send_hour',
+    'ep-github-repo':   'tiffany_ep_github_repo'
+  };
+  Object.keys(map).forEach(function(id) {
+    var el = document.getElementById(id);
+    var v  = localStorage.getItem(map[id]);
+    if (el && v) el.value = v;
+  });
+  var token = localStorage.getItem('tiffany_ep_github_token');
   var tg = document.getElementById('ep-github-token');
-  if (tf && t) tf.value = t;
-  if (te && team) te.value = team;
   if (tg && token) tg.value = '****saved****';
 }
 
@@ -1917,80 +1978,145 @@ async function approveAndSchedule() {
   var confirmText = document.getElementById('ep-confirm-text');
   var errorEl = document.getElementById('ep-schedule-error');
 
+  // Always show test email button in all cases
+  document.getElementById('ep-test-btn').style.display = 'inline-block';
+
   if (saved) {
     errorEl.style.display = 'none';
     confirmEl.style.display = 'block';
-    var nextFriday = getNextFriday();
-    confirmText.textContent = 'Saved to GitHub. The GitHub Actions workflow will send the email to ' + tiffanyEmail + (teamEmails ? ' + team' : '') + ' this Friday (' + nextFriday + ') at 1:00 PM CST.';
-    document.getElementById('ep-status-note').textContent = 'Approved. Scheduled for Friday 1PM CST.';
+    var sendDay = localStorage.getItem('tiffany_ep_send_day') || '5';
+    var sendHour = localStorage.getItem('tiffany_ep_send_hour') || '13';
+    var dayName = {1:'Monday',3:'Wednesday',4:'Thursday',5:'Friday'}[parseInt(sendDay)] || 'Friday';
+    var h = parseInt(sendHour);
+    var hourLabel = h >= 12 ? (h===12?'12:00 PM':(h-12)+':00 PM') : h+':00 AM';
+    confirmText.textContent = 'Saved to GitHub. Sends to Tiffany + team this ' + dayName + ' at ' + hourLabel + ' CST.';
+    document.getElementById('ep-status-note').textContent = 'Scheduled for ' + dayName + ' ' + hourLabel + ' CST.';
+    document.getElementById('ep-approved-badge').textContent = 'Scheduled';
   } else if (token) {
     confirmEl.style.display = 'none';
     errorEl.style.display = 'block';
-    document.getElementById('ep-schedule-error-text').textContent = 'Could not write to GitHub. Check that your token has repo scope and try again. Topics are saved locally.';
-    document.getElementById('ep-status-note').textContent = 'Approved locally. GitHub save failed.';
+    document.getElementById('ep-schedule-error-text').innerHTML = 'GitHub save failed. Make sure the <strong>GitHub Repo</strong> field above is filled in as <strong>username/THCO-Social-Media-Manager</strong>, then try again. You can still send a test email.';
+    document.getElementById('ep-status-note').textContent = 'GitHub save failed. Check repo field.';
   } else {
     errorEl.style.display = 'none';
     confirmEl.style.display = 'block';
-    confirmText.innerHTML = 'Topics approved locally. Add your GitHub token above to enable automatic Friday sending. <br>Without it the GitHub Actions workflow will generate fresh topics instead of these approved ones.';
-    document.getElementById('ep-status-note').textContent = 'Approved locally (no GitHub token).';
+    confirmText.textContent = 'Topics saved locally. Fill in GitHub token + repo above to enable scheduled sending.';
+    document.getElementById('ep-status-note').textContent = 'Saved locally. Add GitHub token + repo to schedule.';
   }
 
   confirmEl.scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
+async function sendTestEmail() {
+  var token = getGithubToken();
+  if (!token) { alert('No GitHub token saved. Enter your token in the settings above.'); return; }
+  var testEmail = localStorage.getItem('tiffany_ep_email_test') || '';
+  if (!testEmail) { alert('Please enter your test email address in the settings above first.'); return; }
+
+  var btn = document.getElementById('ep-test-btn');
+  btn.disabled = true; btn.textContent = 'Sending test...';
+
+  try {
+    // Save a test-mode payload. GitHub Actions reads this and sends only to test email
+    var payload = {
+      approved: true,
+      test_mode: true,
+      test_email: testEmail,
+      approved_at: new Date().toISOString(),
+      recording_week: epCurrentData ? (epCurrentData.recording_week || getRecordingWeek()) : getRecordingWeek(),
+      publishing_week: epCurrentData ? (epCurrentData.publishing_week || getPublishingWeek()) : getPublishingWeek(),
+      planning_note: epCurrentData ? (epCurrentData.planning_note || '') : '',
+      to_email: testEmail,
+      cc_emails: '',
+      topics: epCurrentData ? (epCurrentData.topics || []) : []
+    };
+
+    var saved = await saveToGitHub(token, payload);
+    if (!saved) throw new Error('Could not save to GitHub. Check your token has repo scope.');
+
+    // Trigger the workflow immediately
+    var triggered = await triggerWorkflow(token);
+    if (!triggered) throw new Error('Could not trigger workflow. Check your token has workflow scope.');
+
+    btn.textContent = 'Test sent!';
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    var confirmText = document.getElementById('ep-confirm-text');
+    if (confirmText) confirmText.innerHTML += '<br><span style="color:var(--green);font-weight:600;">Test email triggered. Check ' + escRaw(testEmail) + ' in about 60 seconds.</span>';
+    setTimeout(function() {
+      btn.disabled = false; btn.textContent = 'Send Test Email';
+      btn.style.borderColor = ''; btn.style.color = '';
+    }, 6000);
+  } catch(e) {
+    alert('Test send failed: ' + e.message);
+    btn.disabled = false; btn.textContent = 'Send Test Email';
+    console.error(e);
+  }
+}
+
+async function triggerWorkflow(token) {
+  try {
+    var repoFull = getGitHubRepo();
+    if (!repoFull) return false;
+    var parts = repoFull.split('/');
+    var res = await fetch('https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/actions/workflows/voiceover_workflow.yml/dispatches', {
+      method: 'POST',
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ref: 'main' })
+    });
+    return res.status === 204 || res.status === 200;
+  } catch(e) { console.error(e); return false; }
+}
+
+function getGitHubRepo() {
+  // First check the settings field
+  var stored = localStorage.getItem('tiffany_ep_github_repo') || '';
+  if (stored && stored.indexOf('/') !== -1) return stored.trim();
+  // Fallback: detect from GitHub Pages URL
+  var hostname = window.location.hostname;
+  if (hostname.endsWith('.github.io')) {
+    var owner = hostname.replace('.github.io', '');
+    var pp = window.location.pathname.split('/').filter(Boolean);
+    var repo = pp[0] || '';
+    if (owner && repo) return owner + '/' + repo;
+  }
+  return '';
+}
+
 async function saveToGitHub(token, payload) {
   try {
-    // Detect repo from the current page URL (works for GitHub Pages)
-    var repoOwner = '';
-    var repoName = '';
-    var hostname = window.location.hostname;
-    if (hostname.endsWith('.github.io')) {
-      repoOwner = hostname.replace('.github.io', '');
-      var pathParts = window.location.pathname.split('/').filter(Boolean);
-      repoName = pathParts[0] || 'content-studio';
+    var repoFull = getGitHubRepo();
+    if (!repoFull) {
+      var input = prompt('Enter your GitHub repo (format: username/repo-name):\nExample: ebeprstudios/THCO-Social-Media-Manager');
+      if (!input) return false;
+      repoFull = input.trim();
+      localStorage.setItem('tiffany_ep_github_repo', repoFull);
+      var repoEl = document.getElementById('ep-github-repo');
+      if (repoEl) repoEl.value = repoFull;
     }
 
-    if (!repoOwner) {
-      // Fallback: ask user - store in localStorage
-      var stored = localStorage.getItem('tiffany_ep_github_repo');
-      if (stored) {
-        var parts = stored.split('/');
-        repoOwner = parts[0]; repoName = parts[1];
-      } else {
-        var input = prompt('Enter your GitHub repo (format: username/repo-name):');
-        if (!input) return false;
-        localStorage.setItem('tiffany_ep_github_repo', input.trim());
-        var parts2 = input.trim().split('/');
-        repoOwner = parts2[0]; repoName = parts2[1];
-      }
-    }
+    var parts = repoFull.split('/');
+    var repoOwner = parts[0]; var repoName = parts[1];
+    var apiUrl = 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contents/approved_topics.json';
+    var headers = { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
 
-    var filePath = 'approved_topics.json';
-    var apiUrl = 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contents/' + filePath;
-
-    // Check if file already exists to get its SHA
     var sha = null;
-    var checkRes = await fetch(apiUrl, {
-      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
-    });
-    if (checkRes.ok) {
-      var existing = await checkRes.json();
-      sha = existing.sha;
-    }
+    var checkRes = await fetch(apiUrl, { headers: headers });
+    if (checkRes.ok) { var ex = await checkRes.json(); sha = ex.sha; }
 
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-    var body = { message: 'Approved voiceover topics for ' + payload.recording_week, content: content };
+    var body = { message: 'Approved voiceover topics for ' + (payload.recording_week || 'this week'), content: content };
     if (sha) body.sha = sha;
 
-    var putRes = await fetch(apiUrl, {
-      method: 'PUT',
-      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-
-    return putRes.ok || putRes.status === 201;
+    var putRes = await fetch(apiUrl, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+    if (!putRes.ok) {
+      var errBody = await putRes.text();
+      console.error('GitHub save error:', putRes.status, errBody);
+      return false;
+    }
+    return true;
   } catch(e) {
-    console.error('GitHub save error:', e);
+    console.error('GitHub save exception:', e);
     return false;
   }
 }
@@ -2113,63 +2239,58 @@ async function generateEmailPreview(isRetry) {
 
   var underusedPillars = BRAND.pillars.filter(function(p) { return (profile.pillars[p] || 0) < 3; });
 
-  var systemPrompt = 'You are a content strategist. You ONLY respond with raw valid JSON. No explanation, no markdown, no backticks, no preamble. Your entire response must start with { and end with }.';
+  var systemPrompt = 'You are a content strategist for Tiffany Haynes and Co. You ONLY respond with raw valid JSON. No explanation, no markdown, no backticks. Start with { and end with }.';
 
-  var userPrompt = 'Generate 12 voiceover topic ideas for Tiffany Haynes and Co.\n\n' +
-    'BRAND: ' + BRAND.voice + '\nAVOID: ' + BRAND.avoid + '\nPILLARS: ' + BRAND.pillars.join(', ') + '\n\n' +
+  var baseCtx = 'BRAND: ' + BRAND.voice + '\nAVOID: ' + BRAND.avoid + '\nPILLARS: ' + BRAND.pillars.join(', ') + '\n' +
     (profileCtx || '') + (kbCtx || '') +
-    'Prioritize underused pillars: ' + (underusedPillars.join(', ') || 'all balanced') + '\n' +
-    'Recording window: ' + recWeek + '\nPublishing window: ' + pubWeek + '\n\n' +
-    'Rules: Fresh and original. Never repeat history. Cover all 5 pillars. Vary content types. Hooks stop the scroll.\n\n' +
-    'Return this exact JSON structure with all 12 topics filled in:\n' +
-    '{"recording_week":"' + recWeek + '","publishing_week":"' + pubWeek + '",' +
-    '"planning_note":"one sentence on this week\'s strategic mix",' +
-    '"topics":[' +
-    '{"number":1,"title":"5-8 word title","pillar":"pillar name","content_type":"Talking Head or Teaching or Testimony or Lifestyle or Shenanigans or B-Roll with Text","hook":"exact first 3 seconds","what_to_cover":["point 1","point 2","point 3"],"why_this_works":"one sentence","scripture_angle":"scripture or empty","estimated_length":"30 sec"},' +
-    '{"number":2,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":3,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":4,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":5,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":6,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":7,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":8,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":9,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":10,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":11,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"},' +
-    '{"number":12,"title":"title","pillar":"pillar","content_type":"type","hook":"hook","what_to_cover":["p1","p2","p3"],"why_this_works":"why","scripture_angle":"","estimated_length":"30 sec"}' +
-    ']}';
+    'Underused pillars to prioritize: ' + (underusedPillars.join(', ') || 'all balanced') + '\n' +
+    'Recording: ' + recWeek + ' | Publishing: ' + pubWeek + '\n' +
+    'Rules: Fresh original topics only. Never repeat history. Vary content types.\n\n';
+
+  var topicSchema = '{"number":N,"title":"5-8 word title","pillar":"exact pillar name","content_type":"Talking Head or Teaching or Testimony or Lifestyle or Shenanigans or B-Roll with Text","hook":"exact first 3 seconds in her voice","what_to_cover":["point 1","point 2","point 3"],"why_this_works":"one sentence","scripture_angle":"scripture reference or empty string","estimated_length":"30 sec"}';
+
+  function makePrompt(startNum, count, meta) {
+    var items = [];
+    for (var i = startNum; i < startNum + count; i++) {
+      items.push(topicSchema.replace('N', i));
+    }
+    return baseCtx + meta + '\nReturn ONLY JSON:\n{"topics":[' + items.join(',') + ']}';
+  }
 
   try {
     if (!getApiKey()) throw new Error('No API key. Enter and save your key first.');
-    var epRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': getApiKey(),
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 6000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }]
-      })
-    });
 
-    var epBody = await epRes.text();
-    if (!epRes.ok) {
-      var epJ = {}; try { epJ = JSON.parse(epBody); } catch(x) {}
-      throw new Error('API error ' + epRes.status + ': ' + (epJ.error && epJ.error.message ? epJ.error.message : epBody.slice(0,300)));
+    async function epFetch(prompt) {
+      var r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'x-api-key':getApiKey(), 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:4000, system:systemPrompt, messages:[{role:'user',content:prompt}] })
+      });
+      var body = await r.text();
+      if (!r.ok) { var j={}; try{j=JSON.parse(body);}catch(x){} throw new Error('API '+r.status+': '+(j.error&&j.error.message?j.error.message:body.slice(0,200))); }
+      var d = JSON.parse(body);
+      var raw = (d.content||[]).find(function(b){return b.type==='text';});
+      if (!raw||!raw.text) throw new Error('No text in response.');
+      return safeParseJSON(raw.text);
     }
 
-    var epData = JSON.parse(epBody);
-    var epRaw = (epData.content || []).find(function(b) { return b.type === 'text'; });
-    if (!epRaw || !epRaw.text) throw new Error('No text in API response.');
+    document.getElementById('ep-loading-msg') && (document.getElementById('ep-loading-msg').textContent = 'Generating topics 1-6...');
+    var batch1 = await epFetch(makePrompt(1, 6, 'Generate topics 1-6. Cover pillars: Business, Spiritual/Gods Math, Family.'));
 
-    var result = safeParseJSON(epRaw.text);
+    document.getElementById('ep-loading-msg') && (document.getElementById('ep-loading-msg').textContent = 'Generating topics 7-12...');
+    var batch2 = await epFetch(makePrompt(7, 6, 'Generate topics 7-12. Cover pillars: Humor/Shenanigans, Community/Testimony, and any underused pillar. Make these distinct from topics 1-6.'));
 
-    if (result.topics) {
+    var allTopics = (batch1.topics || []).concat(batch2.topics || []);
+    if (allTopics.length < 6) throw new Error('Not enough topics generated. Got ' + allTopics.length + '. Try generating again.');
+
+    var result = {
+      recording_week: recWeek,
+      publishing_week: pubWeek,
+      planning_note: batch1.planning_note || batch2.planning_note || '',
+      topics: allTopics
+    };
+
+    if (result.topics.length) {
       var pl = { topics_covered:[], recurring_phrases:[], themes:[], pillar_hits:{}, transcript_count:0 };
       result.topics.forEach(function(t) {
         if (t.title) pl.topics_covered.push(t.title);
@@ -2201,16 +2322,21 @@ async function generateEmailPreview(isRetry) {
 function renderEmailPreview(data, approved) {
   epCurrentData = data;
   document.getElementById('ep-week-label').textContent = 'Topics for ' + (data.recording_week || getRecordingWeek());
-  document.getElementById('ep-status-note').textContent = approved ? 'Approved. Scheduled for Friday 1PM CST.' : 'Review topics then click Approve + Schedule.';
+  document.getElementById('ep-status-note').textContent = approved ? 'Scheduled. Send a test email to preview before it goes out.' : 'Review topics below. Send a test email first, then schedule.';
 
   var approveBtn = document.getElementById('ep-approve-btn');
+  var testBtn = document.getElementById('ep-test-btn');
+
+  // Always show test button once topics exist
+  if (testBtn) testBtn.style.display = 'inline-block';
+
   if (approved) {
     document.getElementById('ep-approved-badge').style.display = 'inline-block';
-    approveBtn.textContent = 'Re-approve + Reschedule';
+    approveBtn.textContent = 'Reschedule';
     approveBtn.disabled = false;
   } else {
     document.getElementById('ep-approved-badge').style.display = 'none';
-    approveBtn.textContent = 'Approve + Schedule';
+    approveBtn.textContent = 'Schedule Email';
     approveBtn.disabled = false;
   }
 
@@ -2272,288 +2398,81 @@ function renderEmailPreview(data, approved) {
 
   document.getElementById('ep-cards-grid').innerHTML = cardsHtml;
   document.getElementById('ep-topics-grid').style.display = 'block';
+  buildHTMLEmailPreview(data);
 }
 
-function generatePDF(data) {
-  loadJsPDF(function(jsPDF) {
-    if (!jsPDF) {
-      console.warn('jsPDF not available, using fallback');
-      generatePDFFallback(data);
-      return;
-    }
-    buildPDFWithLib(jsPDF, data);
-  });
-}
-
-function buildPDFWithLib(jsPDF, data) {
+function buildHTMLEmailPreview(data) {
   var topics = data.topics || [];
   var recWeek = data.recording_week || getRecordingWeek();
   var pubWeek = data.publishing_week || getPublishingWeek();
-  var dateStr = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
-  var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  var pageW = 210; var pageH = 297;
-  var margin = 18; var contentW = pageW - margin * 2;
-  var y = margin;
-
-  var CREAM = [255, 253, 245];
-  var RED = [160, 6, 5];
-  var CHARCOAL = [65, 65, 65];
-  var CHARCOAL2 = [90, 90, 90];
-  var CHARCOAL3 = [138, 138, 138];
-  var BORDER = [227, 211, 200];
+  var today = new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+  var planningNote = data.planning_note || '';
 
   var PILLAR_COLORS = {
-    "Business and Entrepreneurship": [184, 120, 48],
-    "Spiritual Development and Gods Math Teaching": [160, 6, 5],
-    "Family and Lifestyle": [58, 158, 110],
-    "Humor and Personality Shenanigans": [106, 80, 168],
-    "Community and Testimony": [58, 110, 168]
+    "Business and Entrepreneurship":        {bg:"#FEF8EE", border:"#B87830", text:"#7A4E0D"},
+    "Spiritual Development and Gods Math Teaching": {bg:"#FFF5F5", border:"#A00605", text:"#7A0504"},
+    "Family and Lifestyle":                 {bg:"#F0FAF4", border:"#3A9E6E", text:"#1E6B48"},
+    "Humor and Personality Shenanigans":    {bg:"#F6F3FF", border:"#6A50A8", text:"#3D2980"},
+    "Community and Testimony":              {bg:"#EFF6FF", border:"#3A6EA8", text:"#1E4B7A"}
   };
 
-  function setPillarColor(pillar) {
-    return PILLAR_COLORS[pillar] || CHARCOAL3;
-  }
+  function pc(pillar) { return PILLAR_COLORS[pillar] || {bg:"#F8F8F8", border:"#999", text:"#555"}; }
 
-  function addPage() {
-    doc.addPage();
-    y = margin;
-    // Subtle header line on each page
-    doc.setDrawColor.apply(doc, BORDER);
-    doc.setLineWidth(0.3);
-    doc.line(margin, 8, pageW - margin, 8);
-    doc.setFontSize(7);
-    doc.setTextColor.apply(doc, CHARCOAL3);
-    doc.text('TIFFANY HAYNES & CO. | VOICEOVER TOPICS | ' + recWeek.toUpperCase(), pageW / 2, 6, { align: 'center' });
-  }
-
-  function checkPageBreak(needed) {
-    if (y + needed > pageH - margin) { addPage(); }
-  }
-
-  //  COVER 
-  doc.setFillColor.apply(doc, CHARCOAL);
-  doc.rect(0, 0, pageW, 60, 'F');
-
-  doc.setFontSize(8);
-  doc.setTextColor(196, 158, 60);
-  doc.setFont('helvetica', 'bold');
-  doc.text('TIFFANY HAYNES & CO. MEDIA TEAM', margin, 18);
-
-  doc.setFontSize(22);
-  doc.setTextColor(255, 253, 245);
-  doc.setFont('helvetica', 'bold');
-  doc.text('12 Voiceover Topics', margin, 32);
-
-  doc.setFontSize(11);
-  doc.setTextColor(180, 180, 180);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Recording: ' + recWeek, margin, 42);
-  doc.text('Publishing: ' + pubWeek, margin, 49);
-
-  doc.setFontSize(8);
-  doc.setTextColor(140, 145, 165);
-  doc.text('Generated: ' + dateStr, pageW - margin, 49, { align: 'right' });
-
-  // Math formula accent
-  doc.setFontSize(9);
-  doc.setTextColor(196, 158, 60);
-  doc.text('1 + 1 = 10,000', pageW - margin, 18, { align: 'right' });
-
-  y = 68;
-
-  // Planning note
-  if (data.planning_note) {
-    doc.setFontSize(10);
-    doc.setTextColor.apply(doc, CHARCOAL2);
-    doc.setFont('helvetica', 'italic');
-    var noteLines = doc.splitTextToSize(data.planning_note, contentW);
-    doc.text(noteLines, margin, y);
-    y += noteLines.length * 5 + 4;
-  }
-
-  // Instruction
-  doc.setFontSize(9);
-  doc.setTextColor.apply(doc, CHARCOAL3);
-  doc.setFont('helvetica', 'normal');
-  var instrText = 'Choose the topics that resonate. Record them this week at your own pace. You do not need to record all 12.';
-  var instrLines = doc.splitTextToSize(instrText, contentW);
-  doc.text(instrLines, margin, y);
-  y += instrLines.length * 4.5 + 10;
-
-  // Divider
-  doc.setDrawColor.apply(doc, BORDER);
-  doc.setLineWidth(0.4);
-  doc.line(margin, y, pageW - margin, y);
-  y += 8;
-
-  //  TOPICS 
-  topics.forEach(function(t, idx) {
-    var coverPoints = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover || '').split('\n').filter(Boolean);
-    var pillarCol = setPillarColor(t.pillar);
-
-    // Estimate height needed
-    var hookLines = doc.splitTextToSize('"' + (t.hook || '') + '"', contentW - 6);
-    var coverH = coverPoints.length * 5;
-    var scriptureLines = t.scripture_angle ? doc.splitTextToSize(t.scripture_angle, contentW - 10) : [];
-    var whyLines = doc.splitTextToSize((t.why_this_works || ''), contentW - 6);
-    var estimatedH = 12 + hookLines.length * 5 + 10 + coverH + (scriptureLines.length ? scriptureLines.length * 4 + 8 : 0) + whyLines.length * 4 + 16;
-    checkPageBreak(estimatedH);
-
-    // Topic header background
-    doc.setFillColor(pillarCol[0], pillarCol[1], pillarCol[2], 0.08);
-    var bgAlpha = [Math.min(255, pillarCol[0] + 180), Math.min(255, pillarCol[1] + 180), Math.min(255, pillarCol[2] + 180)];
-    doc.setFillColor.apply(doc, bgAlpha);
-    doc.roundedRect(margin, y, contentW, 12, 2, 2, 'F');
-
-    // Number circle
-    doc.setFillColor.apply(doc, pillarCol);
-    doc.circle(margin + 5, y + 6, 4, 'F');
-    doc.setFontSize(8);
-    doc.setTextColor(255, 255, 255);
-    doc.setFont('helvetica', 'bold');
-    doc.text(String(t.number || idx + 1), margin + 5, y + 7, { align: 'center' });
-
-    // Title
-    doc.setFontSize(11);
-    doc.setTextColor.apply(doc, CHARCOAL);
-    doc.setFont('helvetica', 'bold');
-    doc.text(t.title || '', margin + 12, y + 7);
-
-    // Meta tags
-    var metaX = margin + 12;
-    var metaY = y + 11.5;
-    doc.setFontSize(7);
-    doc.setTextColor.apply(doc, pillarCol);
-    doc.setFont('helvetica', 'bold');
-    doc.text((t.pillar || '').toUpperCase(), metaX, metaY);
-    if (t.content_type) {
-      var pillarW = doc.getTextWidth((t.pillar || '').toUpperCase());
-      doc.setTextColor.apply(doc, CHARCOAL3);
-      doc.setFont('helvetica', 'normal');
-      doc.text('  |  ' + t.content_type + '  |  ' + (t.estimated_length || ''), metaX + pillarW, metaY);
-    }
-
-    y += 16;
-
-    // Hook
-    doc.setFontSize(8);
-    doc.setTextColor.apply(doc, RED);
-    doc.setFont('helvetica', 'bold');
-    doc.text('HOOK - FIRST 3 SECONDS', margin, y);
-    y += 4.5;
-
-    doc.setFontSize(10);
-    doc.setTextColor.apply(doc, CHARCOAL);
-    doc.setFont('helvetica', 'bolditalic');
-    doc.text(hookLines, margin, y);
-    y += hookLines.length * 5 + 6;
-
-    // What to cover
-    doc.setFontSize(8);
-    doc.setTextColor.apply(doc, CHARCOAL3);
-    doc.setFont('helvetica', 'bold');
-    doc.text('WHAT TO COVER', margin, y);
-    y += 4.5;
-
-    doc.setFontSize(9.5);
-    doc.setTextColor.apply(doc, CHARCOAL2);
-    doc.setFont('helvetica', 'normal');
-    coverPoints.forEach(function(pt) {
-      var ptLines = doc.splitTextToSize('- ' + pt, contentW - 4);
-      checkPageBreak(ptLines.length * 5 + 2);
-      doc.text(ptLines, margin + 2, y);
-      y += ptLines.length * 5;
-    });
-    y += 3;
-
-    // Scripture
-    if (t.scripture_angle && t.scripture_angle.trim()) {
-      checkPageBreak(scriptureLines.length * 4 + 10);
-      doc.setFillColor(255, 245, 245);
-      doc.roundedRect(margin, y, contentW, scriptureLines.length * 4.5 + 6, 1, 1, 'F');
-      doc.setDrawColor.apply(doc, RED);
-      doc.setLineWidth(1.5);
-      doc.line(margin, y, margin, y + scriptureLines.length * 4.5 + 6);
-      doc.setLineWidth(0.3);
-      doc.setFontSize(9);
-      doc.setTextColor.apply(doc, RED);
-      doc.setFont('helvetica', 'italic');
-      doc.text(scriptureLines, margin + 4, y + 4.5);
-      y += scriptureLines.length * 4.5 + 10;
-    }
-
-    // Why this works
-    doc.setFontSize(8);
-    doc.setTextColor.apply(doc, CHARCOAL3);
-    doc.setFont('helvetica', 'bold');
-    doc.text('WHY THIS WORKS:', margin, y);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor.apply(doc, CHARCOAL2);
-    var whyStart = margin + doc.getTextWidth('WHY THIS WORKS:  ');
-    doc.text(whyLines[0] || '', whyStart, y);
-    if (whyLines.length > 1) {
-      y += 4.5;
-      doc.text(whyLines.slice(1).join(' '), margin, y);
-    }
-    y += 6;
-
-    // Divider between topics
-    doc.setDrawColor.apply(doc, BORDER);
-    doc.setLineWidth(0.2);
-    doc.line(margin, y, pageW - margin, y);
-    y += 7;
-  });
-
-  // FOOTER
-  checkPageBreak(20);
-  doc.setDrawColor.apply(doc, BORDER);
-  doc.line(margin, y, pageW - margin, y);
-  y += 6;
-  doc.setFontSize(8);
-  doc.setTextColor.apply(doc, CHARCOAL3);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Tiffany Haynes & Co. Media Team  |  Internal use only  |  Not for distribution outside the media team', pageW / 2, y, { align: 'center' });
-  y += 4;
-  doc.setFontSize(9);
-  doc.setTextColor(196, 158, 60);
-  doc.setFont('helvetica', 'bold');
-  doc.text('1 + 1 = 10,000', pageW / 2, y + 4, { align: 'center' });
-
-  var filename = 'VoiceoverTopics_' + recWeek.replace(/[^a-zA-Z0-9]/g, '_') + '.pdf';
-  doc.save(filename);
-
-  // Show success
-  var status = document.getElementById('ep-pdf-status');
-  if (status) { status.style.display = 'flex'; }
-}
-
-function generatePDFFallback(data) {
-  // Fallback: open a print-ready HTML page
-  var topics = data.topics || [];
-  var recWeek = data.recording_week || getRecordingWeek();
-  var html = '<html><head><title>Voiceover Topics</title><style>body{font-family:Georgia,serif;margin:40px;color:#414141;background:#FFFDF5;}h1{color:#414141;}h2{color:#A00605;font-size:14px;}p{font-size:13px;line-height:1.7;}li{font-size:13px;line-height:1.6;}.topic{margin-bottom:32px;border-bottom:1px solid #E3D3C8;padding-bottom:24px;}.hook{font-style:italic;font-weight:bold;font-size:15px;color:#414141;}.pillar{font-size:10px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;}.scripture{border-left:3px solid #A00605;padding-left:10px;color:#A00605;font-style:italic;background:#FFF5F5;padding:8px 12px;margin:8px 0;}</head><body>';
-  html += '<h1>12 Voiceover Topics</h1><p><strong>Recording:</strong> ' + recWeek + '</p>';
-  if (data.planning_note) html += '<p><em>' + data.planning_note + '</em></p>';
-  html += '<hr>';
+  var topicsHtml = '';
   topics.forEach(function(t) {
+    var p = pc(t.pillar);
     var pts = Array.isArray(t.what_to_cover) ? t.what_to_cover : (t.what_to_cover||'').split('\n').filter(Boolean);
-    html += '<div class="topic">';
-    html += '<h2>' + t.number + '. ' + t.title + '</h2>';
-    html += '<div class="pillar">' + (t.pillar||'') + ' &bull; ' + (t.content_type||'') + ' &bull; ' + (t.estimated_length||'') + '</div>';
-    html += '<p class="hook">"' + t.hook + '"</p>';
-    html += '<ul>' + pts.map(function(p){return '<li>'+p+'</li>';}).join('') + '</ul>';
-    if (t.scripture_angle) html += '<div class="scripture">' + t.scripture_angle + '</div>';
-    html += '<p><strong>Why this works:</strong> ' + t.why_this_works + '</p>';
-    html += '</div>';
+    var liHtml = pts.map(function(pt){ return '<li style="margin-bottom:5px;">' + pt + '</li>'; }).join('');
+    var scriptureHtml = (t.scripture_angle && t.scripture_angle.trim()) ?
+      '<div style="margin-top:10px;padding:8px 12px;border-left:3px solid ' + p.border + ';background:' + p.bg + ';font-style:italic;font-size:12px;color:' + p.text + ';">' + t.scripture_angle + '</div>' : '';
+
+    topicsHtml += '<div style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid #E3D3C8;background:#FFFDF5;">';
+    topicsHtml += '<div style="background:' + p.bg + ';padding:12px 16px;border-bottom:1px solid ' + p.border + '33;display:flex;align-items:flex-start;gap:12px;">';
+    topicsHtml += '<div style="width:26px;height:26px;border-radius:50%;background:' + p.border + ';color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + (t.number||'') + '</div>';
+    topicsHtml += '<div><div style="font-size:15px;font-weight:700;color:#414141;margin-bottom:3px;">' + (t.title||'') + '</div>';
+    topicsHtml += '<div style="font-size:10px;font-weight:700;color:' + p.text + ';letter-spacing:1px;text-transform:uppercase;">' + (t.pillar||'') + ' &bull; ' + (t.content_type||'') + ' &bull; ' + (t.estimated_length||'') + '</div></div></div>';
+    topicsHtml += '<div style="padding:12px 16px;border-bottom:1px solid #E3D3C8;background:#FFFDF5;">';
+    topicsHtml += '<div style="font-size:9px;font-weight:700;color:#A00605;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">HOOK - FIRST 3 SECONDS</div>';
+    topicsHtml += '<div style="font-size:14px;font-weight:600;font-style:italic;color:#414141;line-height:1.4;">&ldquo;' + (t.hook||'') + '&rdquo;</div></div>';
+    topicsHtml += '<div style="padding:12px 16px;border-bottom:1px solid #E3D3C8;">';
+    topicsHtml += '<div style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;">WHAT TO COVER</div>';
+    topicsHtml += '<ul style="margin:0;padding-left:18px;color:#5A5A5A;font-size:13px;line-height:1.7;">' + liHtml + '</ul>' + scriptureHtml + '</div>';
+    topicsHtml += '<div style="padding:10px 16px;background:#F4F0EB;">';
+    topicsHtml += '<span style="font-size:9px;font-weight:700;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">WHY THIS WORKS: </span>';
+    topicsHtml += '<span style="font-size:12px;color:#5A5A5A;">' + (t.why_this_works||'') + '</span></div></div>';
   });
-  html += '<p style="text-align:center;color:#C49E3C;font-size:14px;font-weight:bold;">1 + 1 = 10,000</p>';
-  html += '</body></html>';
-  var win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  win.print();
+
+  var html = '<div style="font-family:Georgia,serif;background:#F4F0EB;padding:24px 20px;">';
+  html += '<div style="max-width:600px;margin:0 auto;">';
+
+  // Header
+  html += '<div style="background:#414141;border-radius:10px 10px 0 0;padding:24px 28px;">';
+  html += '<div style="font-size:10px;font-weight:700;color:#C49E3C;letter-spacing:4px;text-transform:uppercase;margin-bottom:6px;">TIFFANY HAYNES &amp; CO. MEDIA TEAM</div>';
+  html += '<div style="font-size:24px;font-weight:700;color:#FFFDF5;margin-bottom:6px;">12 Voiceover Topics</div>';
+  html += '<div style="font-size:12px;color:#B8B8B8;">Recording: ' + recWeek + ' &nbsp;&bull;&nbsp; Publishing: ' + pubWeek + '</div>';
+  html += '<div style="font-size:11px;color:#8A8A8A;margin-top:3px;">Sent: ' + today + '</div></div>';
+
+  // Planning note + instructions
+  html += '<div style="background:#FFFDF5;padding:18px 28px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">';
+  if (planningNote) html += '<p style="font-style:italic;color:#5A5A5A;font-size:13px;margin:0 0 12px;">' + planningNote + '</p>';
+  html += '<div style="background:#F4F0EB;border-radius:6px;padding:12px 16px;font-size:12px;color:#5A5A5A;line-height:1.7;">';
+  html += '<strong>How to use:</strong> Choose the topics that speak to you. Record at your own pace this week. You do not need to record all 12. The team begins editing the following week for publishing the week of ' + pubWeek + '.</div></div>';
+
+  // Topics
+  html += '<div style="background:#FFFDF5;padding:8px 28px 20px;border-left:1px solid #E3D3C8;border-right:1px solid #E3D3C8;">' + topicsHtml + '</div>';
+
+  // Footer
+  html += '<div style="background:#414141;border-radius:0 0 10px 10px;padding:18px 28px;text-align:center;">';
+  html += '<div style="font-size:14px;font-weight:700;color:#C49E3C;letter-spacing:3px;margin-bottom:4px;">1 + 1 = 10,000</div>';
+  html += '<div style="font-size:10px;color:#8A8A8A;letter-spacing:1.5px;text-transform:uppercase;">Tiffany Haynes &amp; Co. Media Team &bull; Internal Use Only</div></div>';
+
+  html += '</div></div>';
+
+  var previewEl = document.getElementById('ep-email-preview');
+  if (previewEl) previewEl.innerHTML = html;
 }
+
+
 
 
 
@@ -2862,16 +2781,6 @@ function renderKBExpanded(entry, dc) {
 }
 
 </script>
-<script>
-// Load jsPDF dynamically only when needed
-function loadJsPDF(callback) {
-  if (window.jspdf && window.jspdf.jsPDF) { callback(window.jspdf.jsPDF); return; }
-  var s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-  s.onload = function() { callback(window.jspdf && window.jspdf.jsPDF); };
-  s.onerror = function() { callback(null); };
-  document.head.appendChild(s);
-}
-</script>
+
 </body>
 </html>
