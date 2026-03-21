@@ -489,6 +489,7 @@ body::before {
   <button class="tab-btn" onclick="switchTab('planner')">Weekly Planner</button>
   <button class="tab-btn" onclick="switchTab('knowledge')">Knowledge Base</button>
   <button class="tab-btn" onclick="switchTab('emailpreview')">Email Preview</button>
+  <button class="tab-btn" onclick="switchTab('voiceovers')">Voiceovers</button>
 </div>
 
 <!-- MAIN -->
@@ -970,6 +971,55 @@ body::before {
 
     </div>
 
+    <!-- TAB: VOICEOVERS -->
+    <div id="tab-voiceovers" class="tab-pane">
+
+      <!-- CLOUDINARY SETTINGS -->
+      <div style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:16px 20px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:700;color:var(--charcoal2);letter-spacing:1.5px;text-transform:uppercase;">Cloudinary Settings</div>
+          <span id="vo-settings-saved" style="font-size:10px;color:var(--green);font-weight:600;display:none;">Saved</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Cloud Name</div>
+            <input id="vo-cloud-name" type="text" placeholder="dgq3ahq1m" onchange="saveVOSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Upload Preset</div>
+            <input id="vo-upload-preset" type="text" placeholder="tiffany_voiceovers" onchange="saveVOSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">API Key</div>
+            <input id="vo-api-key" type="text" placeholder="839793278382462" onchange="saveVOSettings()" style="width:100%;background:var(--cream-1);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:12px;padding:8px 12px;border-radius:6px;outline:none;" />
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--charcoal3);line-height:1.6;">
+          These settings are used to generate the upload link for Tiffany's email. The upload page is public and mobile-friendly so she can submit directly from her phone.
+        </div>
+      </div>
+
+      <!-- HEADER -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Submitted Voiceovers</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--charcoal);" id="vo-count-label">Loading...</div>
+          <div style="font-size:11px;color:var(--charcoal3);margin-top:3px;">Up to 5 per week. She chooses what resonates with her authentic voice.</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-secondary" onclick="refreshVoiceovers()">Refresh</button>
+          <button class="btn-primary" onclick="fetchFromCloudinary()" style="background:var(--charcoal);">Load from Cloudinary</button>
+        </div>
+      </div>
+
+      <!-- WEEK FILTER -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;" id="vo-week-filters"></div>
+
+      <!-- VOICEOVERS GRID -->
+      <div id="vo-grid"></div>
+
+    </div>
+
   </div>
 </div>
 
@@ -1069,11 +1119,12 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
   document.getElementById('tab-' + tab).classList.add('active');
-  var tabs = ['dashboard','studio','planner','knowledge','emailpreview'];
+  var tabs = ['dashboard','studio','planner','knowledge','emailpreview','voiceovers'];
   var idx = tabs.indexOf(tab);
   if (idx >= 0) document.querySelectorAll('.tab-btn')[idx].classList.add('active');
   if (tab === 'knowledge') renderKnowledgeBase();
   if (tab === 'emailpreview') initEmailPreview();
+  if (tab === 'voiceovers') initVoiceovers();
 }
 
 // ================================================================
@@ -2223,44 +2274,32 @@ async function generateEmailPreview(isRetry) {
   var recWeek = getRecordingWeek();
   var pubWeek = getPublishingWeek();
 
-  var profileCtx = '';
-  if (profile.transcript_count > 0) {
-    profileCtx = 'TIFFANY\'S CONTENT HISTORY (never repeat these):\n' +
-      'Topics covered: ' + (profile.topics.slice(-30).join(', ') || 'none yet') + '\n' +
-      'Her phrases and voice: ' + (profile.phrases.slice(-10).join(', ') || 'building') + '\n' +
-      'Core themes: ' + (profile.themes.slice(-10).join(', ') || 'building') + '\n' +
-      'Pillar usage: ' + JSON.stringify(profile.pillars) + '\n' +
-      'Total scripts analyzed: ' + profile.transcript_count + '\n\n';
-  }
-
-  var kbCtx = '';
+  // Keep context tight to prevent EOF truncation
+  var avoidTopics = profile.topics.slice(-15).join(', ') || 'none yet';
+  var kbNote = '';
   if (kb.length > 0) {
-    var latest = kb[0].data || {};
-    kbCtx = 'PERFORMANCE DATA:\n' +
-      'What resonates: ' + (latest.what_is_working || []).slice(0,3).join(', ') + '\n' +
-      'Top content: ' + (latest.top_performing_content || []).slice(0,3).join(', ') + '\n' +
-      'Audience insights: ' + (latest.audience_insights || []).slice(0,3).join(', ') + '\n' +
-      'Priorities: ' + (latest.strategic_priorities || []).slice(0,3).join(', ') + '\n\n';
+    var kd = kb[0].data || {};
+    var working = (kd.what_is_working || []).slice(0,2).join(', ');
+    if (working) kbNote = 'What resonates with her audience: ' + working + '\n';
   }
-
   var underusedPillars = BRAND.pillars.filter(function(p) { return (profile.pillars[p] || 0) < 3; });
 
-  var systemPrompt = 'You are a content strategist for Tiffany Haynes and Co. You ONLY respond with raw valid JSON. No explanation, no markdown, no backticks. Start with { and end with }.';
+  var systemPrompt = 'You are a content strategist. Respond ONLY with raw valid JSON. No markdown. No backticks. Start with { end with }.';
 
-  var baseCtx = 'BRAND: ' + BRAND.voice + '\nAVOID: ' + BRAND.avoid + '\nPILLARS: ' + BRAND.pillars.join(', ') + '\n' +
-    (profileCtx || '') + (kbCtx || '') +
-    'Underused pillars to prioritize: ' + (underusedPillars.join(', ') || 'all balanced') + '\n' +
-    'Recording: ' + recWeek + ' | Publishing: ' + pubWeek + '\n' +
-    'Rules: Fresh original topics only. Never repeat history. Vary content types.\n\n';
+  // Minimal shared context - keep under 500 chars
+  var ctx = 'Tiffany Haynes voice: conviction-based, scripture-grounded, warm, real. Gods Math 1+1=10000.\n' +
+    'NEVER: divine, activate, em dashes, emojis, hustle cliches, fabricated quotes.\n' +
+    (kbNote || '') +
+    'Do NOT repeat: ' + avoidTopics + '\n' +
+    'Recording: ' + recWeek + ' | Publishing: ' + pubWeek + '\n';
 
-  var topicSchema = '{"number":N,"title":"5-8 word title","pillar":"exact pillar name","content_type":"Talking Head or Teaching or Testimony or Lifestyle or Shenanigans or B-Roll with Text","hook":"exact first 3 seconds in her voice","what_to_cover":["point 1","point 2","point 3"],"why_this_works":"one sentence","scripture_angle":"scripture reference or empty string","estimated_length":"30 sec"}';
+  // One topic schema
+  var schema = '{"number":N,"title":"5-8 word title","pillar":"P","content_type":"T","hook":"exact first 3 seconds","what_to_cover":["p1","p2","p3"],"why_this_works":"one sentence","scripture_angle":"or empty","estimated_length":"30 sec"}';
 
-  function makePrompt(startNum, count, meta) {
-    var items = [];
-    for (var i = startNum; i < startNum + count; i++) {
-      items.push(topicSchema.replace('N', i));
-    }
-    return baseCtx + meta + '\nReturn ONLY JSON:\n{"topics":[' + items.join(',') + ']}';
+  function makeTopicPrompt(numbers, pillarsHint) {
+    var items = numbers.map(function(n) { return schema.replace('N', n); });
+    return ctx + 'Generate ' + numbers.length + ' fresh voiceover topics for these pillars: ' + pillarsHint + '\n' +
+      'Return ONLY: {"topics":[' + items.join(',') + ']}';
   }
 
   try {
@@ -2270,7 +2309,7 @@ async function generateEmailPreview(isRetry) {
       var r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'Content-Type':'application/json', 'x-api-key':getApiKey(), 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
-        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:4000, system:systemPrompt, messages:[{role:'user',content:prompt}] })
+        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2500, system:systemPrompt, messages:[{role:'user',content:prompt}] })
       });
       var body = await r.text();
       if (!r.ok) { var j={}; try{j=JSON.parse(body);}catch(x){} throw new Error('API '+r.status+': '+(j.error&&j.error.message?j.error.message:body.slice(0,200))); }
@@ -2280,19 +2319,27 @@ async function generateEmailPreview(isRetry) {
       return safeParseJSON(raw.text);
     }
 
-    document.getElementById('ep-loading-msg') && (document.getElementById('ep-loading-msg').textContent = 'Generating topics 1-6...');
-    var batch1 = await epFetch(makePrompt(1, 6, 'Generate topics 1-6. Cover pillars: Business, Spiritual/Gods Math, Family.'));
+    var loadEl = document.getElementById('ep-loading-msg');
 
-    document.getElementById('ep-loading-msg') && (document.getElementById('ep-loading-msg').textContent = 'Generating topics 7-12...');
-    var batch2 = await epFetch(makePrompt(7, 6, 'Generate topics 7-12. Cover pillars: Humor/Shenanigans, Community/Testimony, and any underused pillar. Make these distinct from topics 1-6.'));
+    if (loadEl) loadEl.textContent = 'Generating topics 1-3...';
+    var b1 = await epFetch(makeTopicPrompt([1,2,3], 'Business and Entrepreneurship, Spiritual Development and Gods Math Teaching'));
 
-    var allTopics = (batch1.topics || []).concat(batch2.topics || []);
-    if (allTopics.length < 6) throw new Error('Not enough topics generated. Got ' + allTopics.length + '. Try generating again.');
+    if (loadEl) loadEl.textContent = 'Generating topics 4-6...';
+    var b2 = await epFetch(makeTopicPrompt([4,5,6], 'Family and Lifestyle, Community and Testimony'));
+
+    if (loadEl) loadEl.textContent = 'Generating topics 7-9...';
+    var b3 = await epFetch(makeTopicPrompt([7,8,9], 'Humor and Personality Shenanigans, ' + (underusedPillars[0] || 'Business and Entrepreneurship')));
+
+    if (loadEl) loadEl.textContent = 'Generating topics 10-12...';
+    var b4 = await epFetch(makeTopicPrompt([10,11,12], (underusedPillars[1] || 'Spiritual Development and Gods Math Teaching') + ', mix of any pillar'));
+
+    var allTopics = [].concat(b1.topics||[], b2.topics||[], b3.topics||[], b4.topics||[]);
+    if (allTopics.length < 6) throw new Error('Only got ' + allTopics.length + ' topics. Try generating again.');
 
     var result = {
       recording_week: recWeek,
       publishing_week: pubWeek,
-      planning_note: batch1.planning_note || batch2.planning_note || '',
+      planning_note: '',
       topics: allTopics
     };
 
@@ -2482,7 +2529,214 @@ function buildHTMLEmailPreview(data) {
 
 
 
-var kbMsgsList = ['Reading the document...','Extracting key insights...','Identifying performance data...','Updating client profile...','Almost done...'];
+// ================================================================
+// VOICEOVERS TAB
+// ================================================================
+var voiceoverCache = [];
+var voActiveWeek = 'all';
+
+function saveVOSettings() {
+  var fields = { 'vo-cloud-name':'tiffany_vo_cloud', 'vo-upload-preset':'tiffany_vo_preset', 'vo-api-key':'tiffany_vo_apikey' };
+  Object.keys(fields).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.value.trim()) localStorage.setItem(fields[id], el.value.trim());
+  });
+  var note = document.getElementById('vo-settings-saved');
+  if (note) { note.style.display = 'inline'; setTimeout(function() { note.style.display = 'none'; }, 2000); }
+}
+
+function loadVOSettings() {
+  var fields = { 'vo-cloud-name':'tiffany_vo_cloud', 'vo-upload-preset':'tiffany_vo_preset', 'vo-api-key':'tiffany_vo_apikey' };
+  Object.keys(fields).forEach(function(id) {
+    var el = document.getElementById(id);
+    var v = localStorage.getItem(fields[id]);
+    if (el && v) el.value = v;
+  });
+  var cn = document.getElementById('vo-cloud-name');
+  var up = document.getElementById('vo-upload-preset');
+  if (cn && !cn.value) cn.value = 'dgq3ahq1m';
+  if (up && !up.value) up.value = 'tiffany_voiceovers';
+}
+
+function getVOCloud() { return localStorage.getItem('tiffany_vo_cloud') || 'dgq3ahq1m'; }
+function getVOPreset() { return localStorage.getItem('tiffany_vo_preset') || 'tiffany_voiceovers'; }
+
+function initVoiceovers() {
+  loadVOSettings();
+  var stored = getStoredVoiceovers();
+  voiceoverCache = stored;
+  renderVoiceovers(stored);
+}
+
+function getStoredVoiceovers() {
+  var raw = localStorage.getItem('tiffany_voiceovers_list');
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch(e) { return []; }
+}
+
+function saveStoredVoiceovers(list) {
+  localStorage.setItem('tiffany_voiceovers_list', JSON.stringify(list));
+}
+
+async function fetchFromCloudinary() {
+  var cloud = getVOCloud();
+  var apiKey = localStorage.getItem('tiffany_vo_apikey') || '';
+  if (!apiKey) { alert('Please enter your Cloudinary API Key in the settings above.'); return; }
+  var btns = document.querySelectorAll('#tab-voiceovers .btn-primary');
+  btns.forEach(function(b) { b.disabled = true; b.textContent = 'Loading...'; });
+  try {
+    var secret = prompt('Enter your Cloudinary API Secret to load files:\n(Not stored. Only used for this one fetch)');
+    if (!secret) { btns.forEach(function(b) { b.disabled = false; b.textContent = 'Load from Cloudinary'; }); return; }
+    var url = 'https://api.cloudinary.com/v1_1/' + cloud + '/resources/video?resource_type=video&type=upload&prefix=tiffany_voiceovers&max_results=100';
+    var creds = btoa(apiKey + ':' + secret);
+    var res = await fetch(url, { headers: { 'Authorization': 'Basic ' + creds } });
+    if (!res.ok) throw new Error('Cloudinary returned ' + res.status + '. Check your API key and secret.');
+    var data = await res.json();
+    var resources = data.resources || [];
+    var voList = resources.map(function(r) {
+      var parts = r.public_id.split('/');
+      var filename = parts[parts.length - 1];
+      var nameParts = filename.split('_');
+      var topicSlug = nameParts.slice(0, -1).join('_').replace(/-/g, ' ');
+      return {
+        id: r.public_id,
+        url: r.secure_url,
+        topic: topicSlug || filename,
+        filename: filename,
+        date: r.created_at ? r.created_at.split('T')[0] : '',
+        duration: r.duration ? Math.round(r.duration) : null,
+        bytes: r.bytes || 0,
+        format: r.format || 'm4a',
+        week: getWeekLabel(r.created_at || new Date().toISOString()),
+        status: 'received'
+      };
+    });
+    saveStoredVoiceovers(voList);
+    voiceoverCache = voList;
+    renderVoiceovers(voList);
+  } catch(e) {
+    alert('Could not load from Cloudinary: ' + e.message);
+    console.error(e);
+  }
+  btns.forEach(function(b) { b.disabled = false; b.textContent = 'Load from Cloudinary'; });
+}
+
+function refreshVoiceovers() {
+  var stored = getStoredVoiceovers();
+  voiceoverCache = stored;
+  renderVoiceovers(stored);
+}
+
+function getWeekLabel(isoDate) {
+  var d = new Date(isoDate);
+  var day = d.getDay();
+  var monday = new Date(d);
+  monday.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  var sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return monday.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' - ' + sunday.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+
+function renderVoiceovers(list) {
+  var countEl = document.getElementById('vo-count-label');
+  var gridEl = document.getElementById('vo-grid');
+  var filterEl = document.getElementById('vo-week-filters');
+  if (!gridEl) return;
+
+  if (!list || !list.length) {
+    if (countEl) countEl.textContent = 'No voiceovers yet';
+    gridEl.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--charcoal3);font-size:13px;line-height:1.8;">No voiceovers submitted yet.<br>Once Tiffany taps the Submit button in her email, files will appear here.<br><span style="font-size:11px;">Fill in your Cloudinary settings above and click Load from Cloudinary.</span></div>';
+    if (filterEl) filterEl.innerHTML = '';
+    return;
+  }
+
+  var weeks = {};
+  list.forEach(function(v) {
+    var w = v.week || 'Unknown Week';
+    if (!weeks[w]) weeks[w] = [];
+    weeks[w].push(v);
+  });
+  var weekKeys = Object.keys(weeks).sort(function(a,b) { return b.localeCompare(a); });
+
+  if (countEl) countEl.textContent = list.length + ' voiceover' + (list.length !== 1 ? 's' : '') + ' submitted';
+
+  var fh = '<button onclick="setVOWeek(\'all\')" style="font-size:10px;font-weight:600;padding:4px 12px;border-radius:12px;border:1px solid ' + (voActiveWeek==='all'?'var(--red)':'var(--border-md)') + ';background:' + (voActiveWeek==='all'?'var(--red-dim)':'transparent') + ';color:' + (voActiveWeek==='all'?'var(--red)':'var(--charcoal3)') + ';cursor:pointer;">All Weeks (' + list.length + ')</button>';
+  weekKeys.forEach(function(w) {
+    var active = voActiveWeek === w;
+    fh += '<button onclick="setVOWeek(\'' + escRaw(w) + '\')" style="font-size:10px;font-weight:600;padding:4px 12px;border-radius:12px;border:1px solid ' + (active?'var(--red)':'var(--border-md)') + ';background:' + (active?'var(--red-dim)':'transparent') + ';color:' + (active?'var(--red)':'var(--charcoal3)') + ';cursor:pointer;">' + escRaw(w) + ' (' + weeks[w].length + ')</button>';
+  });
+  if (filterEl) filterEl.innerHTML = fh;
+
+  var filtered = voActiveWeek === 'all' ? list : (weeks[voActiveWeek] || []);
+  var filteredWeeks = {};
+  filtered.forEach(function(v) {
+    var w = v.week || 'Unknown Week';
+    if (!filteredWeeks[w]) filteredWeeks[w] = [];
+    filteredWeeks[w].push(v);
+  });
+  var filteredWeekKeys = Object.keys(filteredWeeks).sort(function(a,b) { return b.localeCompare(a); });
+
+  var h = '';
+  filteredWeekKeys.forEach(function(w) {
+    var wList = filteredWeeks[w];
+    var statusColor = wList.length >= 5 ? 'var(--green)' : wList.length >= 3 ? 'var(--amber)' : 'var(--charcoal3)';
+
+    h += '<div style="margin-bottom:28px;">';
+    h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
+    h += '<div><div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;">Week of</div>';
+    h += '<div style="font-family:\'Cormorant Garamond\',serif;font-size:18px;font-weight:600;color:var(--charcoal);">' + escRaw(w) + '</div></div>';
+    h += '<div style="font-size:12px;font-weight:600;color:' + statusColor + ';">' + wList.length + ' of 5 submitted</div></div>';
+    h += '<div style="height:4px;background:var(--cream-3);border-radius:2px;margin-bottom:14px;overflow:hidden;"><div style="height:100%;width:' + Math.min(100,(wList.length/5)*100) + '%;background:' + statusColor + ';border-radius:2px;"></div></div>';
+
+    wList.forEach(function(v) {
+      var mins = v.duration ? Math.floor(v.duration/60) : 0;
+      var secs = v.duration ? (v.duration%60).toString().padStart(2,'0') : '00';
+      var durLabel = v.duration ? mins+':'+secs : '';
+      var sizeMB = v.bytes ? (v.bytes/1048576).toFixed(1)+' MB' : '';
+
+      h += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;overflow:hidden;margin-bottom:10px;box-shadow:0 2px 8px var(--shadow);">';
+      h += '<div style="background:var(--cream-2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">';
+      h += '<div><div style="font-size:13px;font-weight:600;color:var(--charcoal);margin-bottom:2px;">' + escRaw(v.topic||v.filename) + '</div>';
+      h += '<div style="font-size:10px;color:var(--charcoal3);">' + escRaw(v.date||'') + (durLabel?' &bull; '+durLabel:'') + (sizeMB?' &bull; '+sizeMB:'') + '</div></div>';
+      h += '<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:12px;background:var(--green-bg);color:var(--green);text-transform:uppercase;letter-spacing:1px;">Received</span></div>';
+      h += '<div style="padding:12px 16px;">';
+      if (v.url) {
+        h += '<audio controls style="width:100%;height:36px;outline:none;" preload="none"><source src="' + v.url + '" type="audio/mp4"><source src="' + v.url + '" type="audio/m4a">Audio not supported.</audio>';
+      }
+      h += '<div style="display:flex;gap:6px;margin-top:8px;">';
+      h += '<a href="' + (v.url||'#') + '" download="' + escRaw(v.filename||'voiceover') + '" style="font-size:10px;padding:4px 10px;border:1px solid var(--border-md);border-radius:4px;color:var(--charcoal2);text-decoration:none;font-family:Inter,sans-serif;">Download</a>';
+      h += '<button onclick="deleteVoiceover(\'' + escRaw(v.id) + '\')" style="font-size:10px;padding:4px 10px;border:1px solid rgba(160,6,5,0.2);border-radius:4px;color:var(--red);background:transparent;cursor:pointer;font-family:Inter,sans-serif;">Remove</button>';
+      h += '</div></div></div>';
+    });
+
+    for (var i = wList.length; i < 5; i++) {
+      h += '<div style="border:2px dashed var(--border-md);border-radius:10px;padding:14px;text-align:center;color:var(--charcoal4);font-size:12px;margin-bottom:10px;">Slot ' + (i+1) + ' of 5 - waiting for Tiffany</div>';
+    }
+    h += '</div>';
+  });
+  gridEl.innerHTML = h;
+}
+
+function setVOWeek(week) { voActiveWeek = week; renderVoiceovers(voiceoverCache); }
+
+function deleteVoiceover(id) {
+  if (!confirm('Remove this voiceover from the list?')) return;
+  var list = getStoredVoiceovers().filter(function(v) { return v.id !== id; });
+  saveStoredVoiceovers(list);
+  voiceoverCache = list;
+  renderVoiceovers(list);
+}
+
+function getUploadUrl(topicTitle) {
+  var cloud = getVOCloud();
+  var preset = getVOPreset();
+  var base = window.location.href.replace(/\/[^\/]*$/, '/');
+  return base + 'upload.html?topic=' + encodeURIComponent(topicTitle) + '&cloud=' + encodeURIComponent(cloud) + '&preset=' + encodeURIComponent(preset);
+}
+
+// ================================================================
+// KNOWLEDGE BASE
+// ================================================================
 
 function getKnowledgeBase() {
   var raw = localStorage.getItem('tiffany_knowledge_base');

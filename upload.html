@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Submit Voiceover - Tiffany Haynes & Co.</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: #F4F0EB;
+  font-family: 'Georgia', serif;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 20px 60px;
+  min-height: 100vh;
+}
+.card {
+  background: #FFFDF5;
+  border-radius: 16px;
+  padding: 36px 28px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 4px 32px rgba(65,65,65,0.10);
+}
+.brand {
+  font-size: 10px;
+  font-weight: 700;
+  color: #B8B8B8;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #414141;
+  text-align: center;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+.math {
+  font-size: 13px;
+  color: #A00605;
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 28px;
+}
+.topic-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #A00605;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.topic-box {
+  background: #F4F0EB;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 28px;
+}
+.topic-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #414141;
+  line-height: 1.3;
+}
+.instructions {
+  font-size: 14px;
+  color: #5A5A5A;
+  line-height: 1.75;
+  margin-bottom: 28px;
+  text-align: center;
+}
+.instructions strong {
+  color: #414141;
+}
+/* Upload zone */
+.upload-zone {
+  border: 3px dashed #E3D3C8;
+  border-radius: 14px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #FFFDF5;
+  margin-bottom: 16px;
+  position: relative;
+}
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: #A00605;
+  background: #FFF5F5;
+}
+.upload-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  display: block;
+}
+.upload-main-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #414141;
+  margin-bottom: 6px;
+}
+.upload-sub-text {
+  font-size: 13px;
+  color: #8A8A8A;
+}
+#file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+/* File selected state */
+.file-selected {
+  background: #F0FAF4;
+  border: 2px solid #3A9E6E;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+.file-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.file-info { flex: 1; }
+.file-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #414141;
+  word-break: break-all;
+}
+.file-size {
+  font-size: 12px;
+  color: #5A5A5A;
+  margin-top: 2px;
+}
+.change-btn {
+  font-size: 11px;
+  color: #A00605;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  text-decoration: underline;
+  flex-shrink: 0;
+}
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  background: #A00605;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 10px;
+  font-family: Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+  display: none;
+}
+.submit-btn:hover { background: #8A0504; }
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Progress */
+.progress-wrap {
+  display: none;
+  margin-bottom: 16px;
+}
+.progress-label {
+  font-size: 13px;
+  color: #5A5A5A;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.progress-track {
+  background: #E3D3C8;
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #A00605;
+  border-radius: 4px;
+  transition: width 0.3s;
+  width: 0%;
+}
+
+/* Success state */
+.success-card {
+  display: none;
+  text-align: center;
+  padding: 20px 0;
+}
+.success-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  display: block;
+}
+.success-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #414141;
+  margin-bottom: 8px;
+}
+.success-sub {
+  font-size: 14px;
+  color: #5A5A5A;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.submit-another {
+  font-size: 13px;
+  color: #A00605;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  text-decoration: underline;
+}
+
+/* Error */
+.error-msg {
+  display: none;
+  background: #FFF5F5;
+  border: 1px solid rgba(160,6,5,0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #A00605;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.footer-note {
+  text-align: center;
+  font-size: 11px;
+  color: #B8B8B8;
+  margin-top: 24px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="brand">Tiffany Haynes &amp; Co.</div>
+  <div class="title">Submit Your Voiceover</div>
+  <div class="math">1 + 1 = 10,000</div>
+
+  <!-- TOPIC -->
+  <div id="topic-section">
+    <div class="topic-label">Topic</div>
+    <div class="topic-box">
+      <div class="topic-name" id="topic-display">Loading topic...</div>
+    </div>
+  </div>
+
+  <!-- INSTRUCTIONS -->
+  <div class="instructions" id="main-instructions">
+    Record your voiceover in your <strong>Voice Memos</strong> app, then tap below to select the file and submit it directly to your media team.
+  </div>
+
+  <!-- UPLOAD ZONE -->
+  <div id="upload-section">
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="file-input" accept=".m4a,.mp3,.wav,.aac,audio/*" />
+      <span class="upload-icon">&#127908;</span>
+      <div class="upload-main-text">Tap to select your recording</div>
+      <div class="upload-sub-text">.m4a from Voice Memos &bull; Any audio file</div>
+    </div>
+
+    <div class="file-selected" id="file-selected">
+      <span class="file-icon">&#127925;</span>
+      <div class="file-info">
+        <div class="file-name" id="selected-name"></div>
+        <div class="file-size" id="selected-size"></div>
+      </div>
+      <button class="change-btn" onclick="changeFile()">Change</button>
+    </div>
+
+    <div class="error-msg" id="error-msg"></div>
+
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label" id="progress-label">Uploading...</div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitVoiceover()">
+      Send to Media Team
+    </button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-card" id="success-card">
+    <span class="success-icon">&#10003;</span>
+    <div class="success-title">Got it, Tiffany!</div>
+    <div class="success-sub">
+      Your voiceover has been received by the media team.<br>
+      They will begin editing next week.
+    </div>
+    <button class="submit-another" onclick="submitAnother()">Submit another recording</button>
+  </div>
+
+  <div class="footer-note">The Creative Theologian Media Group</div>
+
+</div>
+
+<script>
+var params = new URLSearchParams(window.location.search);
+var topicTitle = params.get('topic') || 'Voiceover Recording';
+var cloudName  = params.get('cloud') || 'dgq3ahq1m';
+var uploadPreset = params.get('preset') || 'tiffany_voiceovers';
+
+var selectedFile = null;
+
+document.getElementById('topic-display').textContent = topicTitle;
+
+document.getElementById('file-input').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  selectedFile = file;
+  showFileSelected(file);
+});
+
+var zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', function() { zone.classList.remove('dragover'); });
+zone.addEventListener('drop', function(e) {
+  e.preventDefault(); zone.classList.remove('dragover');
+  var file = e.dataTransfer.files[0];
+  if (file) { selectedFile = file; showFileSelected(file); }
+});
+
+function showFileSelected(file) {
+  document.getElementById('upload-zone').style.display = 'none';
+  var sel = document.getElementById('file-selected');
+  sel.style.display = 'flex';
+  document.getElementById('selected-name').textContent = file.name;
+  document.getElementById('selected-size').textContent = formatSize(file.size);
+  document.getElementById('submit-btn').style.display = 'block';
+  document.getElementById('error-msg').style.display = 'none';
+}
+
+function changeFile() {
+  selectedFile = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('upload-zone').style.display = 'block';
+  document.getElementById('file-selected').style.display = 'none';
+  document.getElementById('submit-btn').style.display = 'none';
+}
+
+function formatSize(bytes) {
+  if (bytes > 1048576) return (bytes/1048576).toFixed(1) + ' MB';
+  return (bytes/1024).toFixed(0) + ' KB';
+}
+
+function sanitizeFilename(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 60);
+}
+
+function submitVoiceover() {
+  if (!selectedFile) return;
+  var btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('progress-wrap').style.display = 'block';
+
+  var date = new Date().toISOString().split('T')[0];
+  var topicSlug = sanitizeFilename(topicTitle);
+  var publicId = 'tiffany_voiceovers/' + topicSlug + '_' + date;
+
+  var formData = new FormData();
+  formData.append('file', selectedFile);
+  formData.append('upload_preset', uploadPreset);
+  formData.append('public_id', publicId);
+  formData.append('resource_type', 'video');
+  formData.append('context', 'topic=' + topicTitle + '|submitted_date=' + date);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + cloudName + '/video/upload');
+
+  xhr.upload.onprogress = function(e) {
+    if (e.lengthComputable) {
+      var pct = Math.round((e.loaded / e.total) * 100);
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-label').textContent = 'Uploading... ' + pct + '%';
+    }
+  };
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      document.getElementById('progress-fill').style.width = '100%';
+      document.getElementById('progress-label').textContent = 'Upload complete!';
+      setTimeout(showSuccess, 600);
+    } else {
+      var errData = {};
+      try { errData = JSON.parse(xhr.responseText); } catch(e) {}
+      showError('Upload failed: ' + (errData.error && errData.error.message ? errData.error.message : 'Please try again.'));
+      btn.disabled = false;
+      btn.textContent = 'Send to Media Team';
+    }
+  };
+
+  xhr.onerror = function() {
+    showError('Network error. Please check your connection and try again.');
+    btn.disabled = false;
+    btn.textContent = 'Send to Media Team';
+  };
+
+  xhr.send(formData);
+}
+
+function showSuccess() {
+  document.getElementById('upload-section').style.display = 'none';
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('topic-section').style.display = 'none';
+  document.getElementById('main-instructions').style.display = 'none';
+  document.getElementById('success-card').style.display = 'block';
+}
+
+function showError(msg) {
+  var el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('progress-fill').style.width = '0%';
+}
+
+function submitAnother() {
+  selectedFile = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('success-card').style.display = 'none';
+  document.getElementById('upload-section').style.display = 'block';
+  document.getElementById('topic-section').style.display = 'block';
+  document.getElementById('main-instructions').style.display = 'block';
+  document.getElementById('upload-zone').style.display = 'block';
+  document.getElementById('file-selected').style.display = 'none';
+  document.getElementById('submit-btn').style.display = 'none';
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('submit-btn').textContent = 'Send to Media Team';
+  document.getElementById('error-msg').style.display = 'none';
+}
+</script>
+
+</body>
+</html>
