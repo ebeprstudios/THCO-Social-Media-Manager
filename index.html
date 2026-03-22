@@ -688,6 +688,13 @@ body::before {
         <div class="panel-title" id="planner-step1-title">Set Up This Week</div>
         <div class="panel-sub" id="planner-step1-sub">Tell the AI what to build around. The more context you give, the sharper the plan.</div>
 
+        <!-- WEEK SELECTOR -->
+        <div style="margin-bottom:16px;">
+          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Which Week Are You Planning?</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="week-selector-btns"></div>
+          <div style="font-size:11px;color:var(--charcoal3);margin-top:6px;" id="week-selector-label"></div>
+        </div>
+
         <!-- WEEK THEME -->
         <div style="margin-bottom:16px;">
           <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Week Theme or Focus <span style="font-weight:400;font-style:italic;">(optional)</span></div>
@@ -1287,7 +1294,7 @@ function switchTab(tab) {
   if (tab === 'knowledge') { renderKnowledgeBase(); loadMetaSettings(); }
   if (tab === 'emailpreview') initEmailPreview();
   if (tab === 'voiceovers') initVoiceovers();
-  if (tab === 'planner') initPlannerBalance();
+  if (tab === 'planner') { initPlannerBalance(); initWeekSelector(); }
 }
 
 // ================================================================
@@ -2053,7 +2060,7 @@ async function generateWeeklyPlan() {
   var profile = getProfile();
   var kb = getKnowledgeBase();
 
-  var monday = getNextMonday();
+  var monday = getPlannerMonday();
   var weekDates = [];
   for (var i = 0; i < 7; i++) {
     var d = new Date(monday); d.setDate(monday.getDate()+i);
@@ -2283,10 +2290,63 @@ function renderWeeklyPlan(plan) {
   document.getElementById('results-planner').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function getNextMonday() {
-  var d = new Date(); var day = d.getDay();
-  var diff = (7-day+1)%7; if (diff===0) diff=7;
-  d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d;
+var selectedPlannerWeekOffset = 1; // 1 = next week (default)
+
+function initWeekSelector() {
+  var btns = document.getElementById('week-selector-btns');
+  var label = document.getElementById('week-selector-label');
+  if (!btns) return;
+
+  // Build 6 week options: this week + next 5
+  var options = [];
+  for (var i = 0; i <= 5; i++) {
+    var mon = getMondayWithOffset(i);
+    var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    var monStr = mon.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    var sunStr = sun.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    var label_text = i === 0 ? 'This week' : i === 1 ? 'Next week' : monStr + ' - ' + sunStr;
+    options.push({ offset: i, label: label_text, mon: mon, sun: sun, monStr: monStr, sunStr: sunStr });
+  }
+
+  btns.innerHTML = options.map(function(o) {
+    var active = o.offset === selectedPlannerWeekOffset;
+    return '<button onclick="selectPlannerWeek(' + o.offset + ')" style="font-size:11px;font-weight:600;padding:6px 12px;border-radius:7px;border:1.5px solid ' +
+      (active ? 'var(--red)' : 'var(--border-md)') + ';background:' +
+      (active ? 'var(--red-dim)' : 'transparent') + ';color:' +
+      (active ? 'var(--red)' : 'var(--charcoal3)') + ';cursor:pointer;font-family:Inter,sans-serif;">' +
+      o.label + '</button>';
+  }).join('');
+
+  updateWeekSelectorLabel();
+}
+
+function selectPlannerWeek(offset) {
+  selectedPlannerWeekOffset = offset;
+  initWeekSelector();
+}
+
+function updateWeekSelectorLabel() {
+  var label = document.getElementById('week-selector-label');
+  if (!label) return;
+  var mon = getMondayWithOffset(selectedPlannerWeekOffset);
+  var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  var monStr = mon.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+  var sunStr = sun.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+  label.textContent = 'Planning: ' + monStr + ' through ' + sunStr;
+}
+
+function getMondayWithOffset(weekOffset) {
+  var d = new Date();
+  var day = d.getDay(); // 0=Sun, 1=Mon...
+  var daysToMonday = (day === 0) ? 1 : (8 - day); // days until next Monday
+  var nextMonday = new Date(d);
+  nextMonday.setDate(d.getDate() + daysToMonday + (weekOffset - 1) * 7);
+  nextMonday.setHours(0,0,0,0);
+  return nextMonday;
+}
+
+function getPlannerMonday() {
+  return getMondayWithOffset(selectedPlannerWeekOffset);
 }
 
 // ================================================================
