@@ -118,7 +118,9 @@ def build_html(data, rec_week, pub_week, is_test=False):
         scr = t.get("scripture_angle","")
         scr_html = f'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid {p["border"]};background:{p["bg"]};font-style:italic;font-size:11px;color:{p["text"]};">{scr}</div>' if scr else ""
         upload_topic = quote(t.get("title",""), safe="")
-        upload_url = f"https://media.ebeprstudios.com/upload.html?topic={upload_topic}&cloud=dgq3ahq1m&preset=tiffany_voiceovers"
+        # Include GitHub token in URL so upload page can log to voiceovers_log.json
+        gh_token_param = f"&ght={quote(GITHUB_TOKEN, safe='')}" if GITHUB_TOKEN else ""
+        upload_url = f"https://media.ebeprstudios.com/upload.html?topic={upload_topic}&cloud=dgq3ahq1m&preset=tiffany_voiceovers&repo=ebeprstudios%2FTHCO-Social-Media-Manager{gh_token_param}"
 
         card = f'''
 <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #E3D3C8;border-radius:8px;overflow:hidden;background:#FFFDF5;">
