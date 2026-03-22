@@ -3432,64 +3432,43 @@ async function downloadVoiceover(url, filename) {
   if (!url) return;
   var btn = null;
   try { if (event && event.target) btn = event.target; } catch(x) {}
-  if (btn) { btn.disabled = true; btn.textContent = 'Fetching...'; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Downloading...'; }
+
   try {
-    var res = await fetch(url);
-    if (!res.ok) throw new Error('Could not fetch file');
-    var blob = await res.blob();
-    var ext = (filename || '').split('.').pop().toLowerCase();
-    if (ext === 'mp3') {
-      triggerDownload(blob, filename || 'voiceover.mp3');
+    // Convert Cloudinary URL to mp3 by swapping the format in the URL
+    // Cloudinary supports on-the-fly format conversion via URL manipulation
+    var mp3Url = url;
+    var baseName = (filename || 'voiceover').replace(/\.[^.]+$/, '');
+
+    if (url.indexOf('cloudinary.com') !== -1) {
+      // Replace /video/upload/ with /video/upload/f_mp3/ for format conversion
+      // Also works by replacing file extension in URL
+      mp3Url = url.replace('/video/upload/', '/video/upload/f_mp3,q_auto/');
+      // Replace the file extension in the URL
+      mp3Url = mp3Url.replace(/\.webm$/, '.mp3').replace(/\.m4a$/, '.mp3').replace(/\.ogg$/, '.mp3');
+    }
+
+    var res = await fetch(mp3Url);
+    if (!res.ok) {
+      // Fallback to original if conversion URL fails
+      res = await fetch(url);
+      if (!res.ok) throw new Error('Could not fetch file');
+      baseName = baseName; // keep original name
+      var blob = await res.blob();
+      triggerDownload(blob, baseName + '.webm');
       if (btn) { btn.disabled = false; btn.textContent = 'Download'; }
       return;
     }
-    // Convert webm/m4a to mp3 via FFmpeg.wasm
-    if (btn) btn.textContent = 'Converting...';
-    try {
-      var ff = await loadFFmpeg();
-      var inputName = 'input.' + (ext || 'webm');
-      var arrayBuf = await blob.arrayBuffer();
-      await ff.writeFile(inputName, new Uint8Array(arrayBuf));
-      await ff.exec(['-i', inputName, '-vn', '-ar', '44100', '-ac', '2', '-b:a', '128k', 'output.mp3']);
-      var data = await ff.readFile('output.mp3');
-      var mp3Blob = new Blob([data.buffer], { type: 'audio/mpeg' });
-      await ff.deleteFile(inputName);
-      await ff.deleteFile('output.mp3');
-      var baseName = (filename || 'voiceover').replace(/\.[^.]+$/, '');
-      triggerDownload(mp3Blob, baseName + '.mp3');
-    } catch(convErr) {
-      console.warn('FFmpeg conversion failed, downloading original:', convErr.message);
-      triggerDownload(blob, filename || 'voiceover.webm');
-    }
+
+    var blob = await res.blob();
+    triggerDownload(blob, baseName + '.mp3');
+
   } catch(e) {
     console.error('Download error:', e);
     window.open(url, '_blank');
   }
+
   if (btn) { btn.disabled = false; btn.textContent = 'Download'; }
-}
-
-var ffmpegLoaded = false;
-var ffmpegInstance = null;
-
-async function loadFFmpeg() {
-  if (ffmpegLoaded) return ffmpegInstance;
-  if (!window.FFmpegWASM) {
-    await new Promise(function(res, rej) {
-      var s = document.createElement('script');
-      s.src = 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js';
-      s.onload = res; s.onerror = rej;
-      document.head.appendChild(s);
-    });
-  }
-  var FFmpeg = window.FFmpegWASM && window.FFmpegWASM.FFmpeg;
-  if (!FFmpeg) throw new Error('FFmpeg not loaded');
-  ffmpegInstance = new FFmpeg();
-  await ffmpegInstance.load({
-    coreURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
-    wasmURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm'
-  });
-  ffmpegLoaded = true;
-  return ffmpegInstance;
 }
 
 function triggerDownload(blob, filename) {
