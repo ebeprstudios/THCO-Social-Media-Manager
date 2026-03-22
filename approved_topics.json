@@ -1,13 +1,12 @@
 {
   "approved": true,
-  "test_mode": true,
-  "test_email": "THECREATIVETHEOLOGIAN@GMAIL.COM",
-  "approved_at": "2026-03-22T01:07:31.269Z",
+  "test_mode": false,
+  "approved_at": "2026-03-22T01:14:09.863Z",
   "recording_week": "March 23 - March 29, 2026",
   "publishing_week": "April 6 - April 12, 2026",
   "planning_note": "",
-  "to_email": "THECREATIVETHEOLOGIAN@GMAIL.COM",
-  "cc_emails": "",
+  "to_email": "tiffany@tiffanyhaynesco.com",
+  "cc_emails": "diana@divineordersupport.com, brittany@transactionez.com, thecreativetheologian@gmail.com",
   "topics": [
     {
       "number": 1,
