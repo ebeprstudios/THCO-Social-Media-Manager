@@ -3430,18 +3430,29 @@ function setVOWeek(week) { voActiveWeek = week; renderVoiceovers(voiceoverCache)
 
 async function downloadVoiceover(url, filename) {
   if (!url) return;
+  // Fix filename - ensure proper audio extension that OS can open
+  var cleanName = filename || 'voiceover.webm';
+  // Strip any double extensions and ensure .webm files are labeled correctly
+  var ext = cleanName.split('.').pop().toLowerCase();
+  if (ext === 'webm') {
+    // Rename to .webm but with a friendly base name
+    var baseName = cleanName.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ').trim();
+    cleanName = baseName + '.webm';
+  }
   try {
     var res = await fetch(url);
     if (!res.ok) throw new Error('Could not fetch file');
     var blob = await res.blob();
+    // Force correct MIME type on the blob
+    var mimeType = ext === 'webm' ? 'audio/webm' : ext === 'm4a' ? 'audio/mp4' : ext === 'mp3' ? 'audio/mpeg' : 'audio/webm';
+    var typedBlob = new Blob([blob], { type: mimeType });
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename || 'voiceover.m4a';
+    a.href = URL.createObjectURL(typedBlob);
+    a.download = cleanName;
     document.body.appendChild(a);
     a.click();
     setTimeout(function() { document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 1000);
   } catch(e) {
-    // Fallback: open in new tab so user can save manually
     window.open(url, '_blank');
   }
 }

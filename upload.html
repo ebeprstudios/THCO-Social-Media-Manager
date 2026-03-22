@@ -511,11 +511,17 @@ async function startRecording() {
     analyser.fftSize = 128;
     source.connect(analyser);
 
-    // Pick best supported format
-    var mimeType = 'audio/webm';
-    if (!MediaRecorder.isTypeSupported('audio/webm')) {
-      mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
+    // Pick best supported format - prefer mp4/m4a for universal compatibility
+    var mimeType = '';
+    var preferredTypes = ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg'];
+    for (var i = 0; i < preferredTypes.length; i++) {
+      if (MediaRecorder.isTypeSupported(preferredTypes[i])) {
+        mimeType = preferredTypes[i];
+        break;
+      }
     }
+    // Determine file extension from mimeType
+    var recExt = mimeType.indexOf('mp4') !== -1 || mimeType.indexOf('aac') !== -1 ? 'm4a' : 'webm';
 
     var options = mimeType ? { mimeType: mimeType } : {};
     mediaRecorder = new MediaRecorder(stream, options);
@@ -528,6 +534,8 @@ async function startRecording() {
     mediaRecorder.onstop = function() {
       var type = mimeType || 'audio/webm';
       recordedBlob = new Blob(audioChunks, { type: type });
+      // Store extension for use in submitVoiceover
+      recordedBlob._ext = recExt;
       var url = URL.createObjectURL(recordedBlob);
       var audio = document.getElementById('playback-audio');
       audio.src = url;
@@ -632,7 +640,9 @@ function submitVoiceover() {
 
   var date = new Date().toISOString().split('T')[0];
   var topicSlug = sanitize(topicTitle);
-  var ext = currentMode === 'record' ? 'webm' : (selectedFile.name.split('.').pop() || 'm4a');
+  var ext = currentMode === 'record'
+    ? (recordedBlob._ext || (recordedBlob.type.indexOf('mp4') !== -1 || recordedBlob.type.indexOf('aac') !== -1 ? 'm4a' : 'webm'))
+    : (selectedFile.name.split('.').pop() || 'm4a');
   var filename = topicSlug + '_' + date + '.' + ext;
   var publicId = 'tiffany_voiceovers/' + topicSlug + '_' + date;
 
@@ -722,30 +732,48 @@ function getWeekLabel(isoDate) {
 }
 
 async function saveVoiceoverToGitHub(entry) {
+  console.log('saveVoiceoverToGitHub called');
+  console.log('ghToken present:', !!ghToken);
+  console.log('ghRepo:', ghRepo);
+
+  if (!ghToken) {
+    console.warn('No GitHub token in URL - voiceover will not be logged automatically');
+    showGitHubNote('No GitHub token in this link. Ask your media manager to resend the topics email.');
+    return;
+  }
+
   try {
     var parts = ghRepo.split('/');
     var repoOwner = parts[0] || 'ebeprstudios';
     var repoName  = parts[1] || 'THCO-Social-Media-Manager';
     var logUrl = 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contents/voiceovers_log.json';
-    var headers = { 'Content-Type': 'application/json' };
-    if (ghToken) headers['Authorization'] = 'token ' + ghToken;
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'token ' + ghToken
+    };
 
+    // Read existing log
     var existing = [];
     var sha = null;
     try {
       var checkRes = await fetch(logUrl, { headers: headers });
+      console.log('Read log status:', checkRes.status);
       if (checkRes.ok) {
         var checkData = await checkRes.json();
         sha = checkData.sha;
         existing = JSON.parse(atob(checkData.content.replace(/\n/g,'')));
+        console.log('Existing entries:', existing.length);
       }
-    } catch(e) { existing = []; }
+    } catch(e) {
+      console.warn('Could not read existing log:', e.message);
+      existing = [];
+    }
 
     existing.unshift(entry);
     if (existing.length > 100) existing = existing.slice(0,100);
 
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(existing, null, 2))));
-    var body = { message: 'Voiceover submitted: ' + entry.topic + ' (' + entry.date + ')', content: content };
+    var body = { message: 'Voiceover: ' + entry.topic + ' (' + entry.date + ')', content: content };
     if (sha) body.sha = sha;
 
     var putRes = await fetch(logUrl, {
@@ -753,14 +781,31 @@ async function saveVoiceoverToGitHub(entry) {
       headers: headers,
       body: JSON.stringify(body)
     });
+
+    console.log('Write log status:', putRes.status);
+
     if (putRes.ok || putRes.status === 201) {
-      console.log('Voiceover logged to GitHub');
+      console.log('Voiceover logged to GitHub successfully');
     } else {
-      console.warn('GitHub log save returned:', putRes.status);
+      var errText = await putRes.text();
+      console.warn('GitHub write failed:', putRes.status, errText.slice(0,200));
+      showGitHubNote('Voiceover saved to Cloudinary. GitHub log error: ' + putRes.status);
     }
   } catch(e) {
-    console.warn('Could not log to GitHub (non-critical):', e.message);
+    console.warn('saveVoiceoverToGitHub error:', e.message);
   }
+}
+
+function showGitHubNote(msg) {
+  var el = document.getElementById('github-note');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'github-note';
+    el.style.cssText = 'margin-top:10px;padding:8px 12px;background:#FFF3CD;border-radius:7px;font-size:11px;color:#856404;font-family:Georgia,serif;';
+    var card = document.querySelector('.card');
+    if (card) card.appendChild(el);
+  }
+  el.textContent = msg;
 }
 
 function resetPage() {
