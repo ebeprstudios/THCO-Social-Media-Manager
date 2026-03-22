@@ -275,6 +275,7 @@ def save_current_topics(data, rec_week, pub_week):
         print(f"Could not save current_topics.json: {e}")
 
 
+def send_email(html, to_email, cc_emails, rec_week, is_test=False):
     prefix = "[TEST] " if is_test else ""
     msg = MIMEMultipart("alternative")
     msg["Subject"] = f"{prefix}Your 12 Voiceover Topics - Week of {rec_week}"
