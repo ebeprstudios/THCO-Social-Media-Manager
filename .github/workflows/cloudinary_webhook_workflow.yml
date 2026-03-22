@@ -1,0 +1,22 @@
+name: Log Voiceover from Cloudinary
+
+on:
+  repository_dispatch:
+    types: [voiceover_uploaded]
+
+jobs:
+  log-voiceover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Log voiceover entry
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAYLOAD: ${{ toJson(github.event.client_payload) }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python3 log_voiceover.py
