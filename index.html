@@ -3221,15 +3221,26 @@ async function fetchVoiceoverLog() {
     var repoFull = getGitHubRepo();
     if (!repoFull) return;
     var parts = repoFull.split('/');
-    var url = 'https://raw.githubusercontent.com/' + parts[0] + '/' + parts[1] + '/main/voiceovers_log.json?t=' + Date.now();
-    var res = await fetch(url);
-    if (!res.ok) return; // No log yet - that's fine
-    var list = await res.json();
+    var token = getGithubToken();
+
+    // Use GitHub API instead of raw URL to avoid CDN caching
+    var url = 'https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/contents/voiceovers_log.json';
+    var headers = { 'Accept': 'application/vnd.github.v3+json' };
+    if (token) headers['Authorization'] = 'token ' + token;
+
+    var res = await fetch(url, { headers: headers });
+    if (!res.ok) return;
+
+    var data = await res.json();
+    if (!data.content) return;
+
+    var list = JSON.parse(atob(data.content.replace(/\n/g, '')));
     if (!list || !list.length) return;
+
     saveStoredVoiceovers(list);
     voiceoverCache = list;
     renderVoiceovers(list);
-    console.log('Loaded ' + list.length + ' voiceovers from GitHub log');
+    console.log('Loaded ' + list.length + ' voiceovers from GitHub');
   } catch(e) {
     console.warn('Could not fetch voiceover log:', e.message);
   }
@@ -3389,8 +3400,17 @@ function renderVoiceovers(list) {
       h += '<div style="font-size:10px;color:var(--charcoal3);">' + escRaw(v.date||'') + (durLabel?' &bull; '+durLabel:'') + (sizeMB?' &bull; '+sizeMB:'') + '</div></div>';
       h += '<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:12px;background:var(--green-bg);color:var(--green);text-transform:uppercase;letter-spacing:1px;">Received</span></div>';
       h += '<div style="padding:12px 16px;">';
+      // Build audio player with correct MIME type based on format
       if (v.url) {
-        h += '<audio controls style="width:100%;height:36px;outline:none;" preload="none"><source src="' + v.url + '" type="audio/mp4"><source src="' + v.url + '" type="audio/m4a">Audio not supported.</audio>';
+        var fmt = (v.format || 'webm').toLowerCase();
+        var mimeType = fmt === 'webm' ? 'audio/webm' : fmt === 'm4a' ? 'audio/mp4' : fmt === 'mp3' ? 'audio/mpeg' : 'audio/mp4';
+        h += '<audio controls style="width:100%;height:40px;outline:none;" preload="metadata">';
+        h += '<source src="' + v.url + '" type="' + mimeType + '">';
+        h += '<source src="' + v.url + '" type="audio/webm">';
+        h += '<source src="' + v.url + '" type="audio/mp4">';
+        h += '<source src="' + v.url + '" type="audio/mpeg">';
+        h += 'Audio not supported. <a href="' + v.url + '" target="_blank">Download to listen</a>';
+        h += '</audio>';
       }
       h += '<div style="display:flex;gap:6px;margin-top:8px;">';
       h += '<button onclick="downloadVoiceover(\'' + escRaw(v.url) + '\',\'' + escRaw(v.filename||'voiceover.m4a') + '\')" style="font-size:10px;padding:4px 10px;border:1px solid var(--border-md);border-radius:4px;color:var(--charcoal2);background:transparent;cursor:pointer;font-family:Inter,sans-serif;">Download</button>';
