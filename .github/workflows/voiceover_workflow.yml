@@ -2,10 +2,8 @@ name: Weekly Voiceover Topics Email
 
 on:
   schedule:
-    # Every Friday at 1PM CST = 7PM UTC
     - cron: '0 19 * * 5'
   workflow_dispatch:
-    # Allows manual trigger from GitHub UI or via API (Send Now button)
 
 jobs:
   send-voiceover-email:
@@ -31,5 +29,6 @@ jobs:
           EMAIL_TO:          ${{ secrets.EMAIL_TO }}
           EMAIL_CC:          ${{ secrets.EMAIL_CC }}
           GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_TOKEN:      ${{ secrets.UPLOAD_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python voiceover_topics.py
