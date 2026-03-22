@@ -13,6 +13,7 @@ import requests
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
+from urllib.parse import quote
 
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 EMAIL_FROM        = os.environ["EMAIL_FROM"]
@@ -103,7 +104,6 @@ def pc(pillar):
     return PILLAR_COLORS.get(pillar, {"bg":"#F8F8F8","border":"#999","text":"#555"})
 
 def build_html(data, rec_week, pub_week, is_test=False):
-    from urllib.parse import quote
     topics = data.get("topics", [])
     today = datetime.now().strftime("%B %-d, %Y")
     planning_note = data.get("planning_note", "")
