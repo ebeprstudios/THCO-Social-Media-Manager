@@ -1680,6 +1680,24 @@ function initPlannerBalance() {
   if (history.length > 0) {
     autoSelectPillars();
   }
+  // Show KB status
+  renderKBStatus();
+}
+
+function renderKBStatus() {
+  var kb = getKnowledgeBase();
+  var sub = document.getElementById('planner-step1-sub');
+  if (!sub) return;
+  if (kb.length === 0) {
+    sub.innerHTML = 'Tell the AI what to build around. <span style="color:var(--amber);font-weight:600;">No Knowledge Base data yet</span>. Upload META reports to the Knowledge Base tab to make plans smarter.';
+  } else {
+    var docTypes = kb.map(function(e) {
+      var labels = {'meta-report':'META Report','strategy':'Strategic Plan','brand':'Brand Guide','audience':'Audience Research','calendar':'Content Calendar','csv':'CSV Data','other':'Document'};
+      return labels[e.docType] || 'Document';
+    });
+    var unique = docTypes.filter(function(v,i,a){return a.indexOf(v)===i;});
+    sub.innerHTML = 'Generating from <span style="color:var(--green);font-weight:600;">' + kb.length + ' KB document' + (kb.length>1?'s':'') + '</span>: ' + unique.join(', ') + '. All data cross-referenced and weighted by recency.';
+  }
 }
 
 var kbMsgs = ['Reading the document...','Extracting key insights...','Identifying performance data...','Updating client profile...','Almost done...'];
@@ -2078,15 +2096,54 @@ async function generateWeeklyPlan() {
       'Pillar history: ' + JSON.stringify(profile.pillars) + '\n';
   }
 
+  // Deep KB synthesis - reads ALL docs, weights recent higher, cross-references signals
   var kbCtx = '';
   if (kb.length > 0) {
-    var latest = kb[0].data || {};
-    kbCtx = 'PERFORMANCE DATA FROM KNOWLEDGE BASE:\n' +
-      'What is working: ' + (latest.what_is_working||[]).slice(0,3).join(', ') + '\n' +
-      'What needs attention: ' + (latest.what_needs_attention||[]).slice(0,3).join(', ') + '\n' +
-      'Top performing content: ' + (latest.top_performing_content||[]).slice(0,3).join(', ') + '\n' +
-      'Strategic priorities: ' + (latest.strategic_priorities||[]).slice(0,3).join(', ') + '\n' +
-      'Audience insights: ' + (latest.audience_insights||[]).slice(0,3).join(', ') + '\n';
+    var combined = {
+      what_is_working:[], what_needs_attention:[], top_performing_content:[],
+      strategic_priorities:[], audience_insights:[], content_themes:[],
+      action_items:[], winning_formats:[], key_metrics:[]
+    };
+    kb.forEach(function(entry, idx) {
+      var data = entry.data || {};
+      var weight = idx === 0 ? 3 : idx === 1 ? 2 : 1;
+      function addItems(src, tgt, max) {
+        var items = (data[src]||[]).slice(0,max);
+        for (var w=0;w<weight;w++) items.forEach(function(item){if(item&&tgt.indexOf(item)===-1)tgt.push(item);});
+      }
+      addItems('what_is_working',combined.what_is_working,5);
+      addItems('what_needs_attention',combined.what_needs_attention,4);
+      addItems('top_performing_content',combined.top_performing_content,5);
+      addItems('strategic_priorities',combined.strategic_priorities,4);
+      addItems('audience_insights',combined.audience_insights,4);
+      addItems('content_themes',combined.content_themes,5);
+      addItems('action_items',combined.action_items,3);
+      var pu = data.profile_updates || {};
+      (pu.winning_formats||[]).slice(0,3).forEach(function(f){if(f&&combined.winning_formats.indexOf(f)===-1)combined.winning_formats.push(f);});
+      if (idx===0 && data.key_metrics && data.key_metrics.length) combined.key_metrics = data.key_metrics.slice(0,5);
+    });
+    // Find most referenced pillar in KB text
+    var pillarSignals = {};
+    BRAND.pillars.forEach(function(p){pillarSignals[p]=0;});
+    var allKbText = JSON.stringify(combined).toLowerCase();
+    BRAND.pillars.forEach(function(p){
+      p.toLowerCase().split(' ').filter(function(w){return w.length>4;}).forEach(function(kw){
+        pillarSignals[p]+=(allKbText.match(new RegExp(kw,'g'))||[]).length;
+      });
+    });
+    var topKbPillar = BRAND.pillars.reduce(function(a,b){return pillarSignals[a]>pillarSignals[b]?a:b;});
+
+    kbCtx = 'KNOWLEDGE BASE INTELLIGENCE (' + kb.length + ' document' + (kb.length>1?'s':'') + ' analyzed):\n';
+    if (combined.what_is_working.length)        kbCtx += 'What is working RIGHT NOW: ' + combined.what_is_working.slice(0,5).join(' | ') + '\n';
+    if (combined.top_performing_content.length) kbCtx += 'Top performing content: ' + combined.top_performing_content.slice(0,5).join(' | ') + '\n';
+    if (combined.winning_formats.length)        kbCtx += 'Winning formats: ' + combined.winning_formats.slice(0,4).join(', ') + '\n';
+    if (combined.what_needs_attention.length)   kbCtx += 'Needs improvement: ' + combined.what_needs_attention.slice(0,4).join(' | ') + '\n';
+    if (combined.audience_insights.length)      kbCtx += 'Audience insights: ' + combined.audience_insights.slice(0,4).join(' | ') + '\n';
+    if (combined.strategic_priorities.length)   kbCtx += 'Strategic priorities: ' + combined.strategic_priorities.slice(0,4).join(' | ') + '\n';
+    if (combined.content_themes.length)         kbCtx += 'Themes resonating with audience: ' + combined.content_themes.slice(0,5).join(', ') + '\n';
+    if (combined.action_items.length)           kbCtx += 'Action items from data: ' + combined.action_items.slice(0,3).join(' | ') + '\n';
+    if (combined.key_metrics.length)            kbCtx += 'Key metrics: ' + combined.key_metrics.map(function(m){return m.label+': '+m.value+(m.trend?' ('+m.trend+')':'');}).join(', ') + '\n';
+    kbCtx += 'Most referenced pillar in performance data: ' + topKbPillar + ' (lean into this)\n\n';
   }
 
   var weekCtx = '';
@@ -2748,6 +2805,12 @@ function getEPWeekKey() {
   return monday.toISOString().split('T')[0];
 }
 
+function getNextMonday() {
+  var d = new Date(); var day = d.getDay();
+  var diff = (7 - day + 1) % 7; if (diff === 0) diff = 7;
+  d.setDate(d.getDate() + diff); d.setHours(0,0,0,0); return d;
+}
+
 function isThursday() {
   var et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' }));
   return et.getDay() === 4;
@@ -3147,6 +3210,12 @@ function initVoiceovers() {
   var stored = getStoredVoiceovers();
   voiceoverCache = stored;
   renderVoiceovers(stored);
+  // Show hint if Cloudinary is configured but no files loaded yet
+  var apiKey = localStorage.getItem('tiffany_vo_apikey') || '';
+  if (apiKey && !stored.length) {
+    var grid = document.getElementById('vo-grid');
+    if (grid) grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--charcoal3);font-size:13px;line-height:1.8;">Cloudinary is configured. Click <strong>Load from Cloudinary</strong> above to pull Tiffany\'s submitted voiceovers.<br><span style="font-size:11px;">Files upload instantly when she submits. Click Refresh to see them.</span></div>';
+  }
 }
 
 function getStoredVoiceovers() {
@@ -3168,23 +3237,45 @@ async function fetchFromCloudinary() {
   try {
     var secret = prompt('Enter your Cloudinary API Secret to load files:\n(Not stored. Only used for this one fetch)');
     if (!secret) { btns.forEach(function(b) { b.disabled = false; b.textContent = 'Load from Cloudinary'; }); return; }
-    var url = 'https://api.cloudinary.com/v1_1/' + cloud + '/resources/video?resource_type=video&type=upload&prefix=tiffany_voiceovers&max_results=100';
+
+    // Use Search API - supports CORS from browsers unlike Admin API
+    var url = 'https://api.cloudinary.com/v1_1/' + cloud + '/resources/search';
     var creds = btoa(apiKey + ':' + secret);
-    var res = await fetch(url, { headers: { 'Authorization': 'Basic ' + creds } });
-    if (!res.ok) throw new Error('Cloudinary returned ' + res.status + '. Check your API key and secret.');
+    var res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + creds,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        expression: 'folder:tiffany_voiceovers',
+        max_results: 100,
+        with_field: ['context','tags']
+      })
+    });
+
+    if (!res.ok) {
+      var errText = await res.text();
+      throw new Error('Cloudinary returned ' + res.status + '. Check your API key and secret. ' + errText.slice(0,100));
+    }
+
     var data = await res.json();
     var resources = data.resources || [];
+
     var voList = resources.map(function(r) {
       var parts = r.public_id.split('/');
       var filename = parts[parts.length - 1];
       var nameParts = filename.split('_');
+      var dateStr = nameParts[nameParts.length - 1] || '';
       var topicSlug = nameParts.slice(0, -1).join('_').replace(/-/g, ' ');
+      // Try to get topic from context metadata
+      var contextTopic = r.context && r.context.custom && r.context.custom.topic ? r.context.custom.topic : '';
       return {
         id: r.public_id,
         url: r.secure_url,
-        topic: topicSlug || filename,
-        filename: filename,
-        date: r.created_at ? r.created_at.split('T')[0] : '',
+        topic: contextTopic || topicSlug || filename,
+        filename: filename + '.' + (r.format || 'mp4'),
+        date: r.created_at ? r.created_at.split('T')[0] : dateStr,
         duration: r.duration ? Math.round(r.duration) : null,
         bytes: r.bytes || 0,
         format: r.format || 'm4a',
@@ -3192,9 +3283,11 @@ async function fetchFromCloudinary() {
         status: 'received'
       };
     });
+
     saveStoredVoiceovers(voList);
     voiceoverCache = voList;
     renderVoiceovers(voList);
+
   } catch(e) {
     alert('Could not load from Cloudinary: ' + e.message);
     console.error(e);
