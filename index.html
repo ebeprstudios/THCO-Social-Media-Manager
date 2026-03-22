@@ -3210,11 +3210,26 @@ function initVoiceovers() {
   var stored = getStoredVoiceovers();
   voiceoverCache = stored;
   renderVoiceovers(stored);
-  // Show hint if Cloudinary is configured but no files loaded yet
-  var apiKey = localStorage.getItem('tiffany_vo_apikey') || '';
-  if (apiKey && !stored.length) {
-    var grid = document.getElementById('vo-grid');
-    if (grid) grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--charcoal3);font-size:13px;line-height:1.8;">Cloudinary is configured. Click <strong>Load from Cloudinary</strong> above to pull Tiffany\'s submitted voiceovers.<br><span style="font-size:11px;">Files upload instantly when she submits. Click Refresh to see them.</span></div>';
+  // Auto-fetch from GitHub log on every tab open
+  fetchVoiceoverLog();
+}
+
+async function fetchVoiceoverLog() {
+  try {
+    var repoFull = getGitHubRepo();
+    if (!repoFull) return;
+    var parts = repoFull.split('/');
+    var url = 'https://raw.githubusercontent.com/' + parts[0] + '/' + parts[1] + '/main/voiceovers_log.json?t=' + Date.now();
+    var res = await fetch(url);
+    if (!res.ok) return; // No log yet - that's fine
+    var list = await res.json();
+    if (!list || !list.length) return;
+    saveStoredVoiceovers(list);
+    voiceoverCache = list;
+    renderVoiceovers(list);
+    console.log('Loaded ' + list.length + ' voiceovers from GitHub log');
+  } catch(e) {
+    console.warn('Could not fetch voiceover log:', e.message);
   }
 }
 
@@ -3296,9 +3311,7 @@ async function fetchFromCloudinary() {
 }
 
 function refreshVoiceovers() {
-  var stored = getStoredVoiceovers();
-  voiceoverCache = stored;
-  renderVoiceovers(stored);
+  fetchVoiceoverLog();
 }
 
 function getWeekLabel(isoDate) {

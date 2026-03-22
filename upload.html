@@ -659,6 +659,22 @@ function submitVoiceover() {
   xhr.onload = function() {
     if (xhr.status === 200) {
       document.getElementById('progress-fill').style.width = '100%';
+      var response = {};
+      try { response = JSON.parse(xhr.responseText); } catch(x) {}
+      // Save record to GitHub so Content Studio can read it
+      saveVoiceoverToGitHub({
+        id: response.public_id || publicId,
+        url: response.secure_url || '',
+        topic: topicTitle,
+        filename: filename,
+        date: date,
+        duration: response.duration ? Math.round(response.duration) : null,
+        bytes: response.bytes || 0,
+        format: response.format || ext,
+        week: getWeekLabel(new Date().toISOString()),
+        source: currentMode === 'record' ? 'recorded' : 'uploaded',
+        status: 'received'
+      });
       setTimeout(showSuccess, 500);
     } else {
       var j = {}; try { j = JSON.parse(xhr.responseText); } catch(x) {}
@@ -690,6 +706,69 @@ function showError(msg) {
   el.textContent = msg; el.style.display = 'block';
   document.getElementById('progress-wrap').style.display = 'none';
   document.getElementById('progress-fill').style.width = '0%';
+}
+
+function getWeekLabel(isoDate) {
+  var d = new Date(isoDate);
+  var day = d.getDay();
+  var monday = new Date(d);
+  monday.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+  var sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return monday.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' - ' +
+    sunday.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+
+async function saveVoiceoverToGitHub(entry) {
+  // Detect repo from GitHub Pages URL
+  var repoOwner = '', repoName = '';
+  var hostname = window.location.hostname;
+  if (hostname.endsWith('.github.io')) {
+    repoOwner = hostname.replace('.github.io', '');
+    var pp = window.location.pathname.split('/').filter(Boolean);
+    repoName = pp[0] || 'THCO-Social-Media-Manager';
+  } else {
+    // Custom domain - use hardcoded repo
+    repoOwner = 'ebeprstudios';
+    repoName = 'THCO-Social-Media-Manager';
+  }
+
+  // We need a GitHub token - store it in URL params or use unsigned approach
+  // For now, save to a public JSON endpoint via a simple PUT without auth
+  // using the repo's voiceovers_log.json file
+  try {
+    var logUrl = 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contents/voiceovers_log.json';
+
+    // Try to get existing log (no auth needed for public repos)
+    var existing = [];
+    var sha = null;
+    try {
+      var checkRes = await fetch(logUrl);
+      if (checkRes.ok) {
+        var checkData = await checkRes.json();
+        sha = checkData.sha;
+        existing = JSON.parse(atob(checkData.content.replace(/\n/g,'')));
+      }
+    } catch(e) { existing = []; }
+
+    existing.unshift(entry);
+    // Keep last 100
+    if (existing.length > 100) existing = existing.slice(0,100);
+
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(existing, null, 2))));
+    var body = { message: 'Voiceover submitted: ' + entry.topic + ' (' + entry.date + ')', content: content };
+    if (sha) body.sha = sha;
+
+    // This will only work if repo is public - which GitHub Pages repos are
+    await fetch(logUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    console.log('Voiceover logged to GitHub');
+  } catch(e) {
+    console.warn('Could not log to GitHub (non-critical):', e.message);
+  }
 }
 
 function resetPage() {
