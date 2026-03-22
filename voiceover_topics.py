@@ -21,6 +21,8 @@ EMAIL_TO          = os.environ["EMAIL_TO"]
 EMAIL_CC          = os.environ.get("EMAIL_CC", "")
 GITHUB_TOKEN      = os.environ.get("GITHUB_TOKEN", "")
 GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY", "")
+# Personal access token for embedding in upload URLs (doesn't expire)
+UPLOAD_TOKEN      = os.environ.get("UPLOAD_TOKEN", GITHUB_TOKEN)
 
 def get_next_monday(ref=None):
     d = ref or datetime.now()
@@ -118,8 +120,8 @@ def build_html(data, rec_week, pub_week, is_test=False):
         scr = t.get("scripture_angle","")
         scr_html = f'<div style="margin-top:8px;padding:6px 10px;border-left:3px solid {p["border"]};background:{p["bg"]};font-style:italic;font-size:11px;color:{p["text"]};">{scr}</div>' if scr else ""
         upload_topic = quote(t.get("title",""), safe="")
-        # Include GitHub token in URL so upload page can log to voiceovers_log.json
-        gh_token_param = f"&ght={quote(GITHUB_TOKEN, safe='')}" if GITHUB_TOKEN else ""
+        # Use UPLOAD_TOKEN (personal PAT) not GITHUB_TOKEN (expires after workflow)
+        gh_token_param = f"&ght={quote(UPLOAD_TOKEN, safe='')}" if UPLOAD_TOKEN else ""
         upload_url = f"https://media.ebeprstudios.com/upload.html?topic={upload_topic}&cloud=dgq3ahq1m&preset=tiffany_voiceovers&repo=ebeprstudios%2FTHCO-Social-Media-Manager{gh_token_param}"
 
         card = f'''
