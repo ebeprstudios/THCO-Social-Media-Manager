@@ -1029,6 +1029,7 @@ body::before {
           <div id="ep-approved-badge" style="display:none;background:rgba(58,158,110,0.1);border:1px solid rgba(58,158,110,0.25);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;">Scheduled</div>
           <button class="btn-secondary" id="ep-retry-btn" onclick="generateEmailPreview(true)">Generate</button>
           <button class="btn-secondary" id="ep-test-btn" onclick="sendTestEmail()" style="display:none;border-color:var(--amber);color:var(--amber);">Send Test Email</button>
+          <button class="btn-secondary" id="ep-sendnow-btn" onclick="sendNow()" style="display:none;border-color:var(--red);color:var(--red);">Send Now</button>
           <button class="btn-secondary" id="ep-publish-btn" onclick="publishTopicsPage()" style="display:none;border-color:var(--green);color:var(--green);" title="Publishes topics to the This Week page so Tiffany can browse them">Publish Topics Page</button>
           <button class="btn-primary" id="ep-approve-btn" onclick="approveAndSchedule()" style="background:var(--charcoal);" disabled>Schedule Email</button>
         </div>
@@ -2526,6 +2527,69 @@ async function publishTopicsPage() {
   }
 }
 
+async function sendNow() {
+  // Sends immediately to Tiffany + full team - not a test
+  var token = getGithubToken();
+  if (!token) { alert('No GitHub token saved. Enter your token in the settings above.'); return; }
+
+  var tiffanyEmail = localStorage.getItem('tiffany_ep_email_tiffany') || '';
+  var teamEmails   = localStorage.getItem('tiffany_ep_email_team') || '';
+
+  if (!tiffanyEmail) { alert('Please enter Tiffany\'s email in the settings above first.'); return; }
+  if (!epCurrentData || !epCurrentData.topics || !epCurrentData.topics.length) {
+    alert('No topics generated yet. Click Generate first.'); return;
+  }
+
+  if (!confirm('Send this week\'s topics to Tiffany + team RIGHT NOW?\n\nTo: ' + tiffanyEmail + (teamEmails ? '\nCC: ' + teamEmails : '') + '\n\nThis is the real email, not a test.')) return;
+
+  var btn = document.getElementById('ep-sendnow-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+
+  try {
+    var payload = {
+      approved: true,
+      test_mode: false,
+      approved_at: new Date().toISOString(),
+      recording_week: epCurrentData.recording_week || getRecordingWeek(),
+      publishing_week: epCurrentData.publishing_week || getPublishingWeek(),
+      planning_note: epCurrentData.planning_note || '',
+      to_email: tiffanyEmail,
+      cc_emails: teamEmails,
+      topics: epCurrentData.topics || []
+    };
+
+    var saveResult = await saveToGitHub(token, payload);
+    if (!saveResult.ok) throw new Error(saveResult.error || 'Could not save to GitHub.');
+
+    var triggered = await triggerWorkflow(token);
+    if (!triggered) throw new Error('Could not trigger workflow. Check your token has workflow scope.');
+
+    btn.textContent = 'Sent!';
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+
+    var confirmEl = document.getElementById('ep-approval-confirm');
+    var confirmText = document.getElementById('ep-confirm-text');
+    if (confirmEl && confirmText) {
+      confirmEl.style.display = 'block';
+      confirmText.innerHTML = 'Email sent now to ' + escRaw(tiffanyEmail) + (teamEmails ? ' + team' : '') + '. Check inboxes in about 60 seconds.';
+    }
+
+    setTimeout(function() {
+      btn.disabled = false;
+      btn.textContent = 'Send Now';
+      btn.style.borderColor = 'var(--red)';
+      btn.style.color = 'var(--red)';
+    }, 6000);
+
+  } catch(e) {
+    alert('Send failed: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = 'Send Now';
+    console.error(e);
+  }
+}
+
 async function triggerWorkflow(token) {
   try {
     var repoFull = getGitHubRepo();
@@ -2804,6 +2868,8 @@ function renderEmailPreview(data, approved) {
   if (testBtn) testBtn.style.display = 'inline-block';
   var pubBtn = document.getElementById('ep-publish-btn');
   if (pubBtn) pubBtn.style.display = 'inline-block';
+  var sendNowBtn = document.getElementById('ep-sendnow-btn');
+  if (sendNowBtn) sendNowBtn.style.display = 'inline-block';
 
   if (approved) {
     document.getElementById('ep-approved-badge').style.display = 'inline-block';
