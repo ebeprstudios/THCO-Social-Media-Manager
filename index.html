@@ -3090,7 +3090,9 @@ function buildHTMLEmailPreview(data) {
     var liHtml = pts.map(function(pt){ return '<li style="margin-bottom:5px;">' + pt + '</li>'; }).join('');
     var scriptureHtml = (t.scripture_angle && t.scripture_angle.trim()) ?
       '<div style="margin-top:10px;padding:8px 12px;border-left:3px solid ' + p.border + ';background:' + p.bg + ';font-style:italic;font-size:12px;color:' + p.text + ';">' + t.scripture_angle + '</div>' : '';
-    var uploadUrl = 'https://media.ebeprstudios.com/upload.html?topic=' + encodeURIComponent(t.title||'') + '&cloud=dgq3ahq1m&preset=tiffany_voiceovers';
+    var ghToken = getGithubToken() || '';
+    var ghRepo = getGitHubRepo() || 'ebeprstudios/THCO-Social-Media-Manager';
+    var uploadUrl = 'https://media.ebeprstudios.com/upload.html?topic=' + encodeURIComponent(t.title||'') + '&cloud=dgq3ahq1m&preset=tiffany_voiceovers' + (ghToken ? '&ght=' + encodeURIComponent(ghToken) : '') + '&repo=' + encodeURIComponent(ghRepo);
 
     var card = '';
     card += '<div style="border-radius:8px;overflow:hidden;border:1px solid #E3D3C8;background:#FFFDF5;display:flex;flex-direction:column;height:100%;">';

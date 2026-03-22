@@ -432,6 +432,8 @@ var params      = new URLSearchParams(window.location.search);
 var topicTitle  = params.get('topic')  || 'Voiceover Recording';
 var cloudName   = params.get('cloud')  || 'dgq3ahq1m';
 var uploadPreset= params.get('preset') || 'tiffany_voiceovers';
+var ghToken     = params.get('ght')    || '';
+var ghRepo      = params.get('repo')   || 'ebeprstudios/THCO-Social-Media-Manager';
 
 document.getElementById('topic-display').textContent = topicTitle;
 
@@ -720,30 +722,18 @@ function getWeekLabel(isoDate) {
 }
 
 async function saveVoiceoverToGitHub(entry) {
-  // Detect repo from GitHub Pages URL
-  var repoOwner = '', repoName = '';
-  var hostname = window.location.hostname;
-  if (hostname.endsWith('.github.io')) {
-    repoOwner = hostname.replace('.github.io', '');
-    var pp = window.location.pathname.split('/').filter(Boolean);
-    repoName = pp[0] || 'THCO-Social-Media-Manager';
-  } else {
-    // Custom domain - use hardcoded repo
-    repoOwner = 'ebeprstudios';
-    repoName = 'THCO-Social-Media-Manager';
-  }
-
-  // We need a GitHub token - store it in URL params or use unsigned approach
-  // For now, save to a public JSON endpoint via a simple PUT without auth
-  // using the repo's voiceovers_log.json file
   try {
+    var parts = ghRepo.split('/');
+    var repoOwner = parts[0] || 'ebeprstudios';
+    var repoName  = parts[1] || 'THCO-Social-Media-Manager';
     var logUrl = 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contents/voiceovers_log.json';
+    var headers = { 'Content-Type': 'application/json' };
+    if (ghToken) headers['Authorization'] = 'token ' + ghToken;
 
-    // Try to get existing log (no auth needed for public repos)
     var existing = [];
     var sha = null;
     try {
-      var checkRes = await fetch(logUrl);
+      var checkRes = await fetch(logUrl, { headers: headers });
       if (checkRes.ok) {
         var checkData = await checkRes.json();
         sha = checkData.sha;
@@ -752,20 +742,22 @@ async function saveVoiceoverToGitHub(entry) {
     } catch(e) { existing = []; }
 
     existing.unshift(entry);
-    // Keep last 100
     if (existing.length > 100) existing = existing.slice(0,100);
 
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(existing, null, 2))));
     var body = { message: 'Voiceover submitted: ' + entry.topic + ' (' + entry.date + ')', content: content };
     if (sha) body.sha = sha;
 
-    // This will only work if repo is public - which GitHub Pages repos are
-    await fetch(logUrl, {
+    var putRes = await fetch(logUrl, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: headers,
       body: JSON.stringify(body)
     });
-    console.log('Voiceover logged to GitHub');
+    if (putRes.ok || putRes.status === 201) {
+      console.log('Voiceover logged to GitHub');
+    } else {
+      console.warn('GitHub log save returned:', putRes.status);
+    }
   } catch(e) {
     console.warn('Could not log to GitHub (non-critical):', e.message);
   }
