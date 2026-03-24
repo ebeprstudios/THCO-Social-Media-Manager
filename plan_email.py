@@ -5,7 +5,6 @@ Two modes:
   1. send_plan_to_client  — triggered when SM manager clicks "Send to Tiffany"
   2. plan_approved        — triggered when Tiffany approves on plan_approval.html
 """
-import anthropic
 import smtplib
 import json
 import os
@@ -15,7 +14,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 EMAIL_FROM        = os.environ["EMAIL_FROM"]
 EMAIL_PASSWORD    = os.environ["EMAIL_PASSWORD"]
 EMAIL_TO          = os.environ["EMAIL_TO"]          # Tiffany
@@ -230,7 +228,8 @@ if __name__ == "__main__":
 
         plan = plan_data.get("plan", {})
         week_of = plan.get("week_of", "")
-        tiffany_email = plan_data.get("sent_to", EMAIL_TO)
+        is_test = plan_data.get("is_test", False)
+        recipient = plan_data.get("sent_to", EMAIL_TO)
 
         # Build approval URL with token
         upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
@@ -238,8 +237,9 @@ if __name__ == "__main__":
         approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
 
         html = build_client_email(plan, approval_url)
-        send_email_msg(html, f"Your Content Plan for {week_of} — Please Review & Approve", tiffany_email)
-        print(f"Plan email sent to {tiffany_email}")
+        subject = f"[TEST PREVIEW] Content Plan for {week_of}" if is_test else f"Your Content Plan for {week_of} - Please Review & Approve"
+        send_email_msg(html, subject, recipient)
+        print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else ""))
 
     elif event == "notify_team":
         # Load approval from GitHub and send team task emails

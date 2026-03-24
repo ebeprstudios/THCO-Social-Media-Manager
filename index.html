@@ -2344,6 +2344,7 @@ function renderWeeklyPlan(plan) {
   h += '<div style="font-size:13px;color:var(--charcoal2);margin-bottom:12px;line-height:1.6;">Send this plan to Tiffany for approval. She reviews, adds feedback, and approves. You get notified. Team gets their tasks automatically.</div>';
   h += '<div style="display:flex;gap:10px;flex-wrap:wrap;">';
   h += '<button onclick="sendPlanToClient()" id="send-client-btn" style="background:var(--red);color:white;border:none;padding:12px 28px;border-radius:8px;font-family:Georgia,serif;font-size:14px;font-weight:700;cursor:pointer;">Send to Tiffany for Approval</button>';
+  h += '<button onclick="sendTestPlanEmail()" id="send-test-plan-btn" style="background:transparent;color:var(--amber);border:1.5px solid var(--amber);padding:12px 20px;border-radius:8px;font-family:Georgia,serif;font-size:13px;font-weight:600;cursor:pointer;">Send Test to Me</button>';
   h += '<button onclick="generateWeeklyPlan()" style="background:transparent;color:var(--charcoal3);border:1px solid var(--border-md);padding:12px 20px;border-radius:8px;font-family:Georgia,serif;font-size:13px;cursor:pointer;">Regenerate</button>';
   h += '</div>';
   h += '<div id="send-client-status" style="display:none;margin-top:10px;font-size:12px;color:var(--green);font-weight:600;"></div>';
@@ -3555,6 +3556,48 @@ async function sendPlanToClient() {
   } catch(e) {
     alert('Could not send plan: ' + e.message);
     btn.disabled = false; btn.textContent = 'Send to Tiffany for Approval';
+    console.error(e);
+  }
+}
+
+async function sendTestPlanEmail() {
+  if (!currentGeneratedPlan) { alert('No plan generated yet. Generate a plan first.'); return; }
+  var token = getGithubToken();
+  if (!token) { alert('No GitHub token saved. Enter your token in Email Preview settings first.'); return; }
+  var testEmail = localStorage.getItem('tiffany_ep_email_test') || '';
+  if (!testEmail) { alert('No test email saved. Enter your test email in the Email Preview settings first.'); return; }
+  var repoFull = getGitHubRepo() || 'ebeprstudios/THCO-Social-Media-Manager';
+  var btn = document.getElementById('send-test-plan-btn');
+  btn.disabled = true; btn.textContent = 'Sending test...';
+  try {
+    // Save plan with test flag and test email as recipient
+    var planData = {
+      plan: currentGeneratedPlan,
+      sent_at: new Date().toISOString(),
+      sent_to: testEmail,
+      repo: repoFull,
+      upload_token: token,
+      is_test: true,
+      status: 'test'
+    };
+    await savePlanToGitHub(token, repoFull, planData);
+    var parts = repoFull.split('/');
+    var res = await fetch('https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/dispatches', {
+      method: 'POST',
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event_type: 'send_plan_to_client', client_payload: { week_of: currentGeneratedPlan.week_of || '', is_test: true } })
+    });
+    if (res.status === 204 || res.status === 200) {
+      btn.textContent = 'Test Sent!';
+      btn.style.borderColor = 'var(--green)';
+      btn.style.color = 'var(--green)';
+      setTimeout(function() { btn.disabled = false; btn.textContent = 'Send Test to Me'; btn.style.borderColor = 'var(--amber)'; btn.style.color = 'var(--amber)'; }, 4000);
+    } else {
+      throw new Error('Workflow returned ' + res.status);
+    }
+  } catch(e) {
+    alert('Could not send test: ' + e.message);
+    btn.disabled = false; btn.textContent = 'Send Test to Me';
     console.error(e);
   }
 }
