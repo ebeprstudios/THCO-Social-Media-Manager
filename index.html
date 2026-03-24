@@ -1366,7 +1366,7 @@ async function callAPI(prompt, tokens) {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: tokens || 4000,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -1408,7 +1408,7 @@ async function testConnection() {
     var res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 10, messages: [{ role: 'user', content: 'Say OK' }] })
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 10, messages: [{ role: 'user', content: 'Say OK' }] })
     });
     if (res.status === 200) {
       showDiag('ok', 'Connection successful. API key is working. Ready to generate.');
@@ -2934,7 +2934,7 @@ async function generateEmailPreview(isRetry) {
       var r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'Content-Type':'application/json', 'x-api-key':getApiKey(), 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
-        body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2500, system:systemPrompt, messages:[{role:'user',content:prompt}] })
+        body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:2500, system:systemPrompt, messages:[{role:'user',content:prompt}] })
       });
       var body = await r.text();
       if (!r.ok) { var j={}; try{j=JSON.parse(body);}catch(x){} throw new Error('API '+r.status+': '+(j.error&&j.error.message?j.error.message:body.slice(0,200))); }
@@ -3519,7 +3519,6 @@ function getUploadUrl(topicTitle) {
 // ================================================================
 async function sendPlanToClient() {
   if (!currentGeneratedPlan) { alert('No plan generated yet. Generate a plan first.'); return; }
-  if (!checkApiKey()) return;
   var token = getGithubToken();
   if (!token) { alert('No GitHub token saved. Enter your token in Email Preview settings first.'); return; }
   var tiffanyEmail = localStorage.getItem('tiffany_ep_email_tiffany') || '';
@@ -3527,22 +3526,21 @@ async function sendPlanToClient() {
   var repoFull = getGitHubRepo() || 'ebeprstudios/THCO-Social-Media-Manager';
   var btn = document.getElementById('send-client-btn');
   var statusEl = document.getElementById('send-client-status');
-  btn.disabled = true; btn.textContent = 'Saving plan...';
+  btn.disabled = true; btn.textContent = 'Sending...';
   try {
-    var planData = {
-      plan: currentGeneratedPlan,
-      sent_at: new Date().toISOString(),
-      sent_to: tiffanyEmail,
-      repo: repoFull,
-      status: 'pending'
-    };
-    await savePlanToGitHub(token, repoFull, planData);
-    btn.textContent = 'Triggering email...';
     var parts = repoFull.split('/');
     var res = await fetch('https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/dispatches', {
       method: 'POST',
       headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event_type: 'send_plan_to_client', client_payload: { week_of: currentGeneratedPlan.week_of || '' } })
+      body: JSON.stringify({
+        event_type: 'send_plan_to_client',
+        client_payload: {
+          week_of: currentGeneratedPlan.week_of || '',
+          sent_to: tiffanyEmail,
+          is_test: false,
+          plan: currentGeneratedPlan
+        }
+      })
     });
     if (res.status === 204 || res.status === 200) {
       btn.textContent = 'Sent to Tiffany!';
@@ -3569,21 +3567,19 @@ async function sendTestPlanEmail() {
   var btn = document.getElementById('send-test-plan-btn');
   btn.disabled = true; btn.textContent = 'Sending test...';
   try {
-    // Save plan with test flag and test email as recipient
-    var planData = {
-      plan: currentGeneratedPlan,
-      sent_at: new Date().toISOString(),
-      sent_to: testEmail,
-      repo: repoFull,
-      is_test: true,
-      status: 'test'
-    };
-    await savePlanToGitHub(token, repoFull, planData);
     var parts = repoFull.split('/');
     var res = await fetch('https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/dispatches', {
       method: 'POST',
       headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event_type: 'send_plan_to_client', client_payload: { week_of: currentGeneratedPlan.week_of || '', is_test: true } })
+      body: JSON.stringify({
+        event_type: 'send_plan_to_client',
+        client_payload: {
+          week_of: currentGeneratedPlan.week_of || '',
+          sent_to: testEmail,
+          is_test: true,
+          plan: currentGeneratedPlan
+        }
+      })
     });
     if (res.status === 204 || res.status === 200) {
       btn.textContent = 'Test Sent!';
@@ -4170,7 +4166,7 @@ async function processKBDocument(filename, docType, fileType, base64, textConten
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
+        model:'claude-sonnet-4-6',
         max_tokens: 1500,
         system: systemPrompt,
         messages: messages
