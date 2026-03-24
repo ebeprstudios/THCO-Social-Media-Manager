@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Weekly Content Plan — Tiffany Haynes & Co.</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; background: #F4F0EB; font-family: 'Georgia', serif; -webkit-font-smoothing: antialiased; }
+body { display: flex; align-items: flex-start; justify-content: center; padding: 28px 16px 60px; }
+.card { background: #FFFDF5; border-radius: 16px; width: 100%; max-width: 600px; box-shadow: 0 4px 32px rgba(65,65,65,0.10); overflow: hidden; }
+.header { background: #414141; padding: 24px 28px; }
+.eyebrow { font-size: 10px; font-weight: 700; color: #C49E3C; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+.header-title { font-size: 22px; font-weight: 700; color: #FFFDF5; margin-bottom: 4px; }
+.header-sub { font-size: 13px; color: rgba(255,255,255,0.5); }
+.gold-bar { height: 3px; background: linear-gradient(90deg, #C49E3C, #B87830, #C49E3C); }
+.body { padding: 24px 28px; }
+.section-label { font-size: 10px; font-weight: 700; color: #A00605; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.planning-note { font-size: 13px; color: #5A5A5A; line-height: 1.75; font-style: italic; background: #F4F0EB; border-left: 3px solid #C49E3C; padding: 10px 14px; border-radius: 4px; margin-bottom: 20px; }
+.day-card { border: 1px solid #E3D3C8; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+.day-header { background: #F4F0EB; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E3D3C8; }
+.day-name { font-size: 11px; font-weight: 700; color: #8A8A8A; letter-spacing: 1.5px; text-transform: uppercase; }
+.day-date { font-size: 11px; color: #A0A0A0; }
+.day-body { padding: 14px 16px; }
+.post-type-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-bottom: 6px; }
+.post-title { font-size: 15px; font-weight: 700; color: #414141; margin-bottom: 6px; line-height: 1.4; }
+.hook { font-size: 13px; color: #414141; font-style: italic; margin-bottom: 8px; }
+.hook::before { content: '"'; }
+.hook::after { content: '"'; }
+.direction { font-size: 12px; color: #5A5A5A; line-height: 1.65; margin-bottom: 8px; }
+.designer-badge { font-size: 9px; font-weight: 700; color: #8A8A8A; letter-spacing: 1px; text-transform: uppercase; }
+.time-badge { font-size: 10px; color: #A0A0A0; margin-top: 4px; }
+.divider { height: 1px; background: #E3D3C8; margin: 20px 0; }
+.feedback-section { margin-top: 20px; }
+.feedback-label { font-size: 13px; font-weight: 600; color: #414141; margin-bottom: 8px; }
+.feedback-sub { font-size: 11px; color: #8A8A8A; margin-bottom: 10px; }
+textarea { width: 100%; background: #F4F0EB; border: 1px solid #E3D3C8; color: #414141; font-family: Georgia, serif; font-size: 13px; padding: 12px 14px; border-radius: 8px; outline: none; resize: vertical; min-height: 100px; line-height: 1.65; }
+textarea:focus { border-color: #A00605; }
+.approve-btn { width: 100%; background: #A00605; color: white; border: none; padding: 16px; border-radius: 10px; font-family: Georgia, serif; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 14px; letter-spacing: 0.5px; transition: background 0.2s; }
+.approve-btn:active { background: #800504; }
+.approve-btn:disabled { background: #C0C0C0; cursor: not-allowed; }
+.request-changes-btn { width: 100%; background: transparent; color: #414141; border: 1.5px solid #E3D3C8; padding: 13px; border-radius: 10px; font-family: Georgia, serif; font-size: 14px; cursor: pointer; margin-top: 8px; }
+.progress-wrap { display: none; margin-top: 14px; }
+.progress-bar { height: 4px; background: #E3D3C8; border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; width: 0%; background: #A00605; border-radius: 2px; transition: width 0.3s; }
+.progress-label { font-size: 11px; color: #8A8A8A; margin-top: 6px; text-align: center; }
+.success-card { display: none; text-align: center; padding: 32px 20px; }
+.success-icon { font-size: 48px; margin-bottom: 12px; }
+.success-title { font-size: 22px; font-weight: 700; color: #414141; margin-bottom: 8px; }
+.success-sub { font-size: 14px; color: #5A5A5A; line-height: 1.7; }
+.error-msg { display: none; background: rgba(160,6,5,0.06); border: 1px solid rgba(160,6,5,0.2); color: #A00605; font-size: 12px; padding: 10px 14px; border-radius: 7px; margin-top: 10px; line-height: 1.6; }
+.footer { background: #414141; padding: 14px 28px; text-align: center; }
+.footer-text { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 1.5px; text-transform: uppercase; }
+.loading-state { text-align: center; padding: 48px 20px; color: #8A8A8A; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="eyebrow">Weekly Content Plan</div>
+    <div class="header-title" id="plan-title">Loading your plan...</div>
+    <div class="header-sub" id="plan-subtitle"></div>
+  </div>
+  <div class="gold-bar"></div>
+
+  <div class="body">
+    <div id="loading-state" class="loading-state">Loading your content plan...</div>
+    <div id="plan-content" style="display:none;">
+      <div id="planning-note-wrap" style="display:none;">
+        <div class="section-label">Strategic Direction</div>
+        <div class="planning-note" id="planning-note-text"></div>
+      </div>
+      <div class="section-label">Your Week at a Glance</div>
+      <div id="days-list"></div>
+      <div class="divider"></div>
+      <div id="success-card" class="success-card">
+        <div class="success-icon">&#10003;</div>
+        <div class="success-title">Plan Approved!</div>
+        <div class="success-sub" id="success-message">Your feedback has been sent. The team will begin designing this week's content.</div>
+      </div>
+      <div id="approval-form">
+        <div class="feedback-section">
+          <div class="section-label">Your Feedback</div>
+          <div class="feedback-label">Any changes or notes for the team?</div>
+          <div class="feedback-sub">This goes directly to your social media manager. Optional — leave blank to approve as-is.</div>
+          <textarea id="feedback-input" placeholder="e.g. Change Monday's post to focus more on the business launch... or looks great, approved!"></textarea>
+        </div>
+        <button class="approve-btn" id="approve-btn" onclick="submitApproval('approved')">Approve This Plan</button>
+        <button class="request-changes-btn" id="changes-btn" onclick="submitApproval('changes_requested')">Request Changes</button>
+        <div class="progress-wrap" id="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+          <div class="progress-label" id="progress-label">Submitting...</div>
+        </div>
+        <div class="error-msg" id="error-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer"><div class="footer-text">The Creative Theologian Media Group</div></div>
+</div>
+
+<script>
+var params      = new URLSearchParams(window.location.search);
+var ghToken     = params.get('ght') || '';
+var ghRepo      = params.get('repo') || 'ebeprstudios/THCO-Social-Media-Manager';
+var planData    = null;
+
+// Pillar colors
+var PILLAR_COLORS = {
+  'Business and Entrepreneurship':                { color:'#B87830', bg:'rgba(184,120,48,0.1)' },
+  'Spiritual Development and Gods Math Teaching': { color:'#A00605', bg:'rgba(160,6,5,0.08)' },
+  'Family and Lifestyle':                         { color:'#3A9E6E', bg:'rgba(58,158,110,0.1)' },
+  'Humor and Personality Shenanigans':            { color:'#6A50A8', bg:'rgba(106,80,168,0.1)' },
+  'Community and Testimony':                      { color:'#3A6EA8', bg:'rgba(58,110,168,0.1)' }
+};
+
+async function loadPlan() {
+  try {
+    var parts = ghRepo.split('/');
+    var url = 'https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/contents/pending_plan.json';
+    var headers = { 'Accept': 'application/vnd.github.v3+json' };
+    if (ghToken) headers['Authorization'] = 'token ' + ghToken;
+    var res = await fetch(url, { headers: headers });
+    if (!res.ok) throw new Error('Could not load plan. Link may have expired.');
+    var data = await res.json();
+    planData = JSON.parse(atob(data.content.replace(/\n/g, '')));
+    renderPlan(planData.plan);
+  } catch(e) {
+    document.getElementById('loading-state').innerHTML = '<div style="color:#A00605;font-weight:600;">Could not load plan.<br><span style="font-size:12px;font-weight:400;color:#8A8A8A;">' + e.message + '</span></div>';
+  }
+}
+
+function renderPlan(plan) {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('plan-content').style.display = 'block';
+  document.getElementById('plan-title').textContent = 'Week of ' + (plan.week_of || '');
+  document.getElementById('plan-subtitle').textContent = 'Please review and approve or request changes below.';
+
+  if (plan.planning_note) {
+    document.getElementById('planning-note-text').textContent = plan.planning_note;
+    document.getElementById('planning-note-wrap').style.display = 'block';
+  }
+
+  var daysHtml = '';
+  (plan.days || []).forEach(function(day) {
+    var pc = PILLAR_COLORS[day.pillar] || { color:'#8A8A8A', bg:'rgba(136,136,136,0.08)' };
+    daysHtml += '<div class="day-card">';
+    daysHtml += '<div class="day-header"><span class="day-name">' + esc(day.day) + '</span><span class="day-date">' + esc(day.date||'') + '</span></div>';
+    daysHtml += '<div class="day-body">';
+    daysHtml += '<span class="post-type-tag" style="background:' + pc.bg + ';color:' + pc.color + ';">' + esc(day.post_type||'') + '</span>';
+    daysHtml += '<div class="post-title">' + esc(day.title||'') + '</div>';
+    if (day.hook) daysHtml += '<div class="hook">' + esc(day.hook) + '</div>';
+    if (day.content_direction) daysHtml += '<div class="direction">' + esc(day.content_direction) + '</div>';
+    if (day.designer_needed && day.designer_needed !== 'None') daysHtml += '<div class="designer-badge">' + esc(day.designer_needed) + '</div>';
+    daysHtml += '<div class="time-badge">3:00 PM CST</div>';
+    daysHtml += '</div></div>';
+  });
+  document.getElementById('days-list').innerHTML = daysHtml;
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function submitApproval(action) {
+  var feedback = document.getElementById('feedback-input').value.trim();
+  var approveBtn = document.getElementById('approve-btn');
+  var changesBtn = document.getElementById('changes-btn');
+  approveBtn.disabled = true; changesBtn.disabled = true;
+  document.getElementById('progress-wrap').style.display = 'block';
+  document.getElementById('progress-fill').style.width = '30%';
+  document.getElementById('progress-label').textContent = action === 'approved' ? 'Approving...' : 'Sending feedback...';
+  document.getElementById('error-msg').style.display = 'none';
+
+  var entry = {
+    action: action,
+    feedback: feedback,
+    approved_at: new Date().toISOString(),
+    week_of: planData && planData.plan ? planData.plan.week_of : '',
+    repo: ghRepo
+  };
+
+  try {
+    // Save approval to GitHub
+    await saveApprovalToGitHub(entry);
+    document.getElementById('progress-fill').style.width = '70%';
+    document.getElementById('progress-label').textContent = 'Notifying team...';
+
+    // Trigger team notification workflow
+    var parts = ghRepo.split('/');
+    await fetch('https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/dispatches', {
+      method: 'POST',
+      headers: { 'Authorization': 'token ' + ghToken, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event_type: 'plan_approved_by_client', client_payload: entry })
+    });
+
+    document.getElementById('progress-fill').style.width = '100%';
+    setTimeout(function() {
+      document.getElementById('progress-wrap').style.display = 'none';
+      document.getElementById('approval-form').style.display = 'none';
+      document.getElementById('success-card').style.display = 'block';
+      if (action === 'changes_requested') {
+        document.getElementById('success-title') && (document.getElementById('success-title').textContent = 'Feedback Sent!');
+        document.getElementById('success-message').textContent = 'Your feedback has been sent to the team. They will revise the plan and send you an updated version.';
+      } else {
+        document.getElementById('success-message').textContent = 'The team has been notified and will begin designing your content for the week of ' + (entry.week_of || '') + '.';
+      }
+    }, 800);
+
+  } catch(e) {
+    document.getElementById('progress-wrap').style.display = 'none';
+    var el = document.getElementById('error-msg');
+    el.textContent = 'Could not submit: ' + e.message + '. Please try again or contact your manager.';
+    el.style.display = 'block';
+    approveBtn.disabled = false; changesBtn.disabled = false;
+    console.error(e);
+  }
+}
+
+async function saveApprovalToGitHub(entry) {
+  var parts = ghRepo.split('/');
+  var url = 'https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/contents/plan_approval.json';
+  var headers = { 'Authorization': 'token ' + ghToken, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' };
+  var sha = null;
+  var check = await fetch(url, { headers: headers });
+  if (check.ok) sha = (await check.json()).sha;
+  var content = btoa(unescape(encodeURIComponent(JSON.stringify(entry, null, 2))));
+  var body = { message: 'Plan ' + entry.action + ' by client - ' + entry.week_of, content: content };
+  if (sha) body.sha = sha;
+  var r = await fetch(url, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error('GitHub save failed: ' + r.status);
+}
+
+// Load plan on page start
+loadPlan();
+</script>
+</body>
+</html>
