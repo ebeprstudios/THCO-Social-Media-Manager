@@ -1,0 +1,47 @@
+name: Weekly Plan Approval System
+
+on:
+  repository_dispatch:
+    types: [send_plan_to_client, plan_approved_by_client]
+  workflow_dispatch:
+    inputs:
+      event_type:
+        description: 'Event type: send_plan or notify_team'
+        required: true
+        default: 'send_plan'
+
+jobs:
+  handle-plan-event:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Handle plan event
+        env:
+          EMAIL_FROM:          ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD:      ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO:            ${{ secrets.EMAIL_TO }}
+          EMAIL_CC:            ${{ secrets.EMAIL_CC }}
+          GITHUB_TOKEN:        ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_TOKEN:        ${{ secrets.UPLOAD_TOKEN }}
+          GITHUB_REPOSITORY:   ${{ github.repository }}
+          DESIGNER1_EMAIL:     ${{ secrets.DESIGNER1_EMAIL }}
+          DESIGNER2_EMAIL:     ${{ secrets.DESIGNER2_EMAIL }}
+          VIDEO_EDITOR_EMAIL:  ${{ secrets.VIDEO_EDITOR_EMAIL }}
+          MANAGER_EMAIL:       ${{ secrets.MANAGER_EMAIL }}
+          WORKFLOW_EVENT: >-
+            ${{
+              github.event.action == 'send_plan_to_client' && 'send_plan' ||
+              github.event.action == 'plan_approved_by_client' && 'notify_team' ||
+              github.event.inputs.event_type || 'send_plan'
+            }}
+        run: python plan_email.py
