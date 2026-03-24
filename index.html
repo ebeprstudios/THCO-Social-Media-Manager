@@ -3534,7 +3534,6 @@ async function sendPlanToClient() {
       sent_at: new Date().toISOString(),
       sent_to: tiffanyEmail,
       repo: repoFull,
-      upload_token: token,
       status: 'pending'
     };
     await savePlanToGitHub(token, repoFull, planData);
@@ -3576,7 +3575,6 @@ async function sendTestPlanEmail() {
       sent_at: new Date().toISOString(),
       sent_to: testEmail,
       repo: repoFull,
-      upload_token: token,
       is_test: true,
       status: 'test'
     };
