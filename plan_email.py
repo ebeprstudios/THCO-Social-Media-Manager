@@ -217,19 +217,27 @@ def send_email_msg(html, subject, to_email, cc_emails=""):
 # ── MAIN ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
     event = WORKFLOW_EVENT
-    print(f"Plan email script running. Event: {event}")
+    print(f"Plan email script running. Event: '{event}'")
+    print(f"EVENT_PAYLOAD length: {len(os.environ.get('EVENT_PAYLOAD', '{}'))} chars")
 
     if event == "send_plan":
-        # Load pending plan from GitHub and email it to Tiffany
-        plan_data, _ = gh_get("pending_plan.json")
-        if not plan_data:
-            print("No pending_plan.json found. Exiting.")
-            exit(0)
+        # Read plan from PAYLOAD env var (passed via client_payload in workflow dispatch)
+        # This avoids storing the plan as a file in GitHub (no secret scanning issues)
+        import json as _json
+        payload_raw = os.environ.get("EVENT_PAYLOAD", "{}")
+        try:
+            payload = _json.loads(payload_raw)
+        except Exception:
+            payload = {}
 
-        plan = plan_data.get("plan", {})
-        week_of = plan.get("week_of", "")
-        is_test = plan_data.get("is_test", False)
-        recipient = plan_data.get("sent_to", EMAIL_TO)
+        plan = payload.get("plan", {})
+        week_of = payload.get("week_of", plan.get("week_of", ""))
+        is_test = payload.get("is_test", False)
+        recipient = payload.get("sent_to", EMAIL_TO)
+
+        if not plan:
+            print("No plan data in payload. Exiting.")
+            exit(0)
 
         # Build approval URL with token
         upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
