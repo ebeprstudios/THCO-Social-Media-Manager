@@ -74,8 +74,8 @@ textarea:focus { border-color: #A00605; }
       <div id="days-list"></div>
       <div class="divider"></div>
       <div id="success-card" class="success-card">
-        <div class="success-icon">&#10003;</div>
-        <div class="success-title">Plan Approved!</div>
+        <div class="success-icon" id="success-icon">&#10003;</div>
+        <div class="success-title" id="success-title">Plan Approved!</div>
         <div class="success-sub" id="success-message">Your feedback has been sent. The team will begin designing this week's content.</div>
       </div>
       <div id="approval-form">
@@ -228,15 +228,17 @@ async function submitApproval(action) {
       body: JSON.stringify({ event_type: 'plan_approved_by_client', client_payload: entry })
     });
 
-    document.getElementById('progress-fill').style.width = '100%';
     setTimeout(function() {
       document.getElementById('progress-wrap').style.display = 'none';
       document.getElementById('approval-form').style.display = 'none';
       document.getElementById('success-card').style.display = 'block';
       if (action === 'changes_requested') {
-        document.getElementById('success-title') && (document.getElementById('success-title').textContent = 'Feedback Sent!');
-        document.getElementById('success-message').textContent = 'Your feedback has been sent to the team. They will revise the plan and send you an updated version.';
+        document.getElementById('success-icon').textContent = '✏️';
+        document.getElementById('success-title').textContent = 'Feedback Sent!';
+        document.getElementById('success-message').textContent = 'Your notes have been sent to your social media manager. They will revise the plan and send you an updated version shortly.';
       } else {
+        document.getElementById('success-icon').innerHTML = '&#10003;';
+        document.getElementById('success-title').textContent = 'Plan Approved!';
         document.getElementById('success-message').textContent = 'The team has been notified and will begin designing your content for the week of ' + (entry.week_of || '') + '.';
       }
     }, 800);
