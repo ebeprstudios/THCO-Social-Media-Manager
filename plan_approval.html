@@ -80,10 +80,10 @@ textarea:focus { border-color: #A00605; }
       </div>
       <div id="approval-form">
         <div class="feedback-section">
-          <div class="section-label">Your Feedback</div>
-          <div class="feedback-label">Any changes or notes for the team?</div>
-          <div class="feedback-sub">This goes directly to your social media manager. Optional — leave blank to approve as-is.</div>
-          <textarea id="feedback-input" placeholder="e.g. Change Monday's post to focus more on the business launch... or looks great, approved!"></textarea>
+          <div class="section-label">Overall Feedback</div>
+          <div class="feedback-label">Any general notes for the whole week?</div>
+          <div class="feedback-sub">Use the notes on each day above for specific changes. This box is for general comments to your manager.</div>
+          <textarea id="feedback-input" placeholder="e.g. Great week overall! Just a few tweaks noted above. or I'd like to swap Tuesday and Thursday..."></textarea>
         </div>
         <button class="approve-btn" id="approve-btn" onclick="submitApproval('approved')">Approve This Plan</button>
         <button class="request-changes-btn" id="changes-btn" onclick="submitApproval('changes_requested')">Request Changes</button>
@@ -121,12 +121,18 @@ async function loadPlan() {
     var headers = { 'Accept': 'application/vnd.github.v3+json' };
     if (ghToken) headers['Authorization'] = 'token ' + ghToken;
     var res = await fetch(url, { headers: headers });
-    if (!res.ok) throw new Error('Could not load plan. Link may have expired.');
+
+    if (res.status === 404) {
+      document.getElementById('loading-state').innerHTML = '<div style="color:#A00605;font-weight:600;font-size:14px;">Plan not found.</div><div style="font-size:12px;color:#8A8A8A;margin-top:8px;line-height:1.7;">This link may have expired or the plan has already been processed.<br>Ask your social media manager to resend the plan email.</div>';
+      return;
+    }
+    if (!res.ok) throw new Error('GitHub returned ' + res.status);
+
     var data = await res.json();
     planData = JSON.parse(atob(data.content.replace(/\n/g, '')));
     renderPlan(planData.plan);
   } catch(e) {
-    document.getElementById('loading-state').innerHTML = '<div style="color:#A00605;font-weight:600;">Could not load plan.<br><span style="font-size:12px;font-weight:400;color:#8A8A8A;">' + e.message + '</span></div>';
+    document.getElementById('loading-state').innerHTML = '<div style="color:#A00605;font-weight:600;">Could not load plan.</div><div style="font-size:12px;color:#8A8A8A;margin-top:6px;">' + e.message + '</div><div style="font-size:12px;color:#8A8A8A;margin-top:6px;">Ask your social media manager to resend the plan approval email.</div>';
   }
 }
 
@@ -134,7 +140,7 @@ function renderPlan(plan) {
   document.getElementById('loading-state').style.display = 'none';
   document.getElementById('plan-content').style.display = 'block';
   document.getElementById('plan-title').textContent = 'Week of ' + (plan.week_of || '');
-  document.getElementById('plan-subtitle').textContent = 'Please review and approve or request changes below.';
+  document.getElementById('plan-subtitle').textContent = 'Review each day below, leave notes where needed, then approve at the bottom.';
 
   if (plan.planning_note) {
     document.getElementById('planning-note-text').textContent = plan.planning_note;
@@ -142,7 +148,7 @@ function renderPlan(plan) {
   }
 
   var daysHtml = '';
-  (plan.days || []).forEach(function(day) {
+  (plan.days || []).forEach(function(day, idx) {
     var pc = PILLAR_COLORS[day.pillar] || { color:'#8A8A8A', bg:'rgba(136,136,136,0.08)' };
     daysHtml += '<div class="day-card">';
     daysHtml += '<div class="day-header"><span class="day-name">' + esc(day.day) + '</span><span class="day-date">' + esc(day.date||'') + '</span></div>';
@@ -153,9 +159,23 @@ function renderPlan(plan) {
     if (day.content_direction) daysHtml += '<div class="direction">' + esc(day.content_direction) + '</div>';
     if (day.designer_needed && day.designer_needed !== 'None') daysHtml += '<div class="designer-badge">' + esc(day.designer_needed) + '</div>';
     daysHtml += '<div class="time-badge">3:00 PM CST</div>';
+    // Per-day feedback
+    daysHtml += '<div style="margin-top:12px;border-top:1px solid #F4F0EB;padding-top:10px;">';
+    daysHtml += '<div style="font-size:10px;font-weight:700;color:#A00605;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Notes for ' + esc(day.day) + ' <span style="font-weight:400;color:#A0A0A0;">(optional)</span></div>';
+    daysHtml += '<textarea id="day-feedback-' + idx + '" rows="2" placeholder="e.g. Love this! or Can we change the angle to... or Skip this day" style="width:100%;background:#F4F0EB;border:1px solid #E3D3C8;color:#414141;font-family:Georgia,serif;font-size:12px;padding:8px 10px;border-radius:7px;outline:none;resize:vertical;line-height:1.55;"></textarea>';
+    daysHtml += '</div>';
     daysHtml += '</div></div>';
   });
   document.getElementById('days-list').innerHTML = daysHtml;
+}
+
+function collectDayFeedback() {
+  if (!planData || !planData.plan || !planData.plan.days) return [];
+  return planData.plan.days.map(function(day, idx) {
+    var el = document.getElementById('day-feedback-' + idx);
+    var note = el ? el.value.trim() : '';
+    return note ? { day: day.day, date: day.date || '', title: day.title || '', note: note } : null;
+  }).filter(Boolean);
 }
 
 function esc(str) {
@@ -164,6 +184,7 @@ function esc(str) {
 
 async function submitApproval(action) {
   var feedback = document.getElementById('feedback-input').value.trim();
+  var dayFeedback = collectDayFeedback();
   var approveBtn = document.getElementById('approve-btn');
   var changesBtn = document.getElementById('changes-btn');
   approveBtn.disabled = true; changesBtn.disabled = true;
@@ -172,9 +193,22 @@ async function submitApproval(action) {
   document.getElementById('progress-label').textContent = action === 'approved' ? 'Approving...' : 'Sending feedback...';
   document.getElementById('error-msg').style.display = 'none';
 
+  // Build combined feedback string for manager notification
+  var fullFeedback = '';
+  if (dayFeedback.length > 0) {
+    fullFeedback += 'PER-DAY NOTES:\n' + dayFeedback.map(function(d) {
+      return d.day + ' (' + d.title + '): ' + d.note;
+    }).join('\n');
+  }
+  if (feedback) {
+    fullFeedback += (fullFeedback ? '\n\nOVERALL NOTES:\n' : '') + feedback;
+  }
+
   var entry = {
     action: action,
-    feedback: feedback,
+    feedback: fullFeedback || '',
+    day_feedback: dayFeedback,
+    overall_feedback: feedback,
     approved_at: new Date().toISOString(),
     week_of: planData && planData.plan ? planData.plan.week_of : '',
     repo: ghRepo
