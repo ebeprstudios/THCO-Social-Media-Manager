@@ -173,11 +173,46 @@ def build_team_email(plan, feedback, recipient_role, notion_copy):
 </body></html>"""
 
 # ── BUILD MANAGER NOTIFICATION EMAIL ─────────────────────────────
-def build_manager_email(plan, feedback, action):
+def build_manager_email(plan, feedback, action, day_feedback=None):
     week_of = plan.get("week_of", "")
     today = datetime.now().strftime("%B %-d, %Y")
-    action_label = "APPROVED" if action == "approved" else "CHANGES REQUESTED"
-    action_color = "#3A9E6E" if action == "approved" else "#B87830"
+    action_label = "APPROVED" if action == "approved" else "REJECTED" if action == "rejected" else "CHANGES REQUESTED"
+    action_color = "#3A9E6E" if action == "approved" else "#A00605" if action == "rejected" else "#B87830"
+
+    # Build per-day feedback section
+    day_fb_html = ""
+    if day_feedback:
+        day_fb_html = '<div style="margin-top:14px;border-top:1px solid #E3D3C8;padding-top:12px;">'
+        day_fb_html += '<div style="font-size:10px;font-weight:700;color:#A00605;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Per-Day Notes from Tiffany</div>'
+        for d in day_feedback:
+            day_fb_html += f'<div style="background:#F4F0EB;border-left:3px solid #B87830;padding:8px 12px;border-radius:4px;margin-bottom:6px;"><div style="font-size:11px;font-weight:700;color:#414141;">{d.get("day","")} — {d.get("title","")}</div><div style="font-size:12px;color:#5A5A5A;margin-top:3px;">{d.get("note","")}</div></div>'
+        day_fb_html += '</div>'
+
+    overall_html = f'<div style="background:#FFF3CD;border-left:3px solid #B87830;padding:12px 16px;border-radius:4px;font-size:13px;color:#414141;line-height:1.7;margin-top:10px;"><strong>Overall notes:</strong> {feedback}</div>' if feedback else ""
+
+    feedback_section = (day_fb_html + overall_html) if (day_feedback or feedback) else '<div style="font-size:13px;color:#8A8A8A;margin-top:8px;font-style:italic;">No feedback provided - approved as-is.</div>'
+
+    return f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#F4F0EB;font-family:Georgia,serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F4F0EB;">
+<tr><td align="center" style="padding:24px 16px 40px;">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+<tr><td style="background:#FFFDF5;border:1px solid #E3D3C8;border-radius:12px;padding:28px;">
+  <div style="font-size:10px;font-weight:700;color:{action_color};letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">{action_label}</div>
+  <div style="font-size:20px;font-weight:700;color:#414141;margin-bottom:6px;">Tiffany responded to the week of {week_of}</div>
+  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px;">{today}</div>
+  {feedback_section}
+  {"<div style='margin-top:16px;font-size:13px;color:#3A9E6E;font-weight:600;'>Team task emails have been sent automatically.</div>" if action == "approved" else "<div style='margin-top:16px;font-size:13px;color:#A00605;font-weight:600;'>Plan was REJECTED. Build a new plan from scratch.</div>" if action == "rejected" else "<div style='margin-top:16px;font-size:13px;color:#B87830;font-weight:600;'>Revise the plan and resend for her approval.</div>"}
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>"""
+    week_of = plan.get("week_of", "")
+    today = datetime.now().strftime("%B %-d, %Y")
+    action_label = "APPROVED" if action == "approved" else "REJECTED" if action == "rejected" else "CHANGES REQUESTED"
+    action_color = "#3A9E6E" if action == "approved" else "#A00605" if action == "rejected" else "#B87830"
     feedback_section = f'<div style="background:#FFF3CD;border-left:3px solid #B87830;padding:12px 16px;border-radius:4px;font-size:13px;color:#414141;line-height:1.75;margin-top:12px;"><strong>Her feedback:</strong> {feedback}</div>' if feedback else '<div style="font-size:13px;color:#8A8A8A;margin-top:8px;font-style:italic;">No feedback provided - approved as-is.</div>'
 
     return f"""<!DOCTYPE html>
@@ -191,7 +226,7 @@ def build_manager_email(plan, feedback, action):
   <div style="font-size:20px;font-weight:700;color:#414141;margin-bottom:6px;">Tiffany responded to the week of {week_of}</div>
   <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px;">{today}</div>
   {feedback_section}
-  {"<div style='margin-top:16px;font-size:13px;color:#3A9E6E;font-weight:600;'>Team task emails have been sent automatically.</div>" if action == "approved" else "<div style='margin-top:16px;font-size:13px;color:#B87830;font-weight:600;'>Revise the plan and resend for her approval.</div>"}
+  {"<div style='margin-top:16px;font-size:13px;color:#3A9E6E;font-weight:600;'>Team task emails have been sent automatically.</div>" if action == "approved" else "<div style='margin-top:16px;font-size:13px;color:#A00605;font-weight:600;'>Plan was REJECTED. Build a new plan from scratch.</div>" if action == "rejected" else "<div style='margin-top:16px;font-size:13px;color:#B87830;font-weight:600;'>Revise the plan and resend for her approval.</div>"}
 </td></tr>
 </table>
 </td></tr>
@@ -200,6 +235,8 @@ def build_manager_email(plan, feedback, action):
 
 # ── SEND EMAIL ────────────────────────────────────────────────────
 def send_email_msg(html, subject, to_email, cc_emails=""):
+    to_email  = to_email.strip().replace('\n','').replace('\r','')
+    cc_emails = cc_emails.strip().replace('\n','').replace('\r','') if cc_emails else ""
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"]    = EMAIL_FROM
@@ -283,9 +320,10 @@ if __name__ == "__main__":
             print("No plan_approval.json found. Exiting.")
             exit(0)
 
-        action   = approval_data.get("action", "approved")
-        feedback = approval_data.get("feedback", "")
-        week_of  = approval_data.get("week_of", "")
+        action      = approval_data.get("action", "approved")
+        feedback    = approval_data.get("overall_feedback", approval_data.get("feedback", ""))
+        day_feedback= approval_data.get("day_feedback", [])
+        week_of     = approval_data.get("week_of", "")
 
         plan_data, _ = gh_get("pending_plan.json")
         plan = plan_data.get("plan", {}) if plan_data else {}
@@ -293,9 +331,10 @@ if __name__ == "__main__":
 
         # Notify manager first
         if MANAGER_EMAIL:
-            html = build_manager_email(plan, feedback, action)
-            action_label = "Approved" if action == "approved" else "Changes Requested"
-            send_email_msg(html, f"[{action_label}] Tiffany's Plan Response — Week of {week_of}", MANAGER_EMAIL)
+            html = build_manager_email(plan, feedback, action, day_feedback)
+            action_label = "Approved" if action == "approved" else "Rejected" if action == "rejected" else "Changes Requested"
+            clean_manager = MANAGER_EMAIL.strip().replace('\n','').replace('\r','')
+            send_email_msg(html, f"[{action_label}] Tiffany Plan Response - Week of {week_of}", clean_manager)
 
         if action == "approved":
             # Send task emails to each team member
