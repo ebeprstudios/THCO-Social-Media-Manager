@@ -11,21 +11,43 @@ on:
         default: 'send_plan'
 
 jobs:
-  handle-plan-event:
+  send-plan:
     runs-on: ubuntu-latest
+    if: github.event.action == 'send_plan_to_client' || github.event.inputs.event_type == 'send_plan'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install dependencies
         run: pip install requests
+      - name: Send plan to client
+        env:
+          EMAIL_FROM:        ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD:    ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO:          ${{ secrets.EMAIL_TO }}
+          GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_TOKEN:      ${{ secrets.UPLOAD_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          EVENT_PAYLOAD:     ${{ toJson(github.event.client_payload) }}
+          WORKFLOW_EVENT:    send_plan
+        run: python plan_email.py
 
-      - name: Handle plan event
+  notify-team:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'plan_approved_by_client' || github.event.inputs.event_type == 'notify_team'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Notify team after approval
         env:
           EMAIL_FROM:          ${{ secrets.EMAIL_FROM }}
           EMAIL_PASSWORD:      ${{ secrets.EMAIL_PASSWORD }}
@@ -38,10 +60,6 @@ jobs:
           DESIGNER2_EMAIL:     ${{ secrets.DESIGNER2_EMAIL }}
           VIDEO_EDITOR_EMAIL:  ${{ secrets.VIDEO_EDITOR_EMAIL }}
           MANAGER_EMAIL:       ${{ secrets.MANAGER_EMAIL }}
-          WORKFLOW_EVENT: >-
-            ${{
-              github.event.action == 'send_plan_to_client' && 'send_plan' ||
-              github.event.action == 'plan_approved_by_client' && 'notify_team' ||
-              github.event.inputs.event_type || 'send_plan'
-            }}
+          EVENT_PAYLOAD:       ${{ toJson(github.event.client_payload) }}
+          WORKFLOW_EVENT:      notify_team
         run: python plan_email.py
