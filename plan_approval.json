@@ -1,9 +1,9 @@
 {
-  "action": "approved",
+  "action": "rejected",
   "feedback": "",
   "day_feedback": [],
   "overall_feedback": "",
-  "approved_at": "2026-03-27T05:24:44.111Z",
+  "approved_at": "2026-03-27T05:25:01.575Z",
   "week_of": "",
   "repo": "ebeprstudios/THCO-Social-Media-Manager"
 }
