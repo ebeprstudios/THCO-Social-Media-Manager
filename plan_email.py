@@ -333,8 +333,11 @@ if __name__ == "__main__":
         if MANAGER_EMAIL:
             html = build_manager_email(plan, feedback, action, day_feedback)
             action_label = "Approved" if action == "approved" else "Rejected" if action == "rejected" else "Changes Requested"
-            clean_manager = MANAGER_EMAIL.strip().replace('\n','').replace('\r','')
-            send_email_msg(html, f"[{action_label}] Tiffany Plan Response - Week of {week_of}", clean_manager)
+            # Clean and split manager emails - handle multiple comma-separated addresses
+            manager_emails = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
+            primary = manager_emails[0]
+            cc_rest = ', '.join(manager_emails[1:]) if len(manager_emails) > 1 else ''
+            send_email_msg(html, f"[{action_label}] Tiffany Plan Response - Week of {week_of}", primary, cc_rest)
 
         if action == "approved":
             # Send task emails to each team member
