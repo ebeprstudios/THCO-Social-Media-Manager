@@ -87,6 +87,7 @@ textarea:focus { border-color: #A00605; }
         </div>
         <button class="approve-btn" id="approve-btn" onclick="submitApproval('approved')">Approve This Plan</button>
         <button class="request-changes-btn" id="changes-btn" onclick="submitApproval('changes_requested')">Request Changes</button>
+        <button id="reject-btn" onclick="submitApproval('rejected')" style="width:100%;background:transparent;color:#A00605;border:1.5px solid #A00605;padding:13px;border-radius:10px;font-family:Georgia,serif;font-size:14px;cursor:pointer;margin-top:8px;">Reject This Plan</button>
         <div class="progress-wrap" id="progress-wrap">
           <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
           <div class="progress-label" id="progress-label">Submitting...</div>
@@ -187,7 +188,8 @@ async function submitApproval(action) {
   var dayFeedback = collectDayFeedback();
   var approveBtn = document.getElementById('approve-btn');
   var changesBtn = document.getElementById('changes-btn');
-  approveBtn.disabled = true; changesBtn.disabled = true;
+  var rejectBtn  = document.getElementById('reject-btn');
+  approveBtn.disabled = true; changesBtn.disabled = true; if(rejectBtn) rejectBtn.disabled = true;
   document.getElementById('progress-wrap').style.display = 'block';
   document.getElementById('progress-fill').style.width = '30%';
   document.getElementById('progress-label').textContent = action === 'approved' ? 'Approving...' : 'Sending feedback...';
@@ -222,11 +224,16 @@ async function submitApproval(action) {
 
     // Trigger team notification workflow
     var parts = ghRepo.split('/');
-    await fetch('https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/dispatches', {
+    var dispatchRes = await fetch('https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/dispatches', {
       method: 'POST',
       headers: { 'Authorization': 'token ' + ghToken, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ event_type: 'plan_approved_by_client', client_payload: entry })
     });
+    if (!dispatchRes.ok && dispatchRes.status !== 204) {
+      var errText = await dispatchRes.text();
+      console.error('Dispatch failed:', dispatchRes.status, errText);
+      throw new Error('Could not notify team. GitHub returned ' + dispatchRes.status + '. Check your token has workflow scope.');
+    }
 
     setTimeout(function() {
       document.getElementById('progress-wrap').style.display = 'none';
@@ -236,6 +243,10 @@ async function submitApproval(action) {
         document.getElementById('success-icon').textContent = '✏️';
         document.getElementById('success-title').textContent = 'Feedback Sent!';
         document.getElementById('success-message').textContent = 'Your notes have been sent to your social media manager. They will revise the plan and send you an updated version shortly.';
+      } else if (action === 'rejected') {
+        document.getElementById('success-icon').textContent = '✕';
+        document.getElementById('success-title').textContent = 'Plan Rejected';
+        document.getElementById('success-message').textContent = 'Your social media manager has been notified. They will put together a new plan and send it to you for review.';
       } else {
         document.getElementById('success-icon').innerHTML = '&#10003;';
         document.getElementById('success-title').textContent = 'Plan Approved!';
