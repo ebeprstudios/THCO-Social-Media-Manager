@@ -4197,6 +4197,8 @@ async function processKBDocument(filename, docType, fileType, base64, textConten
     '"action_items":["action1","action2","action3"],' +
     '"profile_updates":{"audience_notes":[],"content_gaps":[],"winning_formats":[]}}';
   } // end else (non-transcript)
+
+  try {
     var messages;
     if (fileType === 'pdf') {
       // For large PDFs, Claude processes the full document - this takes longer
