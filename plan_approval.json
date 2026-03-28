@@ -1,9 +1,9 @@
 {
   "action": "approved",
-  "feedback": "This plan has been reviewed. I approved. I don't have any changes needed.",
+  "feedback": "Test Feedback.",
   "day_feedback": [],
-  "overall_feedback": "This plan has been reviewed. I approved. I don't have any changes needed.",
-  "approved_at": "2026-03-28T15:38:22.294Z",
+  "overall_feedback": "Test Feedback.",
+  "approved_at": "2026-03-28T18:05:20.024Z",
   "week_of": "",
   "repo": "ebeprstudios/THCO-Social-Media-Manager"
 }
