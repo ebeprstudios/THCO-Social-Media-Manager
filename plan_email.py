@@ -128,7 +128,39 @@ def build_client_email(plan, approval_url):
 </body></html>"""
 
 # ── BUILD TEAM TASK EMAIL ─────────────────────────────────────────
-def build_team_email(plan, feedback, recipient_role, notion_copy):
+def build_planning_horizon(week_of_str):
+    """Calculate the 3-week timeline from the week_of string."""
+    from datetime import datetime, timedelta
+    try:
+        # week_of_str is like "March 30 - April 5, 2026" — parse the start date
+        start_str = week_of_str.split("-")[0].strip()
+        # Add year if missing
+        if not any(str(y) in start_str for y in range(2020, 2030)):
+            year = week_of_str.split(",")[-1].strip()
+            start_str = f"{start_str}, {year}"
+        start_date = datetime.strptime(start_str, "%B %d, %Y")
+        # Recording week = week_of itself (week 1)
+        record_start = start_date
+        record_end   = start_date + timedelta(days=6)
+        # Editing week = week 2
+        edit_start   = start_date + timedelta(weeks=1)
+        edit_end     = edit_start + timedelta(days=6)
+        # Publishing week = week 3
+        pub_start    = start_date + timedelta(weeks=2)
+        pub_end      = pub_start + timedelta(days=6)
+
+        def fmt(d): return d.strftime("%B %-d")
+        def fmt_yr(d): return d.strftime("%B %-d, %Y")
+
+        recording  = f"{fmt(record_start)} - {fmt_yr(record_end)}"
+        editing    = f"{fmt(edit_start)} - {fmt_yr(edit_end)}"
+        publishing = f"{fmt(pub_start)} - {fmt_yr(pub_end)}"
+        return recording, editing, publishing
+    except Exception:
+        return week_of_str, "Following week", "Week after that"
+
+
+def build_team_email(plan, feedback, recipient_role, notion_copy, day_feedback=None):
     week_of = plan.get("week_of", "")
     today = datetime.now().strftime("%B %-d, %Y")
     role_colors = {
@@ -137,7 +169,42 @@ def build_team_email(plan, feedback, recipient_role, notion_copy):
         "video_editor": {"color":"#3A9E6E","bg":"rgba(58,158,110,0.1)","label":"Video Editor - Reels"},
     }
     rc = role_colors.get(recipient_role, {"color":"#414141","bg":"rgba(65,65,65,0.08)","label":"Team Member"})
-    feedback_html = f'<div style="background:#FFF3CD;border:1px solid #B87830;border-radius:8px;padding:14px 16px;margin-bottom:20px;"><div style="font-size:10px;font-weight:700;color:#7A4E0D;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Tiffany\'s Feedback</div><div style="font-size:13px;color:#414141;line-height:1.7;">{feedback}</div></div>' if feedback else ""
+
+    # Build 2-week planning horizon banner
+    recording, editing, publishing = build_planning_horizon(week_of)
+    horizon_html = f"""
+<div style="background:#EFF6FF;border:1px solid #3A6EA8;border-radius:8px;padding:14px 16px;margin-bottom:20px;">
+  <div style="font-size:10px;font-weight:700;color:#1E4B7A;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">&#128197; 2-Week Planning Horizon</div>
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="font-size:11px;color:#1E4B7A;font-weight:700;padding-bottom:4px;">&#127909; Recording Week</td>
+      <td style="font-size:12px;color:#414141;padding-bottom:4px;">{recording}</td>
+    </tr>
+    <tr>
+      <td style="font-size:11px;color:#1E4B7A;font-weight:700;padding-bottom:4px;">&#9986;&#65039; Editing Week</td>
+      <td style="font-size:12px;color:#414141;padding-bottom:4px;">{editing}</td>
+    </tr>
+    <tr>
+      <td style="font-size:11px;color:#1E4B7A;font-weight:700;">&#128640; Publishing Week</td>
+      <td style="font-size:12px;color:#414141;">{publishing}</td>
+    </tr>
+  </table>
+  <div style="font-size:11px;color:#5A7A9A;margin-top:10px;line-height:1.6;">Final deliverables are due by end of the editing week so scheduling can begin on time.</div>
+</div>"""
+    # Build feedback section — overall + per-day notes
+    feedback_parts = []
+    if day_feedback:
+        day_lines = "".join([
+            f'<div style="margin-bottom:8px;padding:8px 12px;background:#FFFDF5;border-left:3px solid #B87830;border-radius:4px;">'
+            f'<div style="font-size:11px;font-weight:700;color:#414141;">{d.get("day","")} — {d.get("title","")}</div>'
+            f'<div style="font-size:12px;color:#5A5A5A;margin-top:3px;">{d.get("note","")}</div></div>'
+            for d in day_feedback
+        ])
+        feedback_parts.append(f'<div style="margin-bottom:8px;font-size:10px;font-weight:700;color:#7A4E0D;letter-spacing:2px;text-transform:uppercase;">Per-Day Notes</div>{day_lines}')
+    if feedback:
+        feedback_parts.append(f'<div style="font-size:10px;font-weight:700;color:#7A4E0D;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;{"margin-top:12px;" if day_feedback else ""}">Overall Notes</div><div style="font-size:13px;color:#414141;line-height:1.7;">{feedback}</div>')
+
+    feedback_html = f'<div style="background:#FFF3CD;border:1px solid #B87830;border-radius:8px;padding:14px 16px;margin-bottom:20px;">{"".join(feedback_parts)}</div>' if feedback_parts else ""
 
     return f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
@@ -157,6 +224,7 @@ def build_team_email(plan, feedback, recipient_role, notion_copy):
   <div style="background:{rc["bg"]};border-radius:8px;padding:10px 16px;margin-bottom:20px;display:inline-block;">
     <span style="font-size:12px;font-weight:700;color:{rc["color"]};">{rc["label"]}</span>
   </div>
+  {horizon_html}
   {feedback_html}
   <div style="font-size:10px;font-weight:700;color:#A00605;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Your Notion Task Copy</div>
   <div style="background:#F4F0EB;border:1px solid #E3D3C8;border-radius:8px;padding:16px;font-size:12px;color:#414141;line-height:1.8;white-space:pre-wrap;font-family:Georgia,serif;">{notion_copy}</div>
@@ -176,49 +244,36 @@ def build_team_email(plan, feedback, recipient_role, notion_copy):
 def build_manager_email(plan, feedback, action, day_feedback=None):
     week_of = plan.get("week_of", "") if plan else ""
     today = datetime.now().strftime("%B %-d, %Y")
-    status_map = {"approved": "Approved", "rejected": "Rejected", "changes_requested": "Changes Needed"}
-    status = status_map.get(action, "Changes Needed")
-    status_color = {"Approved": "#3A9E6E", "Rejected": "#A00605", "Changes Needed": "#B87830"}.get(status, "#414141")
+    action_label = "APPROVED" if action == "approved" else "REJECTED"
+    action_color = "#3A9E6E" if action == "approved" else "#A00605"
 
-    # Build combined feedback from per-day notes + overall
-    all_feedback = ""
+    # Build per-day feedback section
+    day_fb_html = ""
     if day_feedback:
-        all_feedback += "\n".join([f"{d.get('day','')} — {d.get('title','')}: {d.get('note','')}" for d in day_feedback])
-    if feedback:
-        all_feedback += ("\n\n" if all_feedback else "") + feedback
-    all_feedback = all_feedback.strip() or "No feedback provided."
+        day_fb_html = '<div style="margin-top:14px;border-top:1px solid #E3D3C8;padding-top:12px;">'
+        day_fb_html += '<div style="font-size:10px;font-weight:700;color:#A00605;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Per-Day Notes from Tiffany</div>'
+        for d in day_feedback:
+            day_fb_html += f'<div style="background:#F4F0EB;border-left:3px solid #B87830;padding:8px 12px;border-radius:4px;margin-bottom:6px;"><div style="font-size:11px;font-weight:700;color:#414141;">{d.get("day","")} — {d.get("title","")}</div><div style="font-size:12px;color:#5A5A5A;margin-top:3px;">{d.get("note","")}</div></div>'
+        day_fb_html += '</div>'
+
+    overall_html = f'<div style="background:#FFF3CD;border-left:3px solid #B87830;padding:12px 16px;border-radius:4px;font-size:13px;color:#414141;line-height:1.7;margin-top:10px;"><strong>Overall notes:</strong> {feedback}</div>' if feedback else ""
+
+    feedback_section = (day_fb_html + overall_html) if (day_feedback or feedback) else '<div style="font-size:13px;color:#8A8A8A;margin-top:8px;font-style:italic;">No feedback provided - approved as-is.</div>'
+
+    next_step = "<div style='margin-top:16px;font-size:13px;color:#3A9E6E;font-weight:600;'>Team task emails have been sent automatically.</div>" if action == "approved" else "<div style='margin-top:16px;font-size:13px;color:#A00605;font-weight:600;'>Plan was REJECTED. Build a new plan from scratch.</div>"
 
     return f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#F4F0EB;font-family:Georgia,serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#F4F0EB;">
-<tr><td align="center" style="padding:32px 16px;">
-<table width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;background:#FFFDF5;border:1px solid #E3D3C8;border-radius:12px;overflow:hidden;">
-<tr><td style="background:#414141;padding:20px 28px;">
-  <div style="font-size:10px;font-weight:700;color:#C49E3C;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">Weekly Content Plan</div>
-  <div style="font-size:18px;font-weight:700;color:#FFFDF5;">Client Response — {week_of}</div>
-  <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;">{today}</div>
-</td></tr>
-<tr><td style="padding:28px;">
-  <table width="100%" cellpadding="0" cellspacing="0">
-    <tr>
-      <td style="font-size:13px;font-weight:700;color:#414141;padding-bottom:6px;">Status</td>
-    </tr>
-    <tr>
-      <td style="padding-bottom:20px;">
-        <span style="font-size:14px;font-weight:700;color:{status_color};background:{'rgba(58,158,110,0.1)' if status=='Approved' else 'rgba(160,6,5,0.08)' if status=='Rejected' else 'rgba(184,120,48,0.1)'};padding:6px 16px;border-radius:20px;">{status}</span>
-      </td>
-    </tr>
-    <tr>
-      <td style="font-size:13px;font-weight:700;color:#414141;padding-bottom:6px;">Feedback</td>
-    </tr>
-    <tr>
-      <td style="font-size:13px;color:#5A5A5A;line-height:1.75;background:#F4F0EB;border-radius:8px;padding:14px 16px;white-space:pre-wrap;">{all_feedback}</td>
-    </tr>
-  </table>
-</td></tr>
-<tr><td style="background:#F4F0EB;padding:14px 28px;text-align:center;border-top:1px solid #E3D3C8;">
-  <div style="font-size:10px;color:#A0A0A0;letter-spacing:1.5px;text-transform:uppercase;">The Creative Theologian Media Group</div>
+<tr><td align="center" style="padding:24px 16px 40px;">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+<tr><td style="background:#FFFDF5;border:1px solid #E3D3C8;border-radius:12px;padding:28px;">
+  <div style="font-size:10px;font-weight:700;color:{action_color};letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">{action_label}</div>
+  <div style="font-size:20px;font-weight:700;color:#414141;margin-bottom:6px;">Tiffany responded to the week of {week_of}</div>
+  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px;">{today}</div>
+  {feedback_section}
+  {next_step}
 </td></tr>
 </table>
 </td></tr>
@@ -347,7 +402,7 @@ if __name__ == "__main__":
         # Notify manager first
         if MANAGER_EMAIL:
             html = build_manager_email(plan, feedback, action, day_feedback)
-            action_label = "Approved" if action == "approved" else "Rejected" if action == "rejected" else "Changes Requested"
+            action_label = "Approved" if action == "approved" else "Rejected"
             # Clean and split manager emails - handle multiple comma-separated addresses
             manager_emails = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
             primary = manager_emails[0]
@@ -355,7 +410,11 @@ if __name__ == "__main__":
             send_email_msg(html, f"[{action_label}] Tiffany Plan Response - Week of {week_of}", primary, cc_rest)
 
         if action == "approved":
-            # Send task emails to each team member
+            # Clean manager email for CC
+            manager_cc = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
+            manager_cc_str = ', '.join(manager_cc)
+
+            # Send task emails to each team member, CC manager
             team = [
                 ("designer1",    DESIGNER1_EMAIL,    delivery.get("designer1",{}).get("notion_copy","")),
                 ("designer2",    DESIGNER2_EMAIL,    delivery.get("designer2",{}).get("notion_copy","")),
@@ -363,9 +422,10 @@ if __name__ == "__main__":
             ]
             for role, email, notion_copy in team:
                 if email and notion_copy:
-                    html = build_team_email(plan, feedback, role, notion_copy)
+                    html = build_team_email(plan, feedback, role, notion_copy, day_feedback)
                     role_label = role.replace("_"," ").title()
-                    send_email_msg(html, f"Your Tasks — Week of {week_of} (Approved)", email)
+                    send_email_msg(html, f"Your Tasks — Week of {week_of} (Approved)", email, manager_cc_str)
+                    print(f"Task email sent to {role_label}: {email} (CC: {manager_cc_str})")
                     print(f"Task email sent to {role_label}: {email}")
 
         # Clean up approval file
