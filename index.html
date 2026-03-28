@@ -2179,33 +2179,24 @@ async function generateWeeklyPlan() {
     scriptCtx +
     modeInstruction + '\n\n' +
     'TWO-WEEK PLAN: ' + weekDates[0] + ' through ' + weekDates[13] + '\n' +
-    'WEEK 1: ' + weekDates[0] + ' – ' + weekDates[6] + '\n' +
-    'WEEK 2: ' + weekDates[7] + ' – ' + weekDates[13] + '\n\n' +
+    'WEEK 1: ' + weekDates[0] + ' through ' + weekDates[6] + '\n' +
+    'WEEK 2: ' + weekDates[7] + ' through ' + weekDates[13] + '\n\n' +
+    'RULES: planning_note=max 15 words. content_direction=max 2 sentences. voiceover_topic=max 12 words. notion_copy=one line per item.\n\n' +
     'Return ONLY valid JSON. No markdown. No backticks. Start with {.\n\n' +
     '{"week_of":"' + weekDates[0] + ' - ' + weekDates[13] + '",' +
     '"mode":"' + plannerMode + '",' +
-    '"planning_note":"One sentence describing the strategic direction and why this mix serves Tiffany across these two weeks.",' +
+    '"planning_note":"...",' +
     '"pillar_balance":{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0},' +
-    '"gaps_addressed":["gap filled 1","gap filled 2"],' +
+    '"gaps_addressed":["...","..."],' +
     '"days":[' +
-    '{"day":"Monday","date":"' + weekDates[0] + '","week_label":"Week 1","post_type":"Reel or Carousel or Quote Post","pillar":"pillar name",' +
-    '"title":"Post title. Specific and compelling. Not generic.",' +
-    '"hook":"The exact first line or on-screen text. Stops the scroll. In her voice.",' +
-    '"content_direction":"2-3 specific sentences on what this post covers and why it works for her audience right now.",' +
-    '"voiceover_topic":"If reel: a specific voiceover direction for Tiffany. What to say, the angle, the energy. If not reel: empty string.",' +
-    '"reel_type":"If reel: either Talking Head (Tiffany on camera speaking directly) or Voiceover (Tiffany records audio only, plays over B-roll footage). Choose based on content — personal stories and teaching = Talking Head, lifestyle moments and behind-the-scenes = Voiceover. If not reel: empty string.",' +
-    '"shot_list":"If reel_type is Voiceover: a numbered list of 3-6 specific B-roll shots Tiffany needs to film to support this reel. Be specific — location, action, mood. Example: 1. Morning coffee at kitchen counter — hands wrapping around mug, steam visible. 2. Walking through front door, dropping keys, sighing. If Talking Head or not a reel: empty string.",' +
-    '"designer_needed":"Designer 1 or Designer 2 or Video Editor or None",' +
-    '"thumbnail_hook":"If reel: exact 4-6 word thumbnail text for Designer 1. Else empty.",' +
-    '"carousel_outline":"If carousel: slide 1 hook headline, slide 2 point, slide 3 point, CTA slide. Else empty.",' +
-    '"quote":"If quote post: the exact quote in her voice. Else empty.",' +
-    '"fresh_or_scripted":"fresh or from script ' + (scripts.length > 0 ? '1 through ' + scripts.length : '') + '"}' +
-    '... (repeat for all 14 days: ' + weekDates.map(function(d,i){return d + (i<7?' [Week 1]':' [Week 2]');}).join(', ') + ')' +
+    '{"day":"Monday","date":"' + weekDates[0] + '","week_label":"Week 1","post_type":"Reel","pillar":"...","title":"...","hook":"...","content_direction":"...","voiceover_topic":"...","reel_type":"Talking Head","shot_list":"","designer_needed":"Video Editor","thumbnail_hook":"...","carousel_outline":"","quote":"","fresh_or_scripted":"fresh"},' +
+    '{"day":"Tuesday","date":"' + weekDates[1] + '","week_label":"Week 1","post_type":"Carousel","pillar":"...","title":"...","hook":"...","content_direction":"...","voiceover_topic":"","reel_type":"","shot_list":"","designer_needed":"Designer 2","thumbnail_hook":"","carousel_outline":"Slide 1:...","quote":"","fresh_or_scripted":"fresh"},' +
+    '...generate all 14 days through ' + weekDates[13] + '...' +
     '],' +
     '"delivery":{' +
-    '"designer1":{"name":"Designer 1","sub":"Thumbnails","notion_copy":"DESIGNER 1 TASKS - WEEKS OF ' + weekDates[0] + ' & ' + weekDates[7] + '\n\nFor each reel listed below, create an Instagram thumbnail with the hook text overlaid on a photo of Tiffany. Brand colors only. Sharp well-lit photo. Text legible on mobile.\n\nWEEK 1 (' + weekDates[0] + ' - ' + weekDates[6] + '):\n[List each Week 1 reel with thumbnail hook and photo direction]\n\nWEEK 2 (' + weekDates[7] + ' - ' + weekDates[13] + '):\n[List each Week 2 reel with thumbnail hook and photo direction]"},' +
-    '"designer2":{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":"DESIGNER 2 TASKS - WEEKS OF ' + weekDates[0] + ' & ' + weekDates[7] + '\n\nWEEK 1 (' + weekDates[0] + ' - ' + weekDates[6] + '):\n[List each Week 1 carousel with full slide outline and each quote post with exact quote text]\n\nWEEK 2 (' + weekDates[7] + ' - ' + weekDates[13] + '):\n[List each Week 2 carousel with full slide outline and each quote post with exact quote text]"},' +
-    '"video_editor":{"name":"Video Editor","sub":"Reels","notion_copy":"VIDEO EDITOR TASKS - WEEKS OF ' + weekDates[0] + ' & ' + weekDates[7] + '\n\nTALKING HEAD REELS: Tiffany films herself on camera speaking. Set up clean background, good lighting, record directly.\n\nVOICEOVER REELS: Tiffany records audio only. You match her voiceover with B-roll footage she has filmed per the shot list, or source from the content library.\n\nWEEK 1 (' + weekDates[0] + ' - ' + weekDates[6] + '):\n[List each Week 1 reel with: reel type (Talking Head / Voiceover), voiceover topic, and shot list if Voiceover]\n\nWEEK 2 (' + weekDates[7] + ' - ' + weekDates[13] + '):\n[List each Week 2 reel with: reel type (Talking Head / Voiceover), voiceover topic, and shot list if Voiceover]"}' +
+    '"designer1":{"name":"Designer 1","sub":"Thumbnails","notion_copy":"W1 Reels:\\n[Day: hook]\\n\\nW2 Reels:\\n[Day: hook]"},' +
+    '"designer2":{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":"W1:\\n[Day: type - task]\\n\\nW2:\\n[Day: type - task]"},' +
+    '"video_editor":{"name":"Video Editor","sub":"Reels","notion_copy":"W1:\\n[Day: type - topic]\\n\\nW2:\\n[Day: type - topic]"}' +
     '}}';
 
   try {
