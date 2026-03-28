@@ -2209,7 +2209,7 @@ async function generateWeeklyPlan() {
     '}}';
 
   try {
-    var plan = await callAPI(prompt, 6000);
+    var plan = await callAPI(prompt, 8000);
 
     // Store plan but DON'T update profile yet - only approved plans count
     currentGeneratedPlan = plan;
