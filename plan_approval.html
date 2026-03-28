@@ -39,7 +39,7 @@ textarea:focus { border-color: #A00605; }
 .approve-btn { width: 100%; background: #A00605; color: white; border: none; padding: 16px; border-radius: 10px; font-family: Georgia, serif; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 14px; letter-spacing: 0.5px; transition: background 0.2s; }
 .approve-btn:active { background: #800504; }
 .approve-btn:disabled { background: #C0C0C0; cursor: not-allowed; }
-.request-changes-btn { width: 100%; background: transparent; color: #414141; border: 1.5px solid #E3D3C8; padding: 13px; border-radius: 10px; font-family: Georgia, serif; font-size: 14px; cursor: pointer; margin-top: 8px; }
+
 .progress-wrap { display: none; margin-top: 14px; }
 .progress-bar { height: 4px; background: #E3D3C8; border-radius: 2px; overflow: hidden; }
 .progress-fill { height: 100%; width: 0%; background: #A00605; border-radius: 2px; transition: width 0.3s; }
@@ -86,7 +86,6 @@ textarea:focus { border-color: #A00605; }
           <textarea id="feedback-input" placeholder="e.g. Great week overall! Just a few tweaks noted above. or I'd like to swap Tuesday and Thursday..."></textarea>
         </div>
         <button class="approve-btn" id="approve-btn" onclick="submitApproval('approved')">Approve This Plan</button>
-        <button class="request-changes-btn" id="changes-btn" onclick="submitApproval('changes_requested')">Request Changes</button>
         <button id="reject-btn" onclick="submitApproval('rejected')" style="width:100%;background:transparent;color:#A00605;border:1.5px solid #A00605;padding:13px;border-radius:10px;font-family:Georgia,serif;font-size:14px;cursor:pointer;margin-top:8px;">Reject This Plan</button>
         <div class="progress-wrap" id="progress-wrap">
           <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
@@ -187,9 +186,8 @@ async function submitApproval(action) {
   var feedback = document.getElementById('feedback-input').value.trim();
   var dayFeedback = collectDayFeedback();
   var approveBtn = document.getElementById('approve-btn');
-  var changesBtn = document.getElementById('changes-btn');
   var rejectBtn  = document.getElementById('reject-btn');
-  approveBtn.disabled = true; changesBtn.disabled = true; if(rejectBtn) rejectBtn.disabled = true;
+  approveBtn.disabled = true; if(rejectBtn) rejectBtn.disabled = true;
   document.getElementById('progress-wrap').style.display = 'block';
   document.getElementById('progress-fill').style.width = '30%';
   document.getElementById('progress-label').textContent = action === 'approved' ? 'Approving...' : 'Sending feedback...';
@@ -239,11 +237,7 @@ async function submitApproval(action) {
       document.getElementById('progress-wrap').style.display = 'none';
       document.getElementById('approval-form').style.display = 'none';
       document.getElementById('success-card').style.display = 'block';
-      if (action === 'changes_requested') {
-        document.getElementById('success-icon').textContent = '✏️';
-        document.getElementById('success-title').textContent = 'Feedback Sent!';
-        document.getElementById('success-message').textContent = 'Your notes have been sent to your social media manager. They will revise the plan and send you an updated version shortly.';
-      } else if (action === 'rejected') {
+      if (action === 'rejected') {
         document.getElementById('success-icon').textContent = '✕';
         document.getElementById('success-title').textContent = 'Plan Rejected';
         document.getElementById('success-message').textContent = 'Your social media manager has been notified. They will put together a new plan and send it to you for review.';
