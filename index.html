@@ -737,42 +737,33 @@ body::before {
 
         <!-- CONTENT MIX -->
         <div style="margin-bottom:16px;">
-          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Content Mix This Week</div>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
-            <div>
-              <div style="font-size:11px;color:var(--charcoal2);margin-bottom:5px;">Reels</div>
-              <select id="mix-reels" class="select" style="width:100%;">
-                <option value="3" selected>3 Reels</option>
-                <option value="4">4 Reels</option>
-                <option value="5">5 Reels</option>
-                <option value="2">2 Reels</option>
-              </select>
+          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Content Mix Per Week</div>
+          <div style="font-size:11px;color:var(--charcoal3);margin-bottom:10px;line-height:1.6;">Per contract: 5 Reels + 2 Carousels required. 3 Quote Posts pulled from Knowledge Base &amp; scripts as a bonus.</div>
+          <div style="background:var(--cream-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--red);"></div>
+              <span style="font-size:13px;font-weight:700;color:var(--charcoal);">5</span>
+              <span style="font-size:12px;color:var(--charcoal2);">Reels</span>
+              <span style="font-size:10px;color:var(--charcoal3);background:rgba(160,6,5,0.08);padding:2px 7px;border-radius:10px;">Contract</span>
             </div>
-            <div>
-              <div style="font-size:11px;color:var(--charcoal2);margin-bottom:5px;">Carousels</div>
-              <select id="mix-carousels" class="select" style="width:100%;">
-                <option value="2" selected>2 Carousels</option>
-                <option value="1">1 Carousel</option>
-                <option value="3">3 Carousels</option>
-              </select>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--blue);"></div>
+              <span style="font-size:13px;font-weight:700;color:var(--charcoal);">2</span>
+              <span style="font-size:12px;color:var(--charcoal2);">Carousels</span>
+              <span style="font-size:10px;color:var(--charcoal3);background:rgba(58,110,168,0.08);padding:2px 7px;border-radius:10px;">Contract</span>
             </div>
-            <div>
-              <div style="font-size:11px;color:var(--charcoal2);margin-bottom:5px;">Quote Posts</div>
-              <select id="mix-quotes" class="select" style="width:100%;">
-                <option value="1" selected>1 Quote Post</option>
-                <option value="0">0 Quote Posts</option>
-                <option value="2">2 Quote Posts</option>
-              </select>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:10px;height:10px;border-radius:50%;background:var(--amber);"></div>
+              <span style="font-size:13px;font-weight:700;color:var(--charcoal);">3</span>
+              <span style="font-size:12px;color:var(--charcoal2);">Quote Posts</span>
+              <span style="font-size:10px;color:var(--charcoal3);background:rgba(196,158,60,0.1);padding:2px 7px;border-radius:10px;">Bonus · From KB &amp; Scripts</span>
             </div>
-            <div>
-              <div style="font-size:11px;color:var(--charcoal2);margin-bottom:5px;">Lifestyle / Other</div>
-              <select id="mix-lifestyle" class="select" style="width:100%;">
-                <option value="1" selected>1 Lifestyle</option>
-                <option value="0">0 Lifestyle</option>
-                <option value="2">2 Lifestyle</option>
-              </select>
-            </div>
+            <div style="margin-left:auto;font-size:11px;color:var(--charcoal3);font-style:italic;">10 posts/week · 20 posts over 2 weeks</div>
           </div>
+          <input type="hidden" id="mix-reels" value="5">
+          <input type="hidden" id="mix-carousels" value="2">
+          <input type="hidden" id="mix-quotes" value="3">
+          <input type="hidden" id="mix-lifestyle" value="0">
         </div>
 
         <!-- SCRIPT MODE: TRANSCRIPT INPUT -->
@@ -2080,12 +2071,12 @@ async function generateWeeklyPlan() {
 
   var monday = getPlannerMonday();
   var weekDates = [];
-  for (var i = 0; i < 7; i++) {
+  for (var i = 0; i < 14; i++) {
     var d = new Date(monday); d.setDate(monday.getDate()+i);
     weekDates.push(d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}));
   }
 
-  var totalPosts = inputs.reels + inputs.carousels + inputs.quotes + inputs.lifestyle;
+  var totalPosts = 10; // Contract: 5 Reels + 2 Carousels + 3 Quotes per week
 
   var profileCtx = '';
   if (profile.transcript_count > 0) {
@@ -2150,7 +2141,9 @@ async function generateWeeklyPlan() {
   if (inputs.theme) weekCtx += 'WEEK THEME: ' + inputs.theme + '\n';
   if (inputs.pillars.length) weekCtx += 'PRIORITIZE THESE PILLARS: ' + inputs.pillars.join(', ') + '\n';
   if (inputs.events) weekCtx += 'UPCOMING EVENTS AND PROMOTIONS: ' + inputs.events + '\n';
-  weekCtx += 'CONTENT MIX: ' + inputs.reels + ' Reels, ' + inputs.carousels + ' Carousels, ' + inputs.quotes + ' Quote Posts, ' + inputs.lifestyle + ' Lifestyle/Other posts (' + totalPosts + ' total)\n';
+  weekCtx += 'CONTRACT CONTENT MIX (PER WEEK — NON-NEGOTIABLE): 5 Reels, 2 Carousels, 3 Quote Posts = 10 posts per week, 20 posts across the 2-week plan.\n';
+  weekCtx += 'QUOTE POST RULE: All 3 quote posts per week MUST be sourced directly from the Knowledge Base performance data, client scripts, or Tiffany\'s existing content. Pull real phrases, real moments, real language she has used. Do NOT invent quotes. The "quote" field must contain her exact words or a faithful synthesis of her documented voice.\n';
+  weekCtx += 'DISTRIBUTION RULE: Spread the 10 posts evenly. No content type should appear back-to-back. Reels, Carousels, and Quote Posts must alternate and vary throughout the week.\n';
 
   var scriptCtx = '';
   if (scripts.length > 0) {
@@ -2184,29 +2177,34 @@ async function generateWeeklyPlan() {
     weekCtx + '\n' +
     scriptCtx +
     modeInstruction + '\n\n' +
-    'WEEK: ' + weekDates[0] + ' through ' + weekDates[6] + '\n\n' +
+    'TWO-WEEK PLAN: ' + weekDates[0] + ' through ' + weekDates[13] + '\n' +
+    'WEEK 1: ' + weekDates[0] + ' – ' + weekDates[6] + '\n' +
+    'WEEK 2: ' + weekDates[7] + ' – ' + weekDates[13] + '\n\n' +
     'Return ONLY valid JSON. No markdown. No backticks. Start with {.\n\n' +
-    '{"week_of":"' + weekDates[0] + ' - ' + weekDates[6] + '",' +
+    '{"week_of":"' + weekDates[0] + ' - ' + weekDates[13] + '",' +
     '"mode":"' + plannerMode + '",' +
-    '"planning_note":"One sentence describing the strategic direction and why this mix serves Tiffany this week.",' +
+    '"planning_note":"One sentence describing the strategic direction and why this mix serves Tiffany across these two weeks.",' +
     '"pillar_balance":{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0},' +
     '"gaps_addressed":["gap filled 1","gap filled 2"],' +
     '"days":[' +
-    '{"day":"Monday","date":"' + weekDates[0] + '","post_type":"Reel or Carousel or Quote Post or Lifestyle or Shenanigans","pillar":"pillar name",' +
+    '{"day":"Monday","date":"' + weekDates[0] + '","week_label":"Week 1","post_type":"Reel or Carousel or Quote Post","pillar":"pillar name",' +
     '"title":"Post title. Specific and compelling. Not generic.",' +
     '"hook":"The exact first line or on-screen text. Stops the scroll. In her voice.",' +
     '"content_direction":"2-3 specific sentences on what this post covers and why it works for her audience right now.",' +
     '"voiceover_topic":"If reel: a specific voiceover direction for Tiffany. What to say, the angle, the energy. If not reel: empty string.",' +
+    '"reel_type":"If reel: either Talking Head (Tiffany on camera speaking directly) or Voiceover (Tiffany records audio only, plays over B-roll footage). Choose based on content — personal stories and teaching = Talking Head, lifestyle moments and behind-the-scenes = Voiceover. If not reel: empty string.",' +
+    '"shot_list":"If reel_type is Voiceover: a numbered list of 3-6 specific B-roll shots Tiffany needs to film to support this reel. Be specific — location, action, mood. Example: 1. Morning coffee at kitchen counter — hands wrapping around mug, steam visible. 2. Walking through front door, dropping keys, sighing. If Talking Head or not a reel: empty string.",' +
     '"designer_needed":"Designer 1 or Designer 2 or Video Editor or None",' +
     '"thumbnail_hook":"If reel: exact 4-6 word thumbnail text for Designer 1. Else empty.",' +
     '"carousel_outline":"If carousel: slide 1 hook headline, slide 2 point, slide 3 point, CTA slide. Else empty.",' +
     '"quote":"If quote post: the exact quote in her voice. Else empty.",' +
     '"fresh_or_scripted":"fresh or from script ' + (scripts.length > 0 ? '1 through ' + scripts.length : '') + '"}' +
+    '... (repeat for all 14 days: ' + weekDates.map(function(d,i){return d + (i<7?' [Week 1]':' [Week 2]');}).join(', ') + ')' +
     '],' +
     '"delivery":{' +
-    '"designer1":{"name":"Designer 1","sub":"Thumbnails","notion_copy":"DESIGNER 1 TASKS - WEEK OF ' + weekDates[0] + '\n\nFor each reel listed below, create an Instagram thumbnail with the hook text overlaid on a photo of Tiffany. Brand colors only. Sharp well-lit photo. Text legible on mobile.\n\n[List each reel day with thumbnail hook text and photo direction]"},' +
-    '"designer2":{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":"DESIGNER 2 TASKS - WEEK OF ' + weekDates[0] + '\n\nFor each carousel and quote post below, create the graphic assets per the brand guide.\n\n[List each carousel with full slide outline and each quote post with the exact quote text]"},' +
-    '"video_editor":{"name":"Video Editor","sub":"Reels","notion_copy":"VIDEO EDITOR TASKS - WEEK OF ' + weekDates[0] + '\n\nReels to edit this week. Tiffany will record voiceovers based on the topics below. Match with available B-roll from the content library.\n\n[List each reel day with voiceover topic and any specific direction]"}' +
+    '"designer1":{"name":"Designer 1","sub":"Thumbnails","notion_copy":"DESIGNER 1 TASKS - WEEKS OF ' + weekDates[0] + ' & ' + weekDates[7] + '\n\nFor each reel listed below, create an Instagram thumbnail with the hook text overlaid on a photo of Tiffany. Brand colors only. Sharp well-lit photo. Text legible on mobile.\n\nWEEK 1 (' + weekDates[0] + ' - ' + weekDates[6] + '):\n[List each Week 1 reel with thumbnail hook and photo direction]\n\nWEEK 2 (' + weekDates[7] + ' - ' + weekDates[13] + '):\n[List each Week 2 reel with thumbnail hook and photo direction]"},' +
+    '"designer2":{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":"DESIGNER 2 TASKS - WEEKS OF ' + weekDates[0] + ' & ' + weekDates[7] + '\n\nWEEK 1 (' + weekDates[0] + ' - ' + weekDates[6] + '):\n[List each Week 1 carousel with full slide outline and each quote post with exact quote text]\n\nWEEK 2 (' + weekDates[7] + ' - ' + weekDates[13] + '):\n[List each Week 2 carousel with full slide outline and each quote post with exact quote text]"},' +
+    '"video_editor":{"name":"Video Editor","sub":"Reels","notion_copy":"VIDEO EDITOR TASKS - WEEKS OF ' + weekDates[0] + ' & ' + weekDates[7] + '\n\nTALKING HEAD REELS: Tiffany films herself on camera speaking. Set up clean background, good lighting, record directly.\n\nVOICEOVER REELS: Tiffany records audio only. You match her voiceover with B-roll footage she has filmed per the shot list, or source from the content library.\n\nWEEK 1 (' + weekDates[0] + ' - ' + weekDates[6] + '):\n[List each Week 1 reel with: reel type (Talking Head / Voiceover), voiceover topic, and shot list if Voiceover]\n\nWEEK 2 (' + weekDates[7] + ' - ' + weekDates[13] + '):\n[List each Week 2 reel with: reel type (Talking Head / Voiceover), voiceover topic, and shot list if Voiceover]"}' +
     '}}';
 
   try {
@@ -2258,9 +2256,26 @@ function renderWeeklyPlan(plan) {
   }
 
   // CALENDAR
-  h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;">Mon-Sun Calendar</div>';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;">Week 1</div>';
   h += '<div class="calendar-grid">';
-  (plan.days||[]).forEach(function(day) {
+  (plan.days||[]).slice(0,7).forEach(function(day) {
+    var pc = BRAND.pillarColors[day.pillar]||{color:'#999',bg:'var(--cream-2)'};
+    var isFresh = !day.fresh_or_scripted || day.fresh_or_scripted === 'fresh';
+    h += '<div class="cal-day">';
+    h += '<div class="cal-day-header"><div class="cal-day-name">' + day.day + '</div>';
+    h += '<div class="cal-day-date">' + (day.date||'') + '</div></div>';
+    h += '<div class="cal-day-body">';
+    h += '<div class="cal-post-type" style="color:' + pc.color + ';">' + escRaw(day.post_type||'') + '</div>';
+    h += '<div class="cal-post-title">' + escRaw(day.title||'') + '</div>';
+    if (day.designer_needed && day.designer_needed !== 'None') h += '<div style="font-size:9px;color:var(--charcoal3);margin-top:3px;font-weight:600;">' + escRaw(day.designer_needed) + '</div>';
+    if (!isFresh) h += '<div style="font-size:9px;color:var(--blue);margin-top:2px;">From script</div>';
+    h += '<div class="cal-time">3:00 PM CST</div>';
+    h += '</div></div>';
+  });
+  h += '</div>';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--amber);letter-spacing:3px;text-transform:uppercase;margin:14px 0 6px;">Week 2</div>';
+  h += '<div class="calendar-grid">';
+  (plan.days||[]).slice(7).forEach(function(day) {
     var pc = BRAND.pillarColors[day.pillar]||{color:'#999',bg:'var(--cream-2)'};
     var isFresh = !day.fresh_or_scripted || day.fresh_or_scripted === 'fresh';
     h += '<div class="cal-day">';
@@ -2278,10 +2293,17 @@ function renderWeeklyPlan(plan) {
 
   // POST DETAILS
   h += '<div style="margin-bottom:28px;">';
-  (plan.days||[]).forEach(function(day) {
+  (plan.days||[]).forEach(function(day, idx) {
     if (!day.title) return;
     var pc = BRAND.pillarColors[day.pillar]||{color:'#999',bg:'var(--cream-2)'};
     var isFresh = !day.fresh_or_scripted || day.fresh_or_scripted === 'fresh';
+    // Add week divider
+    if (idx === 0) {
+      h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--border);">Week 1 — ' + (day.date||'') + '</div>';
+    }
+    if (idx === 7) {
+      h += '<div style="font-size:10px;font-weight:700;color:var(--amber);letter-spacing:3px;text-transform:uppercase;margin:20px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--border);">Week 2 — ' + (day.date||'') + '</div>';
+    }
     h += '<div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:10px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 8px var(--shadow);">';
     h += '<div style="padding:11px 16px;background:var(--cream-2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">';
     h += '<div style="display:flex;align-items:center;gap:10px;">';
@@ -2299,7 +2321,19 @@ function renderWeeklyPlan(plan) {
     h += '</div>';
 
     h += '<div>';
-    if (day.voiceover_topic) { h += '<div style="font-size:9px;font-weight:700;color:var(--amber);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Voiceover Direction</div><div style="font-size:12px;color:var(--charcoal2);line-height:1.65;margin-bottom:10px;">' + escRaw(day.voiceover_topic) + '</div>'; }
+    if (day.voiceover_topic) {
+      var reelBadge = '';
+      if (day.reel_type === 'Talking Head') {
+        reelBadge = '<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(160,6,5,0.08);color:var(--red);margin-left:6px;">🎥 Talking Head</span>';
+      } else if (day.reel_type === 'Voiceover') {
+        reelBadge = '<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(196,158,60,0.1);color:var(--amber);margin-left:6px;">🎙️ Voiceover + B-Roll</span>';
+      }
+      h += '<div style="font-size:9px;font-weight:700;color:var(--amber);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Voiceover Direction' + reelBadge + '</div><div style="font-size:12px;color:var(--charcoal2);line-height:1.65;margin-bottom:10px;">' + escRaw(day.voiceover_topic) + '</div>';
+    }
+    if (day.shot_list && day.reel_type === 'Voiceover') {
+      h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">📋 B-Roll Shot List</div>';
+      h += '<div style="background:rgba(196,158,60,0.06);border:1px solid rgba(196,158,60,0.2);border-radius:7px;padding:10px 12px;font-size:11px;color:var(--charcoal2);line-height:1.8;white-space:pre-wrap;">' + escRaw(day.shot_list) + '</div>';
+    }
     if (day.thumbnail_hook) { h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Thumbnail Text (Designer 1)</div><div style="font-size:13px;font-weight:600;font-style:italic;color:var(--charcoal);margin-bottom:10px;">' + escRaw(day.thumbnail_hook) + '</div>'; }
     if (day.carousel_outline) { h += '<div style="font-size:9px;font-weight:700;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Carousel Outline (Designer 2)</div><div style="font-size:12px;color:var(--charcoal2);line-height:1.65;">' + escRaw(day.carousel_outline) + '</div>'; }
     if (day.quote) { h += '<div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">Quote (Designer 2)</div><div style="font-family:\'Cormorant Garamond\',serif;font-size:15px;font-style:italic;color:var(--charcoal);">' + escRaw(day.quote) + '</div>'; }

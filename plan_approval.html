@@ -185,6 +185,24 @@ function esc(str) {
 async function submitApproval(action) {
   var feedback = document.getElementById('feedback-input').value.trim();
   var dayFeedback = collectDayFeedback();
+
+  // If rejecting with no feedback at all, urge her to fill it out
+  if (action === 'rejected' && !feedback && dayFeedback.length === 0) {
+    var feedbackInput = document.getElementById('feedback-input');
+    feedbackInput.style.borderColor = '#A00605';
+    feedbackInput.style.background = '#FFF5F5';
+    feedbackInput.placeholder = 'Please share what you\'d like to see changed — this helps us put together something you\'ll love.';
+    feedbackInput.focus();
+    var nudge = document.getElementById('feedback-nudge');
+    if (!nudge) {
+      nudge = document.createElement('div');
+      nudge.id = 'feedback-nudge';
+      nudge.style.cssText = 'font-size:12px;color:#A00605;margin-top:6px;line-height:1.6;';
+      nudge.textContent = 'Before rejecting, please let us know what you\'d like to see different. Your notes help us make sure the next plan is exactly what you\'re looking for.';
+      feedbackInput.parentNode.insertBefore(nudge, feedbackInput.nextSibling);
+    }
+    return;
+  }
   var approveBtn = document.getElementById('approve-btn');
   var rejectBtn  = document.getElementById('reject-btn');
   approveBtn.disabled = true; if(rejectBtn) rejectBtn.disabled = true;
