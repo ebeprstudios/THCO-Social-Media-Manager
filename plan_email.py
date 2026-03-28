@@ -174,36 +174,51 @@ def build_team_email(plan, feedback, recipient_role, notion_copy):
 
 # ── BUILD MANAGER NOTIFICATION EMAIL ─────────────────────────────
 def build_manager_email(plan, feedback, action, day_feedback=None):
-    week_of = plan.get("week_of", "")
+    week_of = plan.get("week_of", "") if plan else ""
     today = datetime.now().strftime("%B %-d, %Y")
-    action_label = "APPROVED" if action == "approved" else "REJECTED" if action == "rejected" else "CHANGES REQUESTED"
-    action_color = "#3A9E6E" if action == "approved" else "#A00605" if action == "rejected" else "#B87830"
+    status_map = {"approved": "Approved", "rejected": "Rejected", "changes_requested": "Changes Needed"}
+    status = status_map.get(action, "Changes Needed")
+    status_color = {"Approved": "#3A9E6E", "Rejected": "#A00605", "Changes Needed": "#B87830"}.get(status, "#414141")
 
-    # Build per-day feedback section
-    day_fb_html = ""
+    # Build combined feedback from per-day notes + overall
+    all_feedback = ""
     if day_feedback:
-        day_fb_html = '<div style="margin-top:14px;border-top:1px solid #E3D3C8;padding-top:12px;">'
-        day_fb_html += '<div style="font-size:10px;font-weight:700;color:#A00605;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Per-Day Notes from Tiffany</div>'
-        for d in day_feedback:
-            day_fb_html += f'<div style="background:#F4F0EB;border-left:3px solid #B87830;padding:8px 12px;border-radius:4px;margin-bottom:6px;"><div style="font-size:11px;font-weight:700;color:#414141;">{d.get("day","")} — {d.get("title","")}</div><div style="font-size:12px;color:#5A5A5A;margin-top:3px;">{d.get("note","")}</div></div>'
-        day_fb_html += '</div>'
-
-    overall_html = f'<div style="background:#FFF3CD;border-left:3px solid #B87830;padding:12px 16px;border-radius:4px;font-size:13px;color:#414141;line-height:1.7;margin-top:10px;"><strong>Overall notes:</strong> {feedback}</div>' if feedback else ""
-
-    feedback_section = (day_fb_html + overall_html) if (day_feedback or feedback) else '<div style="font-size:13px;color:#8A8A8A;margin-top:8px;font-style:italic;">No feedback provided - approved as-is.</div>'
+        all_feedback += "\n".join([f"{d.get('day','')} — {d.get('title','')}: {d.get('note','')}" for d in day_feedback])
+    if feedback:
+        all_feedback += ("\n\n" if all_feedback else "") + feedback
+    all_feedback = all_feedback.strip() or "No feedback provided."
 
     return f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#F4F0EB;font-family:Georgia,serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#F4F0EB;">
-<tr><td align="center" style="padding:24px 16px 40px;">
-<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
-<tr><td style="background:#FFFDF5;border:1px solid #E3D3C8;border-radius:12px;padding:28px;">
-  <div style="font-size:10px;font-weight:700;color:{action_color};letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">{action_label}</div>
-  <div style="font-size:20px;font-weight:700;color:#414141;margin-bottom:6px;">Tiffany responded to the week of {week_of}</div>
-  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px;">{today}</div>
-  {feedback_section}
-  {"<div style='margin-top:16px;font-size:13px;color:#3A9E6E;font-weight:600;'>Team task emails have been sent automatically.</div>" if action == "approved" else "<div style='margin-top:16px;font-size:13px;color:#A00605;font-weight:600;'>Plan was REJECTED. Build a new plan from scratch.</div>" if action == "rejected" else "<div style='margin-top:16px;font-size:13px;color:#B87830;font-weight:600;'>Revise the plan and resend for her approval.</div>"}
+<tr><td align="center" style="padding:32px 16px;">
+<table width="520" cellpadding="0" cellspacing="0" style="max-width:520px;width:100%;background:#FFFDF5;border:1px solid #E3D3C8;border-radius:12px;overflow:hidden;">
+<tr><td style="background:#414141;padding:20px 28px;">
+  <div style="font-size:10px;font-weight:700;color:#C49E3C;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">Weekly Content Plan</div>
+  <div style="font-size:18px;font-weight:700;color:#FFFDF5;">Client Response — {week_of}</div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;">{today}</div>
+</td></tr>
+<tr><td style="padding:28px;">
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="font-size:13px;font-weight:700;color:#414141;padding-bottom:6px;">Status</td>
+    </tr>
+    <tr>
+      <td style="padding-bottom:20px;">
+        <span style="font-size:14px;font-weight:700;color:{status_color};background:{'rgba(58,158,110,0.1)' if status=='Approved' else 'rgba(160,6,5,0.08)' if status=='Rejected' else 'rgba(184,120,48,0.1)'};padding:6px 16px;border-radius:20px;">{status}</span>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-size:13px;font-weight:700;color:#414141;padding-bottom:6px;">Feedback</td>
+    </tr>
+    <tr>
+      <td style="font-size:13px;color:#5A5A5A;line-height:1.75;background:#F4F0EB;border-radius:8px;padding:14px 16px;white-space:pre-wrap;">{all_feedback}</td>
+    </tr>
+  </table>
+</td></tr>
+<tr><td style="background:#F4F0EB;padding:14px 28px;text-align:center;border-top:1px solid #E3D3C8;">
+  <div style="font-size:10px;color:#A0A0A0;letter-spacing:1.5px;text-transform:uppercase;">The Creative Theologian Media Group</div>
 </td></tr>
 </table>
 </td></tr>
