@@ -1,34 +1,74 @@
-name: Weekly Voiceover Topics Email
+name: Bi-Weekly Plan Approval System
 
 on:
+  # Auto-send every other Friday at 1PM CST (19:00 UTC)
+  # GitHub cron runs every Friday — plan_email.py checks ISO week number
+  # and only sends on even-numbered weeks
   schedule:
     - cron: '0 19 * * 5'
+  repository_dispatch:
+    types: [send_plan_to_client, plan_approved_by_client]
   workflow_dispatch:
+    inputs:
+      event_type:
+        description: 'Event type: send_plan or notify_team'
+        required: true
+        default: 'send_plan'
 
 jobs:
-  send-voiceover-email:
+  send-plan:
     runs-on: ubuntu-latest
-
+    if: github.event.action == 'send_plan_to_client' || github.event.inputs.event_type == 'send_plan' || github.event_name == 'schedule'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install dependencies
-        run: pip install anthropic requests
-
-      - name: Send voiceover topics email
+        run: pip install requests
+      - name: Send plan to client
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           EMAIL_FROM:        ${{ secrets.EMAIL_FROM }}
           EMAIL_PASSWORD:    ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_TO:          ${{ secrets.EMAIL_TO }}
-          EMAIL_CC:          ${{ secrets.EMAIL_CC }}
           GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
           UPLOAD_TOKEN:      ${{ secrets.UPLOAD_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python voiceover_topics.py
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EVENT_PAYLOAD:     ${{ toJson(github.event.client_payload) }}
+          TRIGGER_SOURCE:    ${{ github.event_name }}
+          WORKFLOW_EVENT:    send_plan
+        run: python plan_email.py
+
+  notify-team:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'plan_approved_by_client' || github.event.inputs.event_type == 'notify_team'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Notify team after approval
+        env:
+          EMAIL_FROM:          ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD:      ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO:            ${{ secrets.EMAIL_TO }}
+          EMAIL_CC:            ${{ secrets.EMAIL_CC }}
+          GITHUB_TOKEN:        ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_TOKEN:        ${{ secrets.UPLOAD_TOKEN }}
+          GITHUB_REPOSITORY:   ${{ github.repository }}
+          DESIGNER1_EMAIL:     ${{ secrets.DESIGNER1_EMAIL }}
+          DESIGNER2_EMAIL:     ${{ secrets.DESIGNER2_EMAIL }}
+          VIDEO_EDITOR_EMAIL:  ${{ secrets.VIDEO_EDITOR_EMAIL }}
+          MANAGER_EMAIL:       ${{ secrets.MANAGER_EMAIL }}
+          ANTHROPIC_API_KEY:   ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTION_TOKEN:        ${{ secrets.NOTION_TOKEN }}
+          EVENT_PAYLOAD:       ${{ toJson(github.event.client_payload) }}
+          WORKFLOW_EVENT:      notify_team
+        run: python plan_email.py
