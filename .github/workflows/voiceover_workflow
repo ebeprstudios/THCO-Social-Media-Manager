@@ -1,0 +1,30 @@
+name: Voiceover Upload Handler
+
+# NOTE: Separate voiceover topic email has been removed.
+# Voiceover topics are now included in the 2-week content plan email sent to Tiffany.
+# This workflow now only handles Cloudinary upload logging.
+
+on:
+  repository_dispatch:
+    types: [voiceover_uploaded]
+  workflow_dispatch:
+
+jobs:
+  log-voiceover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Log voiceover upload
+        env:
+          GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_TOKEN:      ${{ secrets.UPLOAD_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          EVENT_PAYLOAD:     ${{ toJson(github.event.client_payload) }}
+        run: python log_voiceover.py
