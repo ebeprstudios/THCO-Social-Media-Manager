@@ -905,6 +905,7 @@ body::before {
           <input type="file" id="kb-file-input" accept=".pdf,.csv,.txt" style="display:none" onchange="handleKBUpload(event)" />
           <div class="input-row" style="margin-top:10px;">
             <select class="select" id="kb-doc-type">
+              <option value="transcript">Transcript</option>
               <option value="meta-report">META Performance Report</option>
               <option value="strategy">90-Day Strategic Plan</option>
               <option value="brand">Brand Guidelines</option>
@@ -1683,7 +1684,7 @@ function renderKBStatus() {
     sub.innerHTML = 'Tell the AI what to build around. <span style="color:var(--amber);font-weight:600;">No Knowledge Base data yet</span>. Upload META reports to the Knowledge Base tab to make plans smarter.';
   } else {
     var docTypes = kb.map(function(e) {
-      var labels = {'meta-report':'META Report','strategy':'Strategic Plan','brand':'Brand Guide','audience':'Audience Research','calendar':'Content Calendar','csv':'CSV Data','other':'Document'};
+      var labels = {'transcript':'Transcript','meta-report':'META Report','strategy':'Strategic Plan','brand':'Brand Guide','audience':'Audience Research','calendar':'Content Calendar','csv':'CSV Data','other':'Document'};
       return labels[e.docType] || 'Document';
     });
     var unique = docTypes.filter(function(v,i,a){return a.indexOf(v)===i;});
@@ -4159,12 +4160,30 @@ async function processKBDocument(filename, docType, fileType, base64, textConten
   document.getElementById('error-kb').style.display = 'none';
   startLoader('gen-msg-kb', kbMsgsList);
 
-  var labels = {'meta-report':'META Performance Report','strategy':'90-Day Strategic Plan','brand':'Brand Guidelines','audience':'Audience Research','calendar':'Content Calendar','csv':'CSV Data Export','other':'Document'};
+  var labels = {'transcript':'Transcript','meta-report':'META Performance Report','strategy':'90-Day Strategic Plan','brand':'Brand Guidelines','audience':'Audience Research','calendar':'Content Calendar','csv':'CSV Data Export','other':'Document'};
 
   // Tight system prompt = faster, more focused response
   var systemPrompt = 'You extract structured insights from documents. Respond ONLY with raw valid JSON. No markdown. No backticks. No preamble. Start with { end with }. Be concise - max 5 items per array.';
 
-  var userPrompt = 'Extract key insights from this ' + (labels[docType]||'document') + ' for a social media content strategy.\n\n' +
+  // Transcripts get a voice-focused extraction prompt
+  var userPrompt;
+  if (docType === 'transcript') {
+    userPrompt = 'Extract content strategy insights from this transcript for a social media content creator.\n\n' +
+      'Return ONLY this JSON structure:\n' +
+      '{"document_title":"title or topic of the transcript","document_type":"Transcript",' +
+      '"period_covered":"",' +
+      '"key_metrics":[],' +
+      '"audience_insights":["insight about what the audience cares about based on this transcript"],' +
+      '"top_performing_content":["strong quote or moment from this transcript that would make great content"],' +
+      '"what_is_working":["strong topic, angle, or phrase from this transcript that resonates"],' +
+      '"what_needs_attention":[],' +
+      '"strategic_priorities":["content angle or series idea this transcript suggests"],' +
+      '"content_themes":["recurring theme 1","recurring theme 2","recurring theme 3"],' +
+      '"action_items":["specific post idea directly from this transcript"],' +
+      '"profile_updates":{"voice_phrases":["exact phrase or expression she uses naturally"],"topics":["specific topic covered"],"themes":["core theme"],"winning_formats":[]}}' +
+      '\n\nTranscript:\n' + (textContent || '[PDF - extract all spoken content]');
+  } else {
+    userPrompt = 'Extract key insights from this ' + (labels[docType]||'document') + ' for a social media content strategy.\n\n' +
     'Return ONLY this JSON structure:\n' +
     '{"document_title":"title","document_type":"' + (labels[docType]||'Document') + '",' +
     '"period_covered":"date range or empty",' +
@@ -4177,8 +4196,7 @@ async function processKBDocument(filename, docType, fileType, base64, textConten
     '"content_themes":["theme1","theme2","theme3"],' +
     '"action_items":["action1","action2","action3"],' +
     '"profile_updates":{"audience_notes":[],"content_gaps":[],"winning_formats":[]}}';
-
-  try {
+  } // end else (non-transcript)
     var messages;
     if (fileType === 'pdf') {
       // For large PDFs, Claude processes the full document - this takes longer
@@ -4261,6 +4279,7 @@ function renderKnowledgeBase() {
   var kb = getKnowledgeBase();
 
   var docColors = {
+    'transcript':  {color:'#C49E3C', bg:'rgba(196,158,60,0.08)', label:'Transcript'},
     'meta-report': {color:'#A00605', bg:'rgba(160,6,5,0.08)', label:'META Report'},
     'strategy':    {color:'#3A6EA8', bg:'rgba(58,110,168,0.08)', label:'Strategic Plan'},
     'brand':       {color:'#6A50A8', bg:'rgba(106,80,168,0.08)', label:'Brand Guide'},
@@ -4318,6 +4337,7 @@ function renderKnowledgeBase() {
 function toggleKBEntry(id) {
   var kb = getKnowledgeBase();
   var docColors = {
+    'transcript':  {color:'#C49E3C', bg:'rgba(196,158,60,0.08)', label:'Transcript'},
     'meta-report': {color:'#A00605', bg:'rgba(160,6,5,0.08)', label:'META Report'},
     'strategy':    {color:'#3A6EA8', bg:'rgba(58,110,168,0.08)', label:'Strategic Plan'},
     'brand':       {color:'#6A50A8', bg:'rgba(106,80,168,0.08)', label:'Brand Guide'},
