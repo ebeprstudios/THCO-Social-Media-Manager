@@ -1,9 +1,6 @@
 name: Bi-Weekly Plan Approval System
 
 on:
-  # Auto-send every other Friday at 1PM CST (19:00 UTC)
-  # GitHub cron runs every Friday — plan_email.py checks ISO week number
-  # and only sends on even-numbered weeks
   schedule:
     - cron: '0 19 * * 5'
   repository_dispatch:
@@ -27,19 +24,19 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests anthropic
       - name: Send plan to client
         env:
-          EMAIL_FROM:        ${{ secrets.EMAIL_FROM }}
-          EMAIL_PASSWORD:    ${{ secrets.EMAIL_PASSWORD }}
-          EMAIL_TO:          ${{ secrets.EMAIL_TO }}
-          GITHUB_TOKEN:      ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_TOKEN:      ${{ secrets.UPLOAD_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          EVENT_PAYLOAD:     ${{ toJson(github.event.client_payload) }}
-          TRIGGER_SOURCE:    ${{ github.event_name }}
-          WORKFLOW_EVENT:    send_plan
+          EMAIL_FROM:          ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD:      ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO:            ${{ secrets.EMAIL_TO }}
+          GITHUB_TOKEN:        ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_TOKEN:        ${{ secrets.UPLOAD_TOKEN }}
+          GITHUB_REPOSITORY:   ${{ github.repository }}
+          ANTHROPIC_API_KEY:   ${{ secrets.ANTHROPIC_API_KEY }}
+          EVENT_PAYLOAD:       ${{ toJson(github.event.client_payload) }}
+          TRIGGER_SOURCE:      ${{ github.event_name }}
+          WORKFLOW_EVENT:      send_plan
         run: python plan_email.py
 
   notify-team:
@@ -53,7 +50,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests anthropic
       - name: Notify team after approval
         env:
           EMAIL_FROM:          ${{ secrets.EMAIL_FROM }}
