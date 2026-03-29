@@ -545,7 +545,7 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
             "video_editor": "Video Editor - Reels",
         }
         for role, email, notion_copy in team:
-            if email:
+            if email and notion_copy:
                 html = build_team_email(plan, feedback, role, notion_copy, day_feedback)
                 role_label = role.replace("_"," ").title()
                 send_email_msg(html, f"Your Tasks — Week of {week_of} (Approved)", email, manager_cc_str)
@@ -744,7 +744,8 @@ if __name__ == "__main__":
                 nc = plan.get("delivery",{}).get(role,{}).get("notion_copy","")
                 print(f"  {role} notion_copy length being saved: {len(nc)}")
             url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
-            headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+            save_token = UPLOAD_TOKEN or GITHUB_TOKEN  # UPLOAD_TOKEN has repo write scope
+            headers = {"Authorization": f"token {save_token}", "Accept": "application/vnd.github.v3+json"}
             sha = None
             r = requests.get(url, headers=headers)
             if r.status_code == 200:
