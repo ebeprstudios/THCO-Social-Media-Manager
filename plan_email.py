@@ -771,11 +771,13 @@ if __name__ == "__main__":
         try:
             plan_file = {
                 "plan": plan,
-                "week_of": week_of,
+                "week_of": week_of or plan.get("week_of", ""),
                 "sent_to": recipient,
                 "sent_at": datetime.now().isoformat(),
                 "status": "pending"
             }
+            print(f"Saving pending_plan.json with week_of: '{plan_file['week_of']}'")
+            print(f"Plan has {len(plan.get('days',[]))} days, delivery keys: {list(plan.get('delivery',{}).keys())}")
             url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
             headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
             sha = None
@@ -821,4 +823,18 @@ if __name__ == "__main__":
         if not week_of:
             week_of = (plan_data or {}).get("week_of", "") or plan.get("week_of", "")
             print(f"week_of fallback: '{week_of}'")
+
+        print(f"Action: {action}")
+        print(f"week_of: '{week_of}'")
+        print(f"Plan has {len(plan.get('days',[]))} days")
+        print(f"Delivery keys: {list(delivery.keys())}")
+        print(f"Designer1 notion_copy length: {len(delivery.get('designer1',{}).get('notion_copy',''))}")
+        print(f"Designer2 notion_copy length: {len(delivery.get('designer2',{}).get('notion_copy',''))}")
+        print(f"VideoEditor notion_copy length: {len(delivery.get('video_editor',{}).get('notion_copy',''))}")
+        print(f"MANAGER_EMAIL set: {bool(MANAGER_EMAIL)}")
+        print(f"DESIGNER1_EMAIL set: {bool(DESIGNER1_EMAIL)}")
+        print(f"DESIGNER2_EMAIL set: {bool(DESIGNER2_EMAIL)}")
+        print(f"VIDEO_EDITOR_EMAIL set: {bool(VIDEO_EDITOR_EMAIL)}")
+
+        run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha)
 
