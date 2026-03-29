@@ -1,9 +1,9 @@
 {
   "action": "approved",
-  "feedback": "This is a test Email. Please disregard.",
+  "feedback": "This is just a test email. Please disregard for now.",
   "day_feedback": [],
-  "overall_feedback": "This is a test Email. Please disregard.",
-  "approved_at": "2026-03-29T02:28:22.911Z",
+  "overall_feedback": "This is just a test email. Please disregard for now.",
+  "approved_at": "2026-03-29T03:21:44.844Z",
   "week_of": "",
   "repo": "ebeprstudios/THCO-Social-Media-Manager"
 }
