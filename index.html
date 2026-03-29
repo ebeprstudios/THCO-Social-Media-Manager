@@ -1307,11 +1307,38 @@ function ptag(p) {
   return '<span class="d-ptag" style="background:' + pc.bg + ';color:' + pc.color + ';">' + escRaw(p) + '</span>';
 }
 
-function copyText(btn, text) {
+function copyFromEl(btn, id) {
+  var el = document.getElementById(id);
+  if (!el) { btn.textContent = 'Failed'; return; }
+  var raw = el.getAttribute('data-raw') || el.innerText || el.textContent;
+  navigator.clipboard.writeText(raw).then(function() {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = 'Copy for Notion'; btn.classList.remove('copied'); }, 2200);
+  }).catch(function() {
+    // Fallback for older browsers
+    var ta = document.createElement('textarea');
+    ta.value = raw;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy for Notion'; }, 2200);
+  });
+}
+
+function copyFromEl(btn, elId) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  var text = el.innerText || el.textContent || '';
   navigator.clipboard.writeText(text).then(function() {
-    btn.textContent = 'Copied'; btn.classList.add('copied');
-    setTimeout(function() { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2200);
-  }).catch(function() { btn.textContent = 'Failed'; setTimeout(function() { btn.textContent = 'Copy'; }, 2000); });
+    var orig = btn.textContent;
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(function() { btn.textContent = orig; btn.classList.remove('copied'); }, 2200);
+  }).catch(function() { btn.textContent = 'Failed'; setTimeout(function() { btn.textContent = 'Copy for Notion'; }, 2000); });
 }
 
 function wcBadge(text, minW, maxW) {
@@ -2351,18 +2378,26 @@ function renderWeeklyPlan(plan) {
       {key:'designer1', color:'#B87830', bg:'rgba(184,120,48,0.08)', label:'Designer 1', sub:'Thumbnails'},
       {key:'designer2', color:'#3A6EA8', bg:'rgba(58,110,168,0.08)', label:'Designer 2', sub:'Carousels + Quotes'},
       {key:'video_editor', color:'#3A9E6E', bg:'rgba(58,158,110,0.08)', label:'Video Editor', sub:'Reels'}
-    ].forEach(function(role) {
+    ].forEach(function(role, roleIdx) {
       var d = plan.delivery[role.key]||{};
       var notionText = d.notion_copy||'';
+      var safeId = 'notion-copy-' + roleIdx;
       h += '<div class="delivery-card">';
       h += '<div class="delivery-header" style="background:' + role.bg + ';border-bottom:1px solid ' + role.color + '20;">';
       h += '<div class="delivery-role" style="color:' + role.color + ';">' + role.label + '</div>';
       h += '<div class="delivery-person">' + role.sub + '</div></div>';
       h += '<div class="delivery-body">';
       h += '<div style="font-size:9px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Copy for Notion Task</div>';
-      h += '<div class="delivery-block">' + escRaw(notionText) + '</div>';
-      h += '<button class="copy-btn" onclick="copyText(this,' + JSON.stringify(notionText) + ')">Copy for Notion</button>';
+      h += '<div class="delivery-block" id="' + safeId + '" data-raw="">' + escRaw(notionText) + '</div>';
+      h += '<button class="copy-btn" onclick="copyFromEl(this,\'' + safeId + '\')">Copy for Notion</button>';
       h += '</div></div>';
+      // Store raw text after render using setTimeout
+      (function(id, raw) {
+        setTimeout(function() {
+          var el = document.getElementById(id);
+          if (el) el.setAttribute('data-raw', raw);
+        }, 100);
+      })(safeId, notionText);
     });
   }
   h += '</div>';

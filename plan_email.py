@@ -218,14 +218,22 @@ def create_notion_task(project_name, role, description, week_of_str, post_type="
         due_date = None
         publish_date = None
         try:
-            start_str = week_of_str.split("-")[0].strip()
-            if not any(str(y) in start_str for y in range(2020, 2030)):
-                year = week_of_str.split(",")[-1].strip()
-                start_str = f"{start_str}, {year}"
-            start = _dt.strptime(start_str, "%B %d, %Y")
-            due_date    = (start + _td(days=13)).strftime("%Y-%m-%d")   # end of editing week
-            publish_date= (start + _td(days=14)).strftime("%Y-%m-%d")   # start of publishing week
-        except Exception:
+            from datetime import datetime as _now
+            # week_of format: "Monday, Mar 30 - Sunday, Apr 12"
+            # Strip day name if present, extract short month date
+            raw_start = week_of_str.split("-")[0].strip()  # "Monday, Mar 30"
+            parts = [p.strip() for p in raw_start.split(",")]
+            day_names = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+            if parts and any(parts[0] == d for d in day_names):
+                date_part = parts[1] if len(parts) > 1 else parts[0]  # "Mar 30"
+            else:
+                date_part = parts[0]  # "Mar 30" or "March 30"
+            year = str(_now.now().year)
+            start = _dt.strptime(f"{date_part}, {year}", "%b %d, %Y")
+            due_date    = (start + _td(days=13)).strftime("%Y-%m-%d")
+            publish_date= (start + _td(days=14)).strftime("%Y-%m-%d")
+        except Exception as date_err:
+            print(f"Date parse warning: {date_err} — dates will be omitted from Notion task")
             pass
 
         # Map role to Drop in Que and Type
@@ -744,8 +752,7 @@ if __name__ == "__main__":
                 nc = plan.get("delivery",{}).get(role,{}).get("notion_copy","")
                 print(f"  {role} notion_copy length being saved: {len(nc)}")
             url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
-            save_token = UPLOAD_TOKEN or GITHUB_TOKEN  # UPLOAD_TOKEN has repo write scope
-            headers = {"Authorization": f"token {save_token}", "Accept": "application/vnd.github.v3+json"}
+            headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
             sha = None
             r = requests.get(url, headers=headers)
             if r.status_code == 200:
