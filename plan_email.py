@@ -545,7 +545,7 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
             "video_editor": "Video Editor - Reels",
         }
         for role, email, notion_copy in team:
-            if email and notion_copy:
+            if email:
                 html = build_team_email(plan, feedback, role, notion_copy, day_feedback)
                 role_label = role.replace("_"," ").title()
                 send_email_msg(html, f"Your Tasks — Week of {week_of} (Approved)", email, manager_cc_str)
