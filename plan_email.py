@@ -817,5 +817,8 @@ if __name__ == "__main__":
         plan = plan_data.get("plan", {}) if plan_data else {}
         delivery = plan.get("delivery", {})
 
-        run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha)
+        # week_of fallback chain — approval_data → pending_plan top-level → plan.week_of
+        if not week_of:
+            week_of = (plan_data or {}).get("week_of", "") or plan.get("week_of", "")
+            print(f"week_of fallback: '{week_of}'")
 

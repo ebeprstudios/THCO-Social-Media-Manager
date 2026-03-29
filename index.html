@@ -2181,7 +2181,15 @@ async function generateWeeklyPlan() {
     'TWO-WEEK PLAN: ' + weekDates[0] + ' through ' + weekDates[13] + '\n' +
     'WEEK 1: ' + weekDates[0] + ' through ' + weekDates[6] + '\n' +
     'WEEK 2: ' + weekDates[7] + ' through ' + weekDates[13] + '\n\n' +
-    'RULES: planning_note=max 15 words. content_direction=max 2 sentences. voiceover_topic=max 12 words. notion_copy=one line per item.\n\n' +
+    'CRITICAL RULES:\n' +
+    '- week_of field MUST be: "' + weekDates[0] + ' - ' + weekDates[13] + '"\n' +
+    '- planning_note: max 15 words\n' +
+    '- content_direction: max 2 sentences\n' +
+    '- voiceover_topic: max 12 words, only for Reels\n' +
+    '- notion_copy: populate with REAL content from the actual days you generate. List each day on one line.\n' +
+    '- notion_copy for designer1: list every Reel day with its thumbnail_hook text\n' +
+    '- notion_copy for designer2: list every Carousel and Quote Post day with title and outline\n' +
+    '- notion_copy for video_editor: list every Reel day with reel type and voiceover topic\n\n' +
     'Return ONLY valid JSON. No markdown. No backticks. Start with {.\n\n' +
     '{"week_of":"' + weekDates[0] + ' - ' + weekDates[13] + '",' +
     '"mode":"' + plannerMode + '",' +
@@ -2191,14 +2199,13 @@ async function generateWeeklyPlan() {
     '"days":[' +
     '{"day":"Monday","date":"' + weekDates[0] + '","week_label":"Week 1","post_type":"Reel","pillar":"...","title":"...","hook":"...","content_direction":"...","voiceover_topic":"...","reel_type":"Talking Head","shot_list":"","designer_needed":"Video Editor","thumbnail_hook":"...","carousel_outline":"","quote":"","fresh_or_scripted":"fresh"},' +
     '{"day":"Tuesday","date":"' + weekDates[1] + '","week_label":"Week 1","post_type":"Carousel","pillar":"...","title":"...","hook":"...","content_direction":"...","voiceover_topic":"","reel_type":"","shot_list":"","designer_needed":"Designer 2","thumbnail_hook":"","carousel_outline":"Slide 1:...","quote":"","fresh_or_scripted":"fresh"},' +
-    '...generate all 14 days through ' + weekDates[13] + '...' +
+    '...continue for all 14 days through ' + weekDates[13] + '...' +
     '],' +
     '"delivery":{' +
-    '"designer1":{"name":"Designer 1","sub":"Thumbnails","notion_copy":"W1 Reels:\\n[Day: hook]\\n\\nW2 Reels:\\n[Day: hook]"},' +
-    '"designer2":{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":"W1:\\n[Day: type - task]\\n\\nW2:\\n[Day: type - task]"},' +
-    '"video_editor":{"name":"Video Editor","sub":"Reels","notion_copy":"W1:\\n[Day: type - topic]\\n\\nW2:\\n[Day: type - topic]"}' +
+    '"designer1":{"name":"Designer 1","sub":"Thumbnails","notion_copy":"DESIGNER 1 TASKS - WEEK OF ' + weekDates[0] + '\\n\\nCreate thumbnails for each reel below. Hook text overlaid on Tiffany photo. Brand colors only.\\n\\nWEEK 1 REELS:\\n[List each W1 reel: Day - Thumbnail hook text]\\n\\nWEEK 2 REELS:\\n[List each W2 reel: Day - Thumbnail hook text]"},' +
+    '"designer2":{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":"DESIGNER 2 TASKS - WEEK OF ' + weekDates[0] + '\\n\\nCreate carousel graphics and quote post designs per brand guide.\\n\\nWEEK 1:\\n[List each W1 carousel/quote: Day - Type - Key content]\\n\\nWEEK 2:\\n[List each W2 carousel/quote: Day - Type - Key content]"},' +
+    '"video_editor":{"name":"Video Editor","sub":"Reels","notion_copy":"VIDEO EDITOR TASKS - WEEK OF ' + weekDates[0] + '\\n\\nTalking Head = Tiffany films herself on camera. Voiceover = Tiffany records audio, match with B-roll.\\n\\nWEEK 1 REELS:\\n[List each W1 reel: Day - Talking Head or Voiceover - Voiceover topic]\\n\\nWEEK 2 REELS:\\n[List each W2 reel: Day - Talking Head or Voiceover - Voiceover topic]"}' +
     '}}';
-
   try {
     var plan = await callAPI(prompt, 8000);
 
