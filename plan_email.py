@@ -578,15 +578,18 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
             "video_editor": "Video Editor - Reels",
         }
         for role, email, notion_copy in team:
-            if email and notion_copy:
+            if email:
                 html = build_team_email(plan, feedback, role, notion_copy, day_feedback)
                 role_label = role.replace("_"," ").title()
                 send_email_msg(html, f"Your Tasks — Week of {week_of} (Approved)", email, manager_cc_str)
                 print(f"Task email sent to {role_label}: {email} (CC: {manager_cc_str})")
-                # Create Notion task simultaneously
-                notion_role = role_map.get(role, "General/All Roles")
-                task_name = f"{notion_role} — Week of {week_of}"
-                create_notion_task(task_name, role, notion_copy, week_of)
+                # Only create Notion task if we have task content
+                if notion_copy:
+                    notion_role = role_map.get(role, "General/All Roles")
+                    task_name = f"{notion_role} — Week of {week_of}"
+                    create_notion_task(task_name, role, notion_copy, week_of)
+                else:
+                    print(f"No notion_copy for {role_label} — skipping Notion task creation")
 
     elif action == "rejected":
         try:
