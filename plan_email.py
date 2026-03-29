@@ -205,7 +205,7 @@ def build_client_email(plan, approval_url):
 </table>
 </body></html>"""
 
-# ── BUILD TEAM TASK EMAIL ─────────────────────────────────────────
+# ── NOTION TASK CREATION ──────────────────────────────────────────
 def create_notion_task(project_name, role, description, week_of_str, post_type="Video Reels"):
     """Create a task in the Project-THCO Notion database (TCT Media Team)."""
     if not NOTION_TOKEN:
@@ -276,20 +276,15 @@ def build_planning_horizon(week_of_str):
     """Calculate the 3-week timeline from the week_of string."""
     from datetime import datetime, timedelta
     try:
-        # week_of_str is like "March 30 - April 5, 2026" — parse the start date
         start_str = week_of_str.split("-")[0].strip()
-        # Add year if missing
         if not any(str(y) in start_str for y in range(2020, 2030)):
             year = week_of_str.split(",")[-1].strip()
             start_str = f"{start_str}, {year}"
         start_date = datetime.strptime(start_str, "%B %d, %Y")
-        # Recording week = week_of itself (week 1)
         record_start = start_date
         record_end   = start_date + timedelta(days=6)
-        # Editing week = week 2
         edit_start   = start_date + timedelta(weeks=1)
         edit_end     = edit_start + timedelta(days=6)
-        # Publishing week = week 3
         pub_start    = start_date + timedelta(weeks=2)
         pub_end      = pub_start + timedelta(days=6)
 
@@ -314,7 +309,6 @@ def build_team_email(plan, feedback, recipient_role, notion_copy, day_feedback=N
     }
     rc = role_colors.get(recipient_role, {"color":"#414141","bg":"rgba(65,65,65,0.08)","label":"Team Member"})
 
-    # Build 2-week planning horizon banner
     recording, editing, publishing = build_planning_horizon(week_of)
     horizon_html = f"""
 <div style="background:#EFF6FF;border:1px solid #3A6EA8;border-radius:8px;padding:14px 16px;margin-bottom:20px;">
@@ -335,7 +329,7 @@ def build_team_email(plan, feedback, recipient_role, notion_copy, day_feedback=N
   </table>
   <div style="font-size:11px;color:#5A7A9A;margin-top:10px;line-height:1.6;">Final deliverables are due by end of the editing week so scheduling can begin on time.</div>
 </div>"""
-    # Build feedback section — overall + per-day notes
+
     feedback_parts = []
     if day_feedback:
         day_lines = "".join([
@@ -391,7 +385,6 @@ def build_manager_email(plan, feedback, action, day_feedback=None):
     action_label = "APPROVED" if action == "approved" else "REJECTED"
     action_color = "#3A9E6E" if action == "approved" else "#A00605"
 
-    # Build per-day feedback section
     day_fb_html = ""
     if day_feedback:
         day_fb_html = '<div style="margin-top:14px;border-top:1px solid #E3D3C8;padding-top:12px;">'
@@ -423,29 +416,6 @@ def build_manager_email(plan, feedback, action, day_feedback=None):
 </td></tr>
 </table>
 </body></html>"""
-    week_of = plan.get("week_of", "")
-    today = datetime.now().strftime("%B %-d, %Y")
-    action_label = "APPROVED" if action == "approved" else "REJECTED" if action == "rejected" else "CHANGES REQUESTED"
-    action_color = "#3A9E6E" if action == "approved" else "#A00605" if action == "rejected" else "#B87830"
-    feedback_section = f'<div style="background:#FFF3CD;border-left:3px solid #B87830;padding:12px 16px;border-radius:4px;font-size:13px;color:#414141;line-height:1.75;margin-top:12px;"><strong>Her feedback:</strong> {feedback}</div>' if feedback else '<div style="font-size:13px;color:#8A8A8A;margin-top:8px;font-style:italic;">No feedback provided - approved as-is.</div>'
-
-    return f"""<!DOCTYPE html>
-<html><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#F4F0EB;font-family:Georgia,serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#F4F0EB;">
-<tr><td align="center" style="padding:24px 16px 40px;">
-<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
-<tr><td style="background:#FFFDF5;border:1px solid #E3D3C8;border-radius:12px;padding:28px;">
-  <div style="font-size:10px;font-weight:700;color:{action_color};letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">{action_label}</div>
-  <div style="font-size:20px;font-weight:700;color:#414141;margin-bottom:6px;">Tiffany responded to the week of {week_of}</div>
-  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px;">{today}</div>
-  {feedback_section}
-  {"<div style='margin-top:16px;font-size:13px;color:#3A9E6E;font-weight:600;'>Team task emails have been sent automatically.</div>" if action == "approved" else "<div style='margin-top:16px;font-size:13px;color:#A00605;font-weight:600;'>Plan was REJECTED. Build a new plan from scratch.</div>" if action == "rejected" else "<div style='margin-top:16px;font-size:13px;color:#B87830;font-weight:600;'>Revise the plan and resend for her approval.</div>"}
-</td></tr>
-</table>
-</td></tr>
-</table>
-</body></html>"""
 
 # ── SEND EMAIL ────────────────────────────────────────────────────
 def send_email_msg(html, subject, to_email, cc_emails=""):
@@ -465,8 +435,7 @@ def send_email_msg(html, subject, to_email, cc_emails=""):
         s.sendmail(EMAIL_FROM, all_to, msg.as_string())
     print(f"Sent to {to_email}" + (f" CC: {cc_emails}" if cc_emails else ""))
 
-# ── MAIN ──────────────────────────────────────────────────────────
-
+# ── AUTO-REGENERATE PLAN (on rejection) ──────────────────────────
 def auto_regenerate_plan(old_plan, feedback, day_feedback):
     """Call Claude to generate a revised plan based on rejection feedback."""
     print("Auto-regenerating plan after rejection...")
@@ -475,37 +444,35 @@ def auto_regenerate_plan(old_plan, feedback, day_feedback):
     days     = old_plan.get("days", [])
     note     = old_plan.get("planning_note", "")
 
-    # Build context from rejected plan
     rejected_summary = "\n".join([
         f"- {d.get('day')}: {d.get('post_type')} | {d.get('pillar')} | \"{d.get('title')}\" | Hook: {d.get('hook','')}"
         for d in days
     ])
 
-    # Per-day feedback context
     day_fb_text = ""
     if day_feedback:
-        day_fb_text = "\nPer-day feedback:\n" + "\n".join([
+        day_fb_text = "\nPER-DAY NOTES:\n" + "\n".join([
             f"- {d.get('day')} ({d.get('title','')}): {d.get('note','')}"
             for d in day_feedback
         ])
 
-    overall_fb = f"\nOverall feedback: {feedback}" if feedback else ""
+    prompt = f"""You are the lead content strategist for Tiffany Haynes and Co.
+The client rejected the following 2-week content plan and provided feedback.
+Generate a REVISED plan that addresses her feedback completely.
 
-    prompt = f"""You are a social media content planner for Tiffany Haynes, a Christian entrepreneur and theologian. Her content pillars are:
-1. Business and Entrepreneurship
-2. Spiritual Development and Gods Math Teaching
-3. Family and Lifestyle
-4. Humor and Personality Shenanigans
-5. Community and Testimony
-
-The client REJECTED the following weekly content plan for the week of {week_of}.
-
-REJECTED PLAN:
+REJECTED PLAN (week of {week_of}):
 {rejected_summary}
 
-CLIENT FEEDBACK:{day_fb_text}{overall_fb}
+REJECTION FEEDBACK:{day_fb_text}
+OVERALL: {feedback or "No overall feedback provided."}
 
-Generate a completely revised 7-day content plan addressing all feedback. Return ONLY valid JSON with no markdown or backticks in exactly this structure:
+Brand voice: Authentic, faith-driven, entrepreneurial. Bold, warm, direct.
+Pillars: Business and Entrepreneurship, Spiritual Development and Gods Math Teaching,
+Family and Lifestyle, Humor and Personality Shenanigans, Community and Testimony
+Content mix per week: 3 Reels, 2 Carousels, 1 Quote Post, 1 Lifestyle
+
+Return ONLY valid JSON matching this exact structure. No markdown. No backticks. Start with {{ end with }}.
+
 {{
   "week_of": "{week_of}",
   "planning_note": "Brief note explaining the revisions made based on feedback",
@@ -553,7 +520,7 @@ Generate a completely revised 7-day content plan addressing all feedback. Return
     return json.loads(raw)
 
 
-# ── MAIN ── notify_team section (continued)
+# ── RUN NOTIFY TEAM ───────────────────────────────────────────────
 def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha):
     # Notify manager
     if MANAGER_EMAIL:
@@ -578,25 +545,20 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
             "video_editor": "Video Editor - Reels",
         }
         for role, email, notion_copy in team:
-            if email:
+            if email and notion_copy:
                 html = build_team_email(plan, feedback, role, notion_copy, day_feedback)
                 role_label = role.replace("_"," ").title()
                 send_email_msg(html, f"Your Tasks — Week of {week_of} (Approved)", email, manager_cc_str)
                 print(f"Task email sent to {role_label}: {email} (CC: {manager_cc_str})")
-                # Only create Notion task if we have task content
-                if notion_copy:
-                    notion_role = role_map.get(role, "General/All Roles")
-                    task_name = f"{notion_role} — Week of {week_of}"
-                    create_notion_task(task_name, role, notion_copy, week_of)
-                else:
-                    print(f"No notion_copy for {role_label} — skipping Notion task creation")
+                notion_role = role_map.get(role, "General/All Roles")
+                task_name = f"{notion_role} — Week of {week_of}"
+                create_notion_task(task_name, role, notion_copy, week_of)
 
     elif action == "rejected":
         try:
             new_plan = auto_regenerate_plan(plan, feedback, day_feedback)
             new_week_of = new_plan.get("week_of", week_of)
 
-            # Save new plan to GitHub
             plan_file = {
                 "plan": new_plan,
                 "week_of": new_week_of,
@@ -614,7 +576,6 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
             requests.put(url, headers=headers_gh, json=body)
             print(f"Revised plan saved to GitHub.")
 
-            # Send new plan to Tiffany
             upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
             repo_encoded = GITHUB_REPOSITORY.replace("/", "%2F")
             approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
@@ -622,7 +583,6 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
             send_email_msg(html, f"Revised Content Plan for {new_week_of} - Please Review & Approve", EMAIL_TO)
             print(f"Revised plan auto-sent to Tiffany: {EMAIL_TO}")
 
-            # Notify manager
             if MANAGER_EMAIL:
                 manager_emails = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
                 notify_html = f"""<html><body style="font-family:Georgia,serif;background:#F4F0EB;padding:24px;">
@@ -651,6 +611,8 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
 
     print(f"Team notification complete. Action: {action}")
 
+
+# ── MAIN ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
     event = WORKFLOW_EVENT
     print(f"Plan email script running. Event: '{event}'")
@@ -663,8 +625,6 @@ if __name__ == "__main__":
         print(f"Trigger source: {trigger_source}")
 
         # ── BI-WEEKLY CHECK ──────────────────────────────────────────
-        # When triggered by schedule, only send on even ISO week numbers
-        # This makes the auto-send bi-weekly (every other Friday)
         if trigger_source == "schedule":
             iso_week = datetime.now().isocalendar()[1]
             print(f"Scheduled run. ISO week number: {iso_week}")
@@ -673,23 +633,17 @@ if __name__ == "__main__":
                 exit(0)
             print(f"Even week ({iso_week}) — proceeding with auto-send.")
 
-            # ── AUTO-GENERATE PLAN FOR SCHEDULED RUNS ────────────────
-            # Scheduled runs have no payload — auto-generate the 2-week plan
-            # using the Anthropic API and the KB context from GitHub
             try:
                 from datetime import timedelta
-                # Calculate next Monday (start of 2-week window)
                 today = datetime.now()
                 days_to_monday = (7 - today.weekday()) % 7 or 7
                 next_monday = today + timedelta(days=days_to_monday)
-                # Build 14 date strings
                 date_strs = []
                 for i in range(14):
                     d = next_monday + timedelta(days=i)
                     date_strs.append(d.strftime("%A, %b %-d"))
                 week_of = f"{date_strs[0]} - {date_strs[13]}"
 
-                # Load KB context from GitHub
                 kb_context = ""
                 try:
                     kb_data, _ = gh_get("kb_snapshot.json")
@@ -749,7 +703,6 @@ if __name__ == "__main__":
                 exit(1)
 
         else:
-            # Manual or repository_dispatch — read from payload as before
             try:
                 payload = json.loads(payload_raw)
                 if payload is None:
@@ -757,43 +710,26 @@ if __name__ == "__main__":
             except Exception:
                 payload = {}
 
-            plan = payload.get("plan", {}) if payload else {}
-            week_of = payload.get("week_of", plan.get("week_of", "")) if payload else ""
-            is_test = payload.get("is_test", False) if payload else False
+            is_test   = payload.get("is_test", False) if payload else False
             recipient = payload.get("sent_to", EMAIL_TO) if payload else EMAIL_TO
 
-            if not plan:
-                print("No plan data in payload — trigger from Content Studio Send button only.")
+            # Browser saves pending_plan.json BEFORE dispatching to avoid
+            # GitHub's client_payload size limit (~10KB). Read it from there.
+            plan_data, _ = gh_get("pending_plan.json")
+            if plan_data:
+                plan    = plan_data.get("plan", {})
+                week_of = plan_data.get("week_of", plan.get("week_of", ""))
+                # Use recipient from payload if provided, else fall back to saved
+                if not recipient or recipient == EMAIL_TO:
+                    recipient = plan_data.get("sent_to", EMAIL_TO)
+                print(f"Plan loaded from pending_plan.json — week_of: {week_of}")
+            else:
+                print("No plan data in payload and no pending_plan.json found. Exiting.")
                 exit(0)
 
-        # Save plan to GitHub so plan_approval.html can load it
-        # No tokens stored - only plan content which is safe
-        try:
-            plan_file = {
-                "plan": plan,
-                "week_of": week_of or plan.get("week_of", ""),
-                "sent_to": recipient,
-                "sent_at": datetime.now().isoformat(),
-                "status": "pending"
-            }
-            print(f"Saving pending_plan.json with week_of: '{plan_file['week_of']}'")
-            print(f"Plan has {len(plan.get('days',[]))} days, delivery keys: {list(plan.get('delivery',{}).keys())}")
-            url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
-            headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
-            sha = None
-            r = requests.get(url, headers=headers)
-            if r.status_code == 200:
-                sha = r.json().get("sha")
-            content = base64.b64encode(json.dumps(plan_file, indent=2).encode()).decode()
-            body = {"message": f"Weekly plan for {week_of}", "content": content}
-            if sha:
-                body["sha"] = sha
-            r2 = requests.put(url, headers=headers, json=body)
-            print(f"Plan saved to GitHub: {r2.status_code}")
-        except Exception as e:
-            print(f"Could not save plan to GitHub: {e}")
+        # Plan is already saved to GitHub by the browser — just confirm and continue
 
-        # Build approval URL with token
+        # Build approval URL and send email
         upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
         repo_encoded = GITHUB_REPOSITORY.replace("/", "%2F")
         approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
@@ -804,7 +740,6 @@ if __name__ == "__main__":
         print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else ""))
 
     elif event == "notify_team":
-        # Load approval from GitHub and send team task emails
         approval_data, approval_sha = gh_get("plan_approval.json")
         if not approval_data:
             print("No plan_approval.json found. Exiting.")
@@ -819,22 +754,4 @@ if __name__ == "__main__":
         plan = plan_data.get("plan", {}) if plan_data else {}
         delivery = plan.get("delivery", {})
 
-        # week_of fallback chain — approval_data → pending_plan top-level → plan.week_of
-        if not week_of:
-            week_of = (plan_data or {}).get("week_of", "") or plan.get("week_of", "")
-            print(f"week_of fallback: '{week_of}'")
-
-        print(f"Action: {action}")
-        print(f"week_of: '{week_of}'")
-        print(f"Plan has {len(plan.get('days',[]))} days")
-        print(f"Delivery keys: {list(delivery.keys())}")
-        print(f"Designer1 notion_copy length: {len(delivery.get('designer1',{}).get('notion_copy',''))}")
-        print(f"Designer2 notion_copy length: {len(delivery.get('designer2',{}).get('notion_copy',''))}")
-        print(f"VideoEditor notion_copy length: {len(delivery.get('video_editor',{}).get('notion_copy',''))}")
-        print(f"MANAGER_EMAIL set: {bool(MANAGER_EMAIL)}")
-        print(f"DESIGNER1_EMAIL set: {bool(DESIGNER1_EMAIL)}")
-        print(f"DESIGNER2_EMAIL set: {bool(DESIGNER2_EMAIL)}")
-        print(f"VIDEO_EDITOR_EMAIL set: {bool(VIDEO_EDITOR_EMAIL)}")
-
         run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha)
-
