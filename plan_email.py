@@ -466,173 +466,6 @@ def send_email_msg(html, subject, to_email, cc_emails=""):
     print(f"Sent to {to_email}" + (f" CC: {cc_emails}" if cc_emails else ""))
 
 # ── MAIN ──────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    event = WORKFLOW_EVENT
-    print(f"Plan email script running. Event: '{event}'")
-    print(f"EVENT_PAYLOAD length: {len(os.environ.get('EVENT_PAYLOAD', '{}'))} chars")
-
-    if event == "send_plan":
-        trigger_source = os.environ.get("TRIGGER_SOURCE", "")
-        payload_raw = os.environ.get("EVENT_PAYLOAD", "{}")
-        print(f"EVENT_PAYLOAD raw: {payload_raw[:100]}")
-        print(f"Trigger source: {trigger_source}")
-
-        # ── BI-WEEKLY CHECK ──────────────────────────────────────────
-        # When triggered by schedule, only send on even ISO week numbers
-        # This makes the auto-send bi-weekly (every other Friday)
-        if trigger_source == "schedule":
-            iso_week = datetime.now().isocalendar()[1]
-            print(f"Scheduled run. ISO week number: {iso_week}")
-            if iso_week % 2 != 0:
-                print(f"Odd week ({iso_week}) — skipping. Auto-send runs on even weeks only.")
-                exit(0)
-            print(f"Even week ({iso_week}) — proceeding with auto-send.")
-
-            # ── AUTO-GENERATE PLAN FOR SCHEDULED RUNS ────────────────
-            # Scheduled runs have no payload — auto-generate the 2-week plan
-            # using the Anthropic API and the KB context from GitHub
-            try:
-                from datetime import timedelta
-                # Calculate next Monday (start of 2-week window)
-                today = datetime.now()
-                days_to_monday = (7 - today.weekday()) % 7 or 7
-                next_monday = today + timedelta(days=days_to_monday)
-                # Build 14 date strings
-                date_strs = []
-                for i in range(14):
-                    d = next_monday + timedelta(days=i)
-                    date_strs.append(d.strftime("%A, %b %-d"))
-                week_of = f"{date_strs[0]} - {date_strs[13]}"
-
-                # Load KB context from GitHub
-                kb_context = ""
-                try:
-                    kb_data, _ = gh_get("kb_snapshot.json")
-                    if kb_data:
-                        kb_context = f"PERFORMANCE INSIGHTS: {json.dumps(kb_data)[:2000]}\n\n"
-                except Exception:
-                    pass
-
-                auto_prompt = (
-                    f"You are the lead content strategist for Tiffany Haynes and Co. "
-                    f"Generate a complete 2-week content plan.\n\n"
-                    f"{kb_context}"
-                    f"WEEK 1: {date_strs[0]} through {date_strs[6]}\n"
-                    f"WEEK 2: {date_strs[7]} through {date_strs[13]}\n\n"
-                    f"Brand voice: Authentic, faith-driven, entrepreneurial. Bold, warm, direct.\n"
-                    f"Pillars: Business and Entrepreneurship, Spiritual Development and Gods Math Teaching, "
-                    f"Family and Lifestyle, Humor and Personality Shenanigans, Community and Testimony\n"
-                    f"Content mix per week: 3 Reels, 2 Carousels, 1 Quote Post, 1 Lifestyle\n\n"
-                    f"Return ONLY valid JSON. No markdown. No backticks.\n\n"
-                    f'{{"week_of":"{week_of}","mode":"fresh","planning_note":"Strategic direction for these two weeks.",'
-                    f'"pillar_balance":{{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,'
-                    f'"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0}},'
-                    f'"gaps_addressed":[],'
-                    f'"days":[{{"day":"Monday","date":"{date_strs[0]}","week_label":"Week 1","post_type":"Reel",'
-                    f'"pillar":"pillar","title":"","hook":"","content_direction":"","voiceover_topic":"",'
-                    f'"designer_needed":"Designer 1","thumbnail_hook":"","carousel_outline":"","quote":"","fresh_or_scripted":"fresh"}}],'
-                    f'"delivery":{{"designer1":{{"name":"Designer 1","sub":"Thumbnails","notion_copy":""}},'
-                    f'"designer2":{{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":""}},'
-                    f'"video_editor":{{"name":"Video Editor","sub":"Reels","notion_copy":""}}}}}}'
-                )
-
-                import urllib.request as _req
-                req_data = json.dumps({
-                    "model": "claude-sonnet-4-6",
-                    "max_tokens": 4000,
-                    "messages": [{"role": "user", "content": auto_prompt}]
-                }).encode()
-                req = _req.Request(
-                    "https://api.anthropic.com/v1/messages",
-                    data=req_data,
-                    headers={
-                        "Content-Type": "application/json",
-                        "x-api-key": ANTHROPIC_API_KEY,
-                        "anthropic-version": "2023-06-01"
-                    }
-                )
-                with _req.urlopen(req) as resp:
-                    result = json.loads(resp.read().decode())
-                raw_text = next((b["text"] for b in result.get("content",[]) if b.get("type")=="text"), "")
-                plan = json.loads(raw_text.replace("```json","").replace("```","").strip())
-                week_of = plan.get("week_of", week_of)
-                is_test = False
-                recipient = EMAIL_TO
-                print(f"Auto-generated plan for {week_of}")
-            except Exception as e:
-                print(f"Auto-generate failed: {e}")
-                exit(1)
-
-        else:
-            # Manual or repository_dispatch — read from payload as before
-            try:
-                payload = json.loads(payload_raw)
-                if payload is None:
-                    payload = {}
-            except Exception:
-                payload = {}
-
-            plan = payload.get("plan", {}) if payload else {}
-            week_of = payload.get("week_of", plan.get("week_of", "")) if payload else ""
-            is_test = payload.get("is_test", False) if payload else False
-            recipient = payload.get("sent_to", EMAIL_TO) if payload else EMAIL_TO
-
-            if not plan:
-                print("No plan data in payload — trigger from Content Studio Send button only.")
-                exit(0)
-
-        # Save plan to GitHub so plan_approval.html can load it
-        # No tokens stored - only plan content which is safe
-        try:
-            plan_file = {
-                "plan": plan,
-                "week_of": week_of,
-                "sent_to": recipient,
-                "sent_at": datetime.now().isoformat(),
-                "status": "pending"
-            }
-            url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
-            headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
-            sha = None
-            r = requests.get(url, headers=headers)
-            if r.status_code == 200:
-                sha = r.json().get("sha")
-            content = base64.b64encode(json.dumps(plan_file, indent=2).encode()).decode()
-            body = {"message": f"Weekly plan for {week_of}", "content": content}
-            if sha:
-                body["sha"] = sha
-            r2 = requests.put(url, headers=headers, json=body)
-            print(f"Plan saved to GitHub: {r2.status_code}")
-        except Exception as e:
-            print(f"Could not save plan to GitHub: {e}")
-
-        # Build approval URL with token
-        upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
-        repo_encoded = GITHUB_REPOSITORY.replace("/", "%2F")
-        approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
-
-        html = build_client_email(plan, approval_url)
-        subject = f"[TEST PREVIEW] Content Plan for {week_of}" if is_test else f"Your Content Plan for {week_of} - Please Review & Approve"
-        send_email_msg(html, subject, recipient)
-        print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else ""))
-
-    elif event == "notify_team":
-        # Load approval from GitHub and send team task emails
-        approval_data, approval_sha = gh_get("plan_approval.json")
-        if not approval_data:
-            print("No plan_approval.json found. Exiting.")
-            exit(0)
-
-        action      = approval_data.get("action", "approved")
-        feedback    = approval_data.get("overall_feedback", approval_data.get("feedback", ""))
-        day_feedback= approval_data.get("day_feedback", [])
-        week_of     = approval_data.get("week_of", "")
-
-        plan_data, _ = gh_get("pending_plan.json")
-        plan = plan_data.get("plan", {}) if plan_data else {}
-        delivery = plan.get("delivery", {})
-
-        run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha)
 
 def auto_regenerate_plan(old_plan, feedback, day_feedback):
     """Call Claude to generate a revised plan based on rejection feedback."""
@@ -814,3 +647,172 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
         gh_delete("plan_approval.json", approval_sha, f"Plan approval processed - {week_of}")
 
     print(f"Team notification complete. Action: {action}")
+
+if __name__ == "__main__":
+    event = WORKFLOW_EVENT
+    print(f"Plan email script running. Event: '{event}'")
+    print(f"EVENT_PAYLOAD length: {len(os.environ.get('EVENT_PAYLOAD', '{}'))} chars")
+
+    if event == "send_plan":
+        trigger_source = os.environ.get("TRIGGER_SOURCE", "")
+        payload_raw = os.environ.get("EVENT_PAYLOAD", "{}")
+        print(f"EVENT_PAYLOAD raw: {payload_raw[:100]}")
+        print(f"Trigger source: {trigger_source}")
+
+        # ── BI-WEEKLY CHECK ──────────────────────────────────────────
+        # When triggered by schedule, only send on even ISO week numbers
+        # This makes the auto-send bi-weekly (every other Friday)
+        if trigger_source == "schedule":
+            iso_week = datetime.now().isocalendar()[1]
+            print(f"Scheduled run. ISO week number: {iso_week}")
+            if iso_week % 2 != 0:
+                print(f"Odd week ({iso_week}) — skipping. Auto-send runs on even weeks only.")
+                exit(0)
+            print(f"Even week ({iso_week}) — proceeding with auto-send.")
+
+            # ── AUTO-GENERATE PLAN FOR SCHEDULED RUNS ────────────────
+            # Scheduled runs have no payload — auto-generate the 2-week plan
+            # using the Anthropic API and the KB context from GitHub
+            try:
+                from datetime import timedelta
+                # Calculate next Monday (start of 2-week window)
+                today = datetime.now()
+                days_to_monday = (7 - today.weekday()) % 7 or 7
+                next_monday = today + timedelta(days=days_to_monday)
+                # Build 14 date strings
+                date_strs = []
+                for i in range(14):
+                    d = next_monday + timedelta(days=i)
+                    date_strs.append(d.strftime("%A, %b %-d"))
+                week_of = f"{date_strs[0]} - {date_strs[13]}"
+
+                # Load KB context from GitHub
+                kb_context = ""
+                try:
+                    kb_data, _ = gh_get("kb_snapshot.json")
+                    if kb_data:
+                        kb_context = f"PERFORMANCE INSIGHTS: {json.dumps(kb_data)[:2000]}\n\n"
+                except Exception:
+                    pass
+
+                auto_prompt = (
+                    f"You are the lead content strategist for Tiffany Haynes and Co. "
+                    f"Generate a complete 2-week content plan.\n\n"
+                    f"{kb_context}"
+                    f"WEEK 1: {date_strs[0]} through {date_strs[6]}\n"
+                    f"WEEK 2: {date_strs[7]} through {date_strs[13]}\n\n"
+                    f"Brand voice: Authentic, faith-driven, entrepreneurial. Bold, warm, direct.\n"
+                    f"Pillars: Business and Entrepreneurship, Spiritual Development and Gods Math Teaching, "
+                    f"Family and Lifestyle, Humor and Personality Shenanigans, Community and Testimony\n"
+                    f"Content mix per week: 3 Reels, 2 Carousels, 1 Quote Post, 1 Lifestyle\n\n"
+                    f"Return ONLY valid JSON. No markdown. No backticks.\n\n"
+                    f'{{"week_of":"{week_of}","mode":"fresh","planning_note":"Strategic direction for these two weeks.",'
+                    f'"pillar_balance":{{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,'
+                    f'"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0}},'
+                    f'"gaps_addressed":[],'
+                    f'"days":[{{"day":"Monday","date":"{date_strs[0]}","week_label":"Week 1","post_type":"Reel",'
+                    f'"pillar":"pillar","title":"","hook":"","content_direction":"","voiceover_topic":"",'
+                    f'"designer_needed":"Designer 1","thumbnail_hook":"","carousel_outline":"","quote":"","fresh_or_scripted":"fresh"}}],'
+                    f'"delivery":{{"designer1":{{"name":"Designer 1","sub":"Thumbnails","notion_copy":""}},'
+                    f'"designer2":{{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":""}},'
+                    f'"video_editor":{{"name":"Video Editor","sub":"Reels","notion_copy":""}}}}}}'
+                )
+
+                import urllib.request as _req
+                req_data = json.dumps({
+                    "model": "claude-sonnet-4-6",
+                    "max_tokens": 4000,
+                    "messages": [{"role": "user", "content": auto_prompt}]
+                }).encode()
+                req = _req.Request(
+                    "https://api.anthropic.com/v1/messages",
+                    data=req_data,
+                    headers={
+                        "Content-Type": "application/json",
+                        "x-api-key": ANTHROPIC_API_KEY,
+                        "anthropic-version": "2023-06-01"
+                    }
+                )
+                with _req.urlopen(req) as resp:
+                    result = json.loads(resp.read().decode())
+                raw_text = next((b["text"] for b in result.get("content",[]) if b.get("type")=="text"), "")
+                plan = json.loads(raw_text.replace("```json","").replace("```","").strip())
+                week_of = plan.get("week_of", week_of)
+                is_test = False
+                recipient = EMAIL_TO
+                print(f"Auto-generated plan for {week_of}")
+            except Exception as e:
+                print(f"Auto-generate failed: {e}")
+                exit(1)
+
+        else:
+            # Manual or repository_dispatch — read from payload as before
+            try:
+                payload = json.loads(payload_raw)
+                if payload is None:
+                    payload = {}
+            except Exception:
+                payload = {}
+
+            plan = payload.get("plan", {}) if payload else {}
+            week_of = payload.get("week_of", plan.get("week_of", "")) if payload else ""
+            is_test = payload.get("is_test", False) if payload else False
+            recipient = payload.get("sent_to", EMAIL_TO) if payload else EMAIL_TO
+
+            if not plan:
+                print("No plan data in payload — trigger from Content Studio Send button only.")
+                exit(0)
+
+        # Save plan to GitHub so plan_approval.html can load it
+        # No tokens stored - only plan content which is safe
+        try:
+            plan_file = {
+                "plan": plan,
+                "week_of": week_of,
+                "sent_to": recipient,
+                "sent_at": datetime.now().isoformat(),
+                "status": "pending"
+            }
+            url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
+            headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+            sha = None
+            r = requests.get(url, headers=headers)
+            if r.status_code == 200:
+                sha = r.json().get("sha")
+            content = base64.b64encode(json.dumps(plan_file, indent=2).encode()).decode()
+            body = {"message": f"Weekly plan for {week_of}", "content": content}
+            if sha:
+                body["sha"] = sha
+            r2 = requests.put(url, headers=headers, json=body)
+            print(f"Plan saved to GitHub: {r2.status_code}")
+        except Exception as e:
+            print(f"Could not save plan to GitHub: {e}")
+
+        # Build approval URL with token
+        upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
+        repo_encoded = GITHUB_REPOSITORY.replace("/", "%2F")
+        approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
+
+        html = build_client_email(plan, approval_url)
+        subject = f"[TEST PREVIEW] Content Plan for {week_of}" if is_test else f"Your Content Plan for {week_of} - Please Review & Approve"
+        send_email_msg(html, subject, recipient)
+        print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else ""))
+
+    elif event == "notify_team":
+        # Load approval from GitHub and send team task emails
+        approval_data, approval_sha = gh_get("plan_approval.json")
+        if not approval_data:
+            print("No plan_approval.json found. Exiting.")
+            exit(0)
+
+        action      = approval_data.get("action", "approved")
+        feedback    = approval_data.get("overall_feedback", approval_data.get("feedback", ""))
+        day_feedback= approval_data.get("day_feedback", [])
+        week_of     = approval_data.get("week_of", "")
+
+        plan_data, _ = gh_get("pending_plan.json")
+        plan = plan_data.get("plan", {}) if plan_data else {}
+        delivery = plan.get("delivery", {})
+
+        run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha)
+
