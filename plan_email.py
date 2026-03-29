@@ -715,16 +715,24 @@ if __name__ == "__main__":
 
             # Browser saves pending_plan.json BEFORE dispatching to avoid
             # GitHub's client_payload size limit (~10KB). Read it from there.
-            plan_data, _ = gh_get("pending_plan.json")
+            # Retry up to 5 times with 3s delay to handle race conditions.
+            import time
+            plan_data = None
+            for attempt in range(5):
+                plan_data, _ = gh_get("pending_plan.json")
+                if plan_data:
+                    break
+                print(f"pending_plan.json not ready yet (attempt {attempt+1}/5) — waiting 3s...")
+                time.sleep(3)
+
             if plan_data:
                 plan    = plan_data.get("plan", {})
                 week_of = plan_data.get("week_of", plan.get("week_of", ""))
-                # Use recipient from payload if provided, else fall back to saved
                 if not recipient or recipient == EMAIL_TO:
                     recipient = plan_data.get("sent_to", EMAIL_TO)
                 print(f"Plan loaded from pending_plan.json — week_of: {week_of}")
             else:
-                print("No plan data in payload and no pending_plan.json found. Exiting.")
+                print("No plan data in payload and pending_plan.json not found after 5 attempts. Exiting.")
                 exit(0)
 
         # Plan is already saved to GitHub by the browser — just confirm and continue
