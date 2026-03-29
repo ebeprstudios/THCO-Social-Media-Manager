@@ -771,13 +771,38 @@ if __name__ == "__main__":
             print("No plan_approval.json found. Exiting.")
             exit(0)
 
-        action      = approval_data.get("action", "approved")
-        feedback    = approval_data.get("overall_feedback", approval_data.get("feedback", ""))
-        day_feedback= approval_data.get("day_feedback", [])
-        week_of     = approval_data.get("week_of", "")
+        action       = approval_data.get("action", "approved")
+        feedback     = approval_data.get("overall_feedback", approval_data.get("feedback", ""))
+        day_feedback = approval_data.get("day_feedback", [])
+        week_of      = approval_data.get("week_of", "")
+        print(f"Approval loaded — action: '{action}', week_of from approval: '{week_of}'")
 
         plan_data, _ = gh_get("pending_plan.json")
-        plan = plan_data.get("plan", {}) if plan_data else {}
-        delivery = plan.get("delivery", {})
+        print(f"pending_plan.json found: {plan_data is not None}")
+        if plan_data:
+            print(f"pending_plan.json top-level keys: {list(plan_data.keys())}")
+            print(f"pending_plan.json week_of: '{plan_data.get('week_of','')}'")
+            plan = plan_data.get("plan", {})
+            print(f"plan keys: {list(plan.keys()) if plan else 'EMPTY'}")
+            print(f"plan.week_of: '{plan.get('week_of','')}'")
+            print(f"plan days count: {len(plan.get('days', []))}")
+            delivery = plan.get("delivery", {})
+            print(f"delivery keys: {list(delivery.keys())}")
+            for role in ["designer1", "designer2", "video_editor"]:
+                nc = delivery.get(role, {}).get("notion_copy", "")
+                print(f"  {role} notion_copy length: {len(nc)}")
+        else:
+            plan = {}
+            delivery = {}
+
+        # week_of fallback chain
+        if not week_of:
+            week_of = (plan_data or {}).get("week_of", "") or plan.get("week_of", "")
+            print(f"week_of after fallback: '{week_of}'")
+
+        print(f"MANAGER_EMAIL set: {bool(MANAGER_EMAIL)}")
+        print(f"DESIGNER1_EMAIL set: {bool(DESIGNER1_EMAIL)}")
+        print(f"DESIGNER2_EMAIL set: {bool(DESIGNER2_EMAIL)}")
+        print(f"VIDEO_EDITOR_EMAIL set: {bool(VIDEO_EDITOR_EMAIL)}")
 
         run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha)
