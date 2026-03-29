@@ -780,7 +780,16 @@ if __name__ == "__main__":
         week_of      = approval_data.get("week_of", "")
         print(f"Approval loaded — action: '{action}', week_of from approval: '{week_of}'")
 
-        plan_data, _ = gh_get("pending_plan.json")
+        import time
+        plan_data = None
+        for attempt in range(6):
+            raw, _ = gh_get("pending_plan.json")
+            if raw and isinstance(raw, dict) and raw.get("plan"):
+                plan_data = raw
+                break
+            print(f"pending_plan.json attempt {attempt+1}/6 — got: {str(raw)[:100]} — retrying in 5s...")
+            time.sleep(5)
+
         print(f"pending_plan.json returned: {type(plan_data).__name__} — value: {str(plan_data)[:200]}")
         if plan_data is not None and isinstance(plan_data, dict) and plan_data:
             print(f"pending_plan.json top-level keys: {list(plan_data.keys())}")
