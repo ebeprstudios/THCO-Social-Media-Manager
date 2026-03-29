@@ -222,13 +222,20 @@ async function submitApproval(action) {
     fullFeedback += (fullFeedback ? '\n\nOVERALL NOTES:\n' : '') + feedback;
   }
 
+  // week_of fallback chain — plan.week_of → top-level week_of → title text
+  var resolvedWeekOf = (planData && planData.plan && planData.plan.week_of)
+    ? planData.plan.week_of
+    : (planData && planData.week_of)
+      ? planData.week_of
+      : (document.getElementById('plan-title') ? document.getElementById('plan-title').textContent.replace('Week of ', '').trim() : '');
+
   var entry = {
     action: action,
     feedback: fullFeedback || '',
     day_feedback: dayFeedback,
     overall_feedback: feedback,
     approved_at: new Date().toISOString(),
-    week_of: planData && planData.plan ? planData.plan.week_of : '',
+    week_of: resolvedWeekOf,
     repo: ghRepo
   };
 

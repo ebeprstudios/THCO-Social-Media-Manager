@@ -740,6 +740,9 @@ if __name__ == "__main__":
                 "status": "pending"
             }
             print(f"Saving pending_plan.json — week_of: '{week_of}', days: {len(plan.get('days',[]))}, delivery keys: {list(plan.get('delivery',{}).keys())}")
+            for role in ["designer1", "designer2", "video_editor"]:
+                nc = plan.get("delivery",{}).get(role,{}).get("notion_copy","")
+                print(f"  {role} notion_copy length being saved: {len(nc)}")
             url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
             headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
             sha = None
@@ -778,8 +781,8 @@ if __name__ == "__main__":
         print(f"Approval loaded — action: '{action}', week_of from approval: '{week_of}'")
 
         plan_data, _ = gh_get("pending_plan.json")
-        print(f"pending_plan.json found: {plan_data is not None}")
-        if plan_data:
+        print(f"pending_plan.json returned: {type(plan_data).__name__} — value: {str(plan_data)[:200]}")
+        if plan_data is not None and isinstance(plan_data, dict) and plan_data:
             print(f"pending_plan.json top-level keys: {list(plan_data.keys())}")
             print(f"pending_plan.json week_of: '{plan_data.get('week_of','')}'")
             plan = plan_data.get("plan", {})
@@ -792,6 +795,7 @@ if __name__ == "__main__":
                 nc = delivery.get(role, {}).get("notion_copy", "")
                 print(f"  {role} notion_copy length: {len(nc)}")
         else:
+            print("pending_plan.json is empty or invalid — plan will be empty")
             plan = {}
             delivery = {}
 
