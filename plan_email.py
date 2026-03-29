@@ -710,32 +710,50 @@ if __name__ == "__main__":
             except Exception:
                 payload = {}
 
+            plan      = payload.get("plan", {}) if payload else {}
+            week_of   = payload.get("week_of", plan.get("week_of", "")) if payload else ""
             is_test   = payload.get("is_test", False) if payload else False
             recipient = payload.get("sent_to", EMAIL_TO) if payload else EMAIL_TO
 
-            # Browser saves pending_plan.json BEFORE dispatching to avoid
-            # GitHub's client_payload size limit (~10KB). Read it from there.
-            # Retry up to 5 times with 3s delay to handle race conditions.
-            import time
-            plan_data = None
-            for attempt in range(5):
+            print(f"Payload plan days: {len(plan.get('days', []))}, week_of: '{week_of}'")
+
+            # Fallback: if payload had no plan, try pending_plan.json
+            if not plan:
+                print("No plan in payload — trying pending_plan.json fallback...")
                 plan_data, _ = gh_get("pending_plan.json")
                 if plan_data:
-                    break
-                print(f"pending_plan.json not ready yet (attempt {attempt+1}/5) — waiting 3s...")
-                time.sleep(3)
+                    plan      = plan_data.get("plan", {})
+                    week_of   = plan_data.get("week_of", plan.get("week_of", ""))
+                    recipient = plan_data.get("sent_to", recipient)
+                    print(f"Plan loaded from pending_plan.json — week_of: '{week_of}'")
+                else:
+                    print("No plan in payload and no pending_plan.json found. Exiting.")
+                    exit(0)
 
-            if plan_data:
-                plan    = plan_data.get("plan", {})
-                week_of = plan_data.get("week_of", plan.get("week_of", ""))
-                if not recipient or recipient == EMAIL_TO:
-                    recipient = plan_data.get("sent_to", EMAIL_TO)
-                print(f"Plan loaded from pending_plan.json — week_of: {week_of}")
-            else:
-                print("No plan data in payload and pending_plan.json not found after 5 attempts. Exiting.")
-                exit(0)
-
-        # Plan is already saved to GitHub by the browser — just confirm and continue
+        # Save plan to GitHub so plan_approval.html and notify-team can load it
+        try:
+            plan_file = {
+                "plan": plan,
+                "week_of": week_of,
+                "sent_to": recipient,
+                "sent_at": datetime.now().isoformat(),
+                "status": "pending"
+            }
+            print(f"Saving pending_plan.json — week_of: '{week_of}', days: {len(plan.get('days',[]))}, delivery keys: {list(plan.get('delivery',{}).keys())}")
+            url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
+            headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+            sha = None
+            r = requests.get(url, headers=headers)
+            if r.status_code == 200:
+                sha = r.json().get("sha")
+            content = base64.b64encode(json.dumps(plan_file, indent=2).encode()).decode()
+            body = {"message": f"Weekly plan for {week_of}", "content": content}
+            if sha:
+                body["sha"] = sha
+            r2 = requests.put(url, headers=headers, json=body)
+            print(f"Plan saved to GitHub: {r2.status_code}")
+        except Exception as e:
+            print(f"Could not save plan to GitHub: {e}")
 
         # Build approval URL and send email
         upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
