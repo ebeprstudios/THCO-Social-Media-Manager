@@ -779,6 +779,35 @@ body::before {
           <button class="add-transcript-btn" onclick="addTranscript()">+ Add Another Script</button>
         </div>
 
+        <!-- DIRECTOR'S NOTES — chat-style prompt input -->
+        <div style="margin-top:20px;">
+          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px;">Tell Claude what you want this week</div>
+
+          <!-- Suggestion chips -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+            <button onclick="setNote('Add more humor and personality this week')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border-md);color:var(--charcoal2);background:var(--cream-2);cursor:pointer;font-family:Inter,sans-serif;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border-md)';this.style.color='var(--charcoal2)'">More humor</button>
+            <button onclick="setNote('Make the hooks shorter and more provocative')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border-md);color:var(--charcoal2);background:var(--cream-2);cursor:pointer;font-family:Inter,sans-serif;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border-md)';this.style.color='var(--charcoal2)'">Punchier hooks</button>
+            <button onclick="setNote('Lead with Spiritual content. More Gods Math this cycle')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border-md);color:var(--charcoal2);background:var(--cream-2);cursor:pointer;font-family:Inter,sans-serif;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border-md)';this.style.color='var(--charcoal2)'">Lead with Spiritual</button>
+            <button onclick="setNote('Less teaching content. More personal storytelling and testimony')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border-md);color:var(--charcoal2);background:var(--cream-2);cursor:pointer;font-family:Inter,sans-serif;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border-md)';this.style.color='var(--charcoal2)'">More storytelling</button>
+            <button onclick="setNote('Keep captions short this week. 3-5 sentences max')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border-md);color:var(--charcoal2);background:var(--cream-2);cursor:pointer;font-family:Inter,sans-serif;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border-md)';this.style.color='var(--charcoal2)'">Short captions</button>
+            <button onclick="setNote('Push the REVA Challenge CTA on every post this cycle')" style="font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--border-md);color:var(--charcoal2);background:var(--cream-2);cursor:pointer;font-family:Inter,sans-serif;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border-md)';this.style.color='var(--charcoal2)'">Push REVA Challenge</button>
+          </div>
+
+          <!-- Chat-style input box -->
+          <div style="display:flex;align-items:flex-end;gap:0;background:var(--cream-1);border:1.5px solid var(--border-md);border-radius:14px;padding:4px 4px 4px 14px;transition:border-color 0.2s;" id="notes-input-wrap">
+            <textarea id="director-notes"
+              placeholder="Give Claude direction... e.g. 'Create more humor this week' or 'Make the captions feel warmer and less instructional'"
+              rows="1"
+              onInput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"
+              onfocus="document.getElementById('notes-input-wrap').style.borderColor='var(--charcoal)'"
+              onblur="document.getElementById('notes-input-wrap').style.borderColor='var(--border-md)'"
+              style="flex:1;background:transparent;border:none;color:var(--charcoal);font-family:Inter,sans-serif;font-size:13px;padding:8px 0;outline:none;resize:none;min-height:36px;max-height:120px;line-height:1.5;"></textarea>
+            <button onclick="document.getElementById('director-notes').value='';document.getElementById('director-notes').style.height='36px';" title="Clear"
+              style="flex-shrink:0;width:32px;height:32px;border-radius:10px;border:none;background:transparent;cursor:pointer;color:var(--charcoal3);font-size:14px;display:flex;align-items:center;justify-content:center;margin-bottom:2px;">✕</button>
+          </div>
+          <div style="font-size:10px;color:var(--charcoal3);margin-top:6px;padding-left:2px;">Anything you type here becomes Claude's top priority instruction for this generation.</div>
+        </div>
+
         <div style="margin-top:16px;display:flex;gap:10px;align-items:center;">
           <button class="btn-primary" id="gen-btn-week" onclick="generateWeeklyPlan()">Generate Weekly Plan</button>
           <span style="font-size:11px;color:var(--charcoal3);" id="planner-gen-note">Generates a complete Mon-Sun calendar with fresh original concepts.</span>
@@ -1341,6 +1370,25 @@ function copyFromEl(btn, elId) {
   }).catch(function() { btn.textContent = 'Failed'; setTimeout(function() { btn.textContent = 'Copy for Notion'; }, 2000); });
 }
 
+function addNote(text) {
+  var el = document.getElementById('director-notes');
+  if (!el) return;
+  var cur = el.value.trim();
+  el.value = cur ? cur + '. ' + text : text;
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  el.focus();
+}
+
+function setNote(text) {
+  var el = document.getElementById('director-notes');
+  if (!el) return;
+  el.value = text;
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  el.focus();
+}
+
 function wcBadge(text, minW, maxW) {
   var wc = (text||'').trim().split(/\s+/).length;
   var cls = wc < minW ? 'wc-short' : wc > maxW ? 'wc-long' : 'wc-ok';
@@ -1370,6 +1418,20 @@ function safeParseJSON(raw) {
       throw new Error('Parse error: ' + e2.message + ' | Snippet: ' + s.slice(0,200));
     }
   }
+}
+
+function cleanEmDashes(obj) {
+  // Recursively strip em dashes and en dashes from all string values
+  if (typeof obj === 'string') {
+    return obj.replace(/\u2014/g, ' ').replace(/\u2013/g, '-');
+  }
+  if (Array.isArray(obj)) return obj.map(cleanEmDashes);
+  if (obj && typeof obj === 'object') {
+    var out = {};
+    for (var k in obj) out[k] = cleanEmDashes(obj[k]);
+    return out;
+  }
+  return obj;
 }
 
 async function callAPI(prompt, tokens) {
@@ -1773,6 +1835,7 @@ async function generateDashboard() {
 
   try {
     var result = await callAPI(prompt, 5000);
+    result = cleanEmDashes(result);
     renderDashCard('quotes', result.quotes);
     renderDashCard('captions', result.captions);
     renderDashCard('hooks', result.hooks);
@@ -1808,6 +1871,7 @@ async function refreshCarousels() {
 
   try {
     var result = await callAPI(prompt, 2500);
+    result = cleanEmDashes(result);
     renderDashCard('carousels', result.carousels);
   } catch(e) {
     document.getElementById('body-carousels').innerHTML = '<div class="dash-empty" style="color:var(--red);font-size:11px;">Error: ' + escRaw(e.message) + '</div>';
@@ -2179,6 +2243,13 @@ async function generateWeeklyPlan() {
       scripts.map(function(s,i) { return 'Script ' + (i+1) + ':\n' + s.slice(0,400); }).join('\n\n---\n\n') + '\n\n';
   }
 
+  // Director's notes — injected directly into prompt if present
+  var directorNotes = (document.getElementById('director-notes')||{}).value || '';
+  directorNotes = directorNotes.trim();
+  var directorCtx = directorNotes
+    ? 'DIRECTOR\'S NOTES — HIGHEST PRIORITY — follow these instructions exactly:\n' + directorNotes + '\n\n'
+    : '';
+
   var modeInstruction = plannerMode === 'fresh'
     ? 'Generate completely FRESH, ORIGINAL content concepts. Do NOT pull from or reference any existing transcripts. Every idea must be brand new, drawn from her profile, performance data, and the week direction above. Each post concept should feel like something Tiffany has not said before but absolutely would say.'
     : 'Build the first ' + scripts.length + ' day(s) around the recorded scripts provided. For the remaining days generate completely fresh original concepts. Mix the two seamlessly so the week feels cohesive.';
@@ -2204,6 +2275,7 @@ async function generateWeeklyPlan() {
     kbCtx + '\n' +
     weekCtx + '\n' +
     scriptCtx +
+    directorCtx +
     modeInstruction + '\n\n' +
     'TWO-WEEK PLAN: ' + weekDates[0] + ' through ' + weekDates[13] + '\n' +
     'WEEK 1: ' + weekDates[0] + ' through ' + weekDates[6] + '\n' +
@@ -2235,6 +2307,7 @@ async function generateWeeklyPlan() {
     '}}';
   try {
     var plan = await callAPI(prompt, 8000);
+    plan = cleanEmDashes(plan);
 
     // Store plan but DON'T update profile yet - only approved plans count
     currentGeneratedPlan = plan;
