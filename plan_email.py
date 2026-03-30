@@ -218,22 +218,14 @@ def create_notion_task(project_name, role, description, week_of_str, post_type="
         due_date = None
         publish_date = None
         try:
-            from datetime import datetime as _now
-            # week_of format: "Monday, Mar 30 - Sunday, Apr 12"
-            # Strip day name if present, extract short month date
-            raw_start = week_of_str.split("-")[0].strip()  # "Monday, Mar 30"
-            parts = [p.strip() for p in raw_start.split(",")]
-            day_names = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-            if parts and any(parts[0] == d for d in day_names):
-                date_part = parts[1] if len(parts) > 1 else parts[0]  # "Mar 30"
-            else:
-                date_part = parts[0]  # "Mar 30" or "March 30"
-            year = str(_now.now().year)
-            start = _dt.strptime(f"{date_part}, {year}", "%b %d, %Y")
-            due_date    = (start + _td(days=13)).strftime("%Y-%m-%d")
-            publish_date= (start + _td(days=14)).strftime("%Y-%m-%d")
-        except Exception as date_err:
-            print(f"Date parse warning: {date_err} — dates will be omitted from Notion task")
+            start_str = week_of_str.split("-")[0].strip()
+            if not any(str(y) in start_str for y in range(2020, 2030)):
+                year = week_of_str.split(",")[-1].strip()
+                start_str = f"{start_str}, {year}"
+            start = _dt.strptime(start_str, "%B %d, %Y")
+            due_date    = (start + _td(days=13)).strftime("%Y-%m-%d")   # end of editing week
+            publish_date= (start + _td(days=14)).strftime("%Y-%m-%d")   # start of publishing week
+        except Exception:
             pass
 
         # Map role to Drop in Que and Type
@@ -588,7 +580,8 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
             repo_encoded = GITHUB_REPOSITORY.replace("/", "%2F")
             approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
             html = build_client_email(new_plan, approval_url)
-            send_email_msg(html, f"Revised Content Plan for {new_week_of} - Please Review & Approve", EMAIL_TO)
+            revised_cc = ", ".join([e.strip().replace("\n","").replace("\r","") for e in MANAGER_EMAIL.replace("\n",",").split(",") if e.strip()]) if MANAGER_EMAIL else ""
+            send_email_msg(html, f"Revised Content Plan for {new_week_of} - Please Review & Approve", EMAIL_TO, revised_cc)
             print(f"Revised plan auto-sent to Tiffany: {EMAIL_TO}")
 
             if MANAGER_EMAIL:
@@ -773,8 +766,9 @@ if __name__ == "__main__":
 
         html = build_client_email(plan, approval_url)
         subject = f"[TEST PREVIEW] Content Plan for {week_of}" if is_test else f"Your Content Plan for {week_of} - Please Review & Approve"
-        send_email_msg(html, subject, recipient)
-        print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else ""))
+        manager_cc = ", ".join([e.strip().replace("\n","").replace("\r","") for e in MANAGER_EMAIL.replace("\n",",").split(",") if e.strip()]) if MANAGER_EMAIL else ""
+        send_email_msg(html, subject, recipient, manager_cc)
+        print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else "") + (f" (CC: {manager_cc})" if manager_cc else ""))
 
     elif event == "notify_team":
         approval_data, approval_sha = gh_get("plan_approval.json")
