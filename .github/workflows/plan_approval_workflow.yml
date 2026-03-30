@@ -30,6 +30,8 @@ jobs:
           EMAIL_FROM:          ${{ secrets.EMAIL_FROM }}
           EMAIL_PASSWORD:      ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_TO:            ${{ secrets.EMAIL_TO }}
+          EMAIL_CC:            ${{ secrets.EMAIL_CC }}
+          MANAGER_EMAIL:       ${{ secrets.MANAGER_EMAIL }}
           GITHUB_TOKEN:        ${{ secrets.GITHUB_TOKEN }}
           UPLOAD_TOKEN:        ${{ secrets.UPLOAD_TOKEN }}
           GITHUB_REPOSITORY:   ${{ github.repository }}
