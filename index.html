@@ -1182,7 +1182,7 @@ body::before {
 <script>
 var BRAND = {
   voice: "Conviction-based, rooted in testimony and scripture. Authoritative but warm. Spiritually mature but relatable. Compassionate big sister in Christ. Gods Math: 1+1=10000. She has lived both bankruptcy and breakthrough.",
-  avoid: "NEVER use: words divine or activate, em dashes, emojis, generic Christian cliches, hustle culture language, self-reliance messaging, complex theological jargon without practical application, hype-based motivation, passive or apologetic language, fabricated quotes. No sales CTAs unless directed by leadership.",
+  avoid: "NEVER use: words divine or activate, em dashes, emojis, generic Christian cliches, hustle culture language, self-reliance messaging, complex theological jargon without practical application, hype-based motivation, passive or apologetic language, fabricated quotes. No sales CTAs unless directed by leadership. STRICTLY CHRISTIAN CONTENT ONLY: Never reference, suggest, or imply new age spirituality, manifestation, the law of attraction, the universe as a deity, energy healing, chakras, astrology, numerology, crystals, meditation practices rooted in Eastern mysticism, or any spiritual framework outside of Biblical Christianity. All spiritual content must be explicitly rooted in Scripture and the God of the Bible.",
   captions: "Caption rules: No emojis. No em dashes. No typos. No filler language. Hook in the first line. Story or teaching in the middle. Engagement CTA at the end. In Tiffany's exact voice.",
   pillars: ["Business and Entrepreneurship","Spiritual Development and Gods Math Teaching","Family and Lifestyle","Humor and Personality Shenanigans","Community and Testimony"],
   pillarColors: {
@@ -2482,9 +2482,9 @@ function renderWeeklyPlan(plan) {
   // Send to Client card
   h += '<div style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:18px 20px;margin-bottom:14px;">';
   h += '<div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">Step 1 - Client Review</div>';
-  h += '<div style="font-size:13px;color:var(--charcoal2);margin-bottom:12px;line-height:1.6;">Send this plan to Tiffany for approval. She reviews, adds feedback, and approves. You get notified. Team gets their tasks automatically.</div>';
+  h += '<div style="font-size:13px;color:var(--charcoal2);margin-bottom:12px;line-height:1.6;">Sends to Tiffany, Diana, and Brittany for review. Tiffany approves or rejects. You are CC\'d. Team gets their tasks automatically once approved.</div>';
   h += '<div style="display:flex;gap:10px;flex-wrap:wrap;">';
-  h += '<button onclick="sendPlanToClient()" id="send-client-btn" style="background:var(--red);color:white;border:none;padding:12px 28px;border-radius:8px;font-family:Georgia,serif;font-size:14px;font-weight:700;cursor:pointer;">Send to Tiffany for Approval</button>';
+  h += '<button onclick="sendPlanToClient()" id="send-client-btn" style="background:var(--red);color:white;border:none;padding:12px 28px;border-radius:8px;font-family:Georgia,serif;font-size:14px;font-weight:700;cursor:pointer;">Send for Approval</button>';
   h += '<button onclick="sendTestPlanEmail()" id="send-test-plan-btn" style="background:transparent;color:var(--amber);border:1.5px solid var(--amber);padding:12px 20px;border-radius:8px;font-family:Georgia,serif;font-size:13px;font-weight:600;cursor:pointer;">Send Test to Me</button>';
   h += '<button onclick="generateWeeklyPlan()" style="background:transparent;color:var(--charcoal3);border:1px solid var(--border-md);padding:12px 20px;border-radius:8px;font-family:Georgia,serif;font-size:13px;cursor:pointer;">Regenerate</button>';
   h += '</div>';
@@ -3684,16 +3684,17 @@ async function sendPlanToClient() {
       })
     });
     if (res.status === 204 || res.status === 200) {
-      btn.textContent = 'Sent to Tiffany!';
+      btn.textContent = 'Sent for Approval!';
       btn.style.background = 'var(--green)';
-      if (statusEl) { statusEl.textContent = 'Plan emailed to ' + tiffanyEmail + '. Waiting for her approval.'; statusEl.style.display = 'block'; }
-      setTimeout(function() { btn.disabled = false; btn.textContent = 'Resend to Tiffany'; btn.style.background = 'var(--red)'; }, 5000);
+      var teamCC = localStorage.getItem('tiffany_ep_email_team') || 'the team';
+      if (statusEl) { statusEl.innerHTML = '&#10003; Sent to <strong>' + tiffanyEmail + '</strong> &mdash; CC: <strong>' + teamCC + '</strong>. Waiting for approval.'; statusEl.style.display = 'block'; }
+      setTimeout(function() { btn.disabled = false; btn.textContent = 'Resend for Approval'; btn.style.background = 'var(--red)'; }, 5000);
     } else {
       throw new Error('Workflow trigger returned ' + res.status);
     }
   } catch(e) {
     alert('Could not send plan: ' + e.message);
-    btn.disabled = false; btn.textContent = 'Send to Tiffany for Approval';
+    btn.disabled = false; btn.textContent = 'Send for Approval';
     console.error(e);
   }
 }
