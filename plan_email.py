@@ -580,9 +580,9 @@ def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, app
             repo_encoded = GITHUB_REPOSITORY.replace("/", "%2F")
             approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
             html = build_client_email(new_plan, approval_url)
-            revised_cc = ", ".join([e.strip().replace("\n","").replace("\r","") for e in MANAGER_EMAIL.replace("\n",",").split(",") if e.strip()]) if MANAGER_EMAIL else ""
+            revised_cc = ", ".join([e.strip().replace("\n","").replace("\r","") for e in EMAIL_CC.replace("\n",",").split(",") if e.strip()]) if EMAIL_CC else ""
             send_email_msg(html, f"Revised Content Plan for {new_week_of} - Please Review & Approve", EMAIL_TO, revised_cc)
-            print(f"Revised plan auto-sent to Tiffany: {EMAIL_TO}")
+            print(f"Revised plan auto-sent to Tiffany: {EMAIL_TO}" + (f" (CC: {revised_cc})" if revised_cc else ""))
 
             if MANAGER_EMAIL:
                 manager_emails = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
@@ -766,9 +766,9 @@ if __name__ == "__main__":
 
         html = build_client_email(plan, approval_url)
         subject = f"[TEST PREVIEW] Content Plan for {week_of}" if is_test else f"Your Content Plan for {week_of} - Please Review & Approve"
-        manager_cc = ", ".join([e.strip().replace("\n","").replace("\r","") for e in MANAGER_EMAIL.replace("\n",",").split(",") if e.strip()]) if MANAGER_EMAIL else ""
-        send_email_msg(html, subject, recipient, manager_cc)
-        print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else "") + (f" (CC: {manager_cc})" if manager_cc else ""))
+        plan_cc = ", ".join([e.strip().replace("\n","").replace("\r","") for e in EMAIL_CC.replace("\n",",").split(",") if e.strip()]) if EMAIL_CC else ""
+        send_email_msg(html, subject, recipient, plan_cc)
+        print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else "") + (f" (CC: {plan_cc})" if plan_cc else ""))
 
     elif event == "notify_team":
         approval_data, approval_sha = gh_get("plan_approval.json")
