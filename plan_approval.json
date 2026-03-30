@@ -1,94 +1,9 @@
 {
   "action": "approved",
-  "feedback": "PER-DAY NOTES:\nMonday (Your Business Does Not Need More Ideas. It Needs a Decision.): This looks great!\nTuesday (You Have to Go to the Bible Like a Newborn): This looks great!\nWednesday (5 Things I Had to Unlearn as a Wife Before I Could Build as a Partner): This looks great!\nThursday (God's Math Does Not Work Like Your Math): This looks great!\nFriday (When Not Hiring Is Costing You More Than Hiring Would): This looks great!\nSaturday (My Kid Just Preached a Whole Sermon Without Knowing It): This looks great!\nSunday (3 Signs You Have Been Worshipping a Version of God Someone Else Built): This looks great!\nMonday (Hiring Someone Without a Process Is Like Throwing Files on Their Desk and Saying Fix It): This looks great!\nTuesday (Most Hirers Are Not Ready. They Are Just Exhausted.): This looks great!\nWednesday (The Conversation at Our Dinner Table That Changed How We Spend Money): This looks great!\nThursday (Before You Post That Hiring Ad: A Checklist for What Should Already Be in Place): This looks great!\nFriday (She Said She Was Not Ready. God Said Otherwise.): This looks great!\nSaturday (What You Attach to God Tells You More About Your Past Than His Character): This looks great!\nSunday (Nobody Told Me Entrepreneurship Would Feel Like This on a Sunday): This looks great!\n\nOVERALL NOTES:\nThis looks great!",
-  "day_feedback": [
-    {
-      "day": "Monday",
-      "date": "Monday, Mar 30",
-      "title": "Your Business Does Not Need More Ideas. It Needs a Decision.",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Tuesday",
-      "date": "Tuesday, Apr 1",
-      "title": "You Have to Go to the Bible Like a Newborn",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Wednesday",
-      "date": "Wednesday, Apr 2",
-      "title": "5 Things I Had to Unlearn as a Wife Before I Could Build as a Partner",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Thursday",
-      "date": "Thursday, Apr 3",
-      "title": "God's Math Does Not Work Like Your Math",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Friday",
-      "date": "Friday, Apr 4",
-      "title": "When Not Hiring Is Costing You More Than Hiring Would",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Saturday",
-      "date": "Saturday, Apr 5",
-      "title": "My Kid Just Preached a Whole Sermon Without Knowing It",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Sunday",
-      "date": "Sunday, Apr 6",
-      "title": "3 Signs You Have Been Worshipping a Version of God Someone Else Built",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Monday",
-      "date": "Monday, Apr 7",
-      "title": "Hiring Someone Without a Process Is Like Throwing Files on Their Desk and Saying Fix It",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Tuesday",
-      "date": "Tuesday, Apr 8",
-      "title": "Most Hirers Are Not Ready. They Are Just Exhausted.",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Wednesday",
-      "date": "Wednesday, Apr 9",
-      "title": "The Conversation at Our Dinner Table That Changed How We Spend Money",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Thursday",
-      "date": "Thursday, Apr 10",
-      "title": "Before You Post That Hiring Ad: A Checklist for What Should Already Be in Place",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Friday",
-      "date": "Friday, Apr 11",
-      "title": "She Said She Was Not Ready. God Said Otherwise.",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Saturday",
-      "date": "Saturday, Apr 12",
-      "title": "What You Attach to God Tells You More About Your Past Than His Character",
-      "note": "This looks great!"
-    },
-    {
-      "day": "Sunday",
-      "date": "Sunday, Apr 13",
-      "title": "Nobody Told Me Entrepreneurship Would Feel Like This on a Sunday",
-      "note": "This looks great!"
-    }
-  ],
-  "overall_feedback": "This looks great!",
-  "approved_at": "2026-03-29T05:01:30.885Z",
+  "feedback": "",
+  "day_feedback": [],
+  "overall_feedback": "",
+  "approved_at": "2026-03-30T22:33:57.363Z",
   "week_of": "Monday, Mar 30 - Sunday, Apr 12",
   "repo": "ebeprstudios/THCO-Social-Media-Manager"
 }
