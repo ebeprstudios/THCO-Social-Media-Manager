@@ -25,8 +25,8 @@ body { display: flex; align-items: flex-start; justify-content: center; padding:
 .post-type-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-bottom: 6px; }
 .post-title { font-size: 15px; font-weight: 700; color: #414141; margin-bottom: 6px; line-height: 1.4; }
 .hook { font-size: 13px; color: #414141; font-style: italic; margin-bottom: 8px; }
-.hook::before { content: '"'; }
-.hook::after { content: '"'; }
+.hook::before { content: '\201C'; }
+.hook::after { content: '\201D'; }
 .direction { font-size: 12px; color: #5A5A5A; line-height: 1.65; margin-bottom: 8px; }
 .designer-badge { font-size: 9px; font-weight: 700; color: #8A8A8A; letter-spacing: 1px; text-transform: uppercase; }
 .time-badge { font-size: 10px; color: #A0A0A0; margin-top: 4px; }
@@ -39,7 +39,6 @@ textarea:focus { border-color: #A00605; }
 .approve-btn { width: 100%; background: #A00605; color: white; border: none; padding: 16px; border-radius: 10px; font-family: Georgia, serif; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 14px; letter-spacing: 0.5px; transition: background 0.2s; }
 .approve-btn:active { background: #800504; }
 .approve-btn:disabled { background: #C0C0C0; cursor: not-allowed; }
-
 .progress-wrap { display: none; margin-top: 14px; }
 .progress-bar { height: 4px; background: #E3D3C8; border-radius: 2px; overflow: hidden; }
 .progress-fill { height: 100%; width: 0%; background: #A00605; border-radius: 2px; transition: width 0.3s; }
@@ -80,32 +79,33 @@ textarea:focus { border-color: #A00605; }
       </div>
       <div id="approval-form">
         <div class="feedback-section">
-          <div class="section-label">Overall Feedback</div>
-          <div class="feedback-label">Any general notes for the whole week?</div>
-          <div class="feedback-sub">Use the notes on each day above for specific changes. This box is for general comments to your manager.</div>
-          <textarea id="feedback-input" placeholder="e.g. Great week overall! Just a few tweaks noted above. or I'd like to swap Tuesday and Thursday..."></textarea>
+          <div class="feedback-label">Overall Notes (Optional)</div>
+          <div class="feedback-sub">Any big-picture thoughts? Leave it blank if everything looks great.</div>
+          <textarea id="feedback-input" rows="4" placeholder="e.g. Love the direction this week! or Can we add more humor in week 2?"></textarea>
         </div>
-        <button class="approve-btn" id="approve-btn" onclick="submitApproval('approved')">Approve This Plan</button>
-        <button id="reject-btn" onclick="submitApproval('rejected')" style="width:100%;background:transparent;color:#A00605;border:1.5px solid #A00605;padding:13px;border-radius:10px;font-family:Georgia,serif;font-size:14px;cursor:pointer;margin-top:8px;">Reject This Plan</button>
+        <div class="error-msg" id="error-msg"></div>
         <div class="progress-wrap" id="progress-wrap">
           <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
           <div class="progress-label" id="progress-label">Submitting...</div>
         </div>
-        <div class="error-msg" id="error-msg"></div>
+        <button class="approve-btn" id="approve-btn" onclick="submitApproval('approved')">&#10003; Approve This Plan</button>
+        <button class="approve-btn" id="reject-btn" style="background:#5A5A5A;margin-top:8px;" onclick="submitApproval('rejected')">Request Changes</button>
       </div>
     </div>
   </div>
 
-  <div class="footer"><div class="footer-text">The Creative Theologian Media Group</div></div>
+  <div class="footer">
+    <div class="footer-text">The Creative Theologian Media Group &bull; Confidential</div>
+  </div>
 </div>
 
 <script>
-var params      = new URLSearchParams(window.location.search);
-var ghToken     = params.get('ght') || '';
-var ghRepo      = params.get('repo') || 'ebeprstudios/THCO-Social-Media-Manager';
-var planData    = null;
+var params   = new URLSearchParams(window.location.search);
+var ghToken  = params.get('ght') || '';
+var ghRepo   = params.get('repo') || 'ebeprstudios/THCO-Social-Media-Manager';
+var planToken = params.get('token') || '';   // NEW — unique plan token
+var planData = null;
 
-// Pillar colors
 var PILLAR_COLORS = {
   'Business and Entrepreneurship':                { color:'#B87830', bg:'rgba(184,120,48,0.1)' },
   'Spiritual Development and Gods Math Teaching': { color:'#A00605', bg:'rgba(160,6,5,0.08)' },
@@ -117,10 +117,24 @@ var PILLAR_COLORS = {
 async function loadPlan() {
   try {
     var parts = ghRepo.split('/');
-    var url = 'https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/contents/pending_plan.json';
+
+    // NEW: If a plan token is in the URL, load that specific plan file.
+    // Falls back to pending_plan.json for backward compatibility.
+    var filename = planToken
+      ? 'plans/plan_' + planToken + '.json'
+      : 'pending_plan.json';
+
+    var url = 'https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/contents/' + filename;
     var headers = { 'Accept': 'application/vnd.github.v3+json' };
     if (ghToken) headers['Authorization'] = 'token ' + ghToken;
     var res = await fetch(url, { headers: headers });
+
+    // If plan-specific file not found, fall back to pending_plan.json
+    if (res.status === 404 && planToken) {
+      console.warn('Plan file not found for token ' + planToken + ' — falling back to pending_plan.json');
+      var fallbackUrl = 'https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/contents/pending_plan.json';
+      res = await fetch(fallbackUrl, { headers: headers });
+    }
 
     if (res.status === 404) {
       document.getElementById('loading-state').innerHTML = '<div style="color:#A00605;font-weight:600;font-size:14px;">Plan not found.</div><div style="font-size:12px;color:#8A8A8A;margin-top:8px;line-height:1.7;">This link may have expired or the plan has already been processed.<br>Ask your social media manager to resend the plan email.</div>';
@@ -159,7 +173,6 @@ function renderPlan(plan) {
     if (day.content_direction) daysHtml += '<div class="direction">' + esc(day.content_direction) + '</div>';
     if (day.designer_needed && day.designer_needed !== 'None') daysHtml += '<div class="designer-badge">' + esc(day.designer_needed) + '</div>';
     daysHtml += '<div class="time-badge">3:00 PM CST</div>';
-    // Per-day feedback
     daysHtml += '<div style="margin-top:12px;border-top:1px solid #F4F0EB;padding-top:10px;">';
     daysHtml += '<div style="font-size:10px;font-weight:700;color:#A00605;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Notes for ' + esc(day.day) + ' <span style="font-weight:400;color:#A0A0A0;">(optional)</span></div>';
     daysHtml += '<textarea id="day-feedback-' + idx + '" rows="2" placeholder="e.g. Love this! or Can we change the angle to... or Skip this day" style="width:100%;background:#F4F0EB;border:1px solid #E3D3C8;color:#414141;font-family:Georgia,serif;font-size:12px;padding:8px 10px;border-radius:7px;outline:none;resize:vertical;line-height:1.55;"></textarea>';
@@ -186,7 +199,6 @@ async function submitApproval(action) {
   var feedback = document.getElementById('feedback-input').value.trim();
   var dayFeedback = collectDayFeedback();
 
-  // If rejecting with no feedback at all, urge her to fill it out
   if (action === 'rejected' && !feedback && dayFeedback.length === 0) {
     var feedbackInput = document.getElementById('feedback-input');
     feedbackInput.style.borderColor = '#A00605';
@@ -203,15 +215,16 @@ async function submitApproval(action) {
     }
     return;
   }
+
   var approveBtn = document.getElementById('approve-btn');
   var rejectBtn  = document.getElementById('reject-btn');
-  approveBtn.disabled = true; if(rejectBtn) rejectBtn.disabled = true;
+  approveBtn.disabled = true;
+  if (rejectBtn) rejectBtn.disabled = true;
   document.getElementById('progress-wrap').style.display = 'block';
   document.getElementById('progress-fill').style.width = '30%';
   document.getElementById('progress-label').textContent = action === 'approved' ? 'Approving...' : 'Sending feedback...';
   document.getElementById('error-msg').style.display = 'none';
 
-  // Build combined feedback string for manager notification
   var fullFeedback = '';
   if (dayFeedback.length > 0) {
     fullFeedback += 'PER-DAY NOTES:\n' + dayFeedback.map(function(d) {
@@ -222,30 +235,22 @@ async function submitApproval(action) {
     fullFeedback += (fullFeedback ? '\n\nOVERALL NOTES:\n' : '') + feedback;
   }
 
-  // week_of fallback chain — plan.week_of → top-level week_of → title text
-  var resolvedWeekOf = (planData && planData.plan && planData.plan.week_of)
-    ? planData.plan.week_of
-    : (planData && planData.week_of)
-      ? planData.week_of
-      : (document.getElementById('plan-title') ? document.getElementById('plan-title').textContent.replace('Week of ', '').trim() : '');
-
   var entry = {
     action: action,
     feedback: fullFeedback || '',
     day_feedback: dayFeedback,
     overall_feedback: feedback,
     approved_at: new Date().toISOString(),
-    week_of: resolvedWeekOf,
+    week_of: planData && planData.plan ? planData.plan.week_of : '',
+    plan_token: planToken,   // NEW — pass token through to workflow
     repo: ghRepo
   };
 
   try {
-    // Save approval to GitHub
     await saveApprovalToGitHub(entry);
     document.getElementById('progress-fill').style.width = '70%';
     document.getElementById('progress-label').textContent = 'Notifying team...';
 
-    // Trigger team notification workflow
     var parts = ghRepo.split('/');
     var dispatchRes = await fetch('https://api.github.com/repos/' + parts[0] + '/' + parts[1] + '/dispatches', {
       method: 'POST',
@@ -254,7 +259,6 @@ async function submitApproval(action) {
     });
     if (!dispatchRes.ok && dispatchRes.status !== 204) {
       var errText = await dispatchRes.text();
-      console.error('Dispatch failed:', dispatchRes.status, errText);
       throw new Error('Could not notify team. GitHub returned ' + dispatchRes.status + '. Check your token has workflow scope.');
     }
 
@@ -263,7 +267,7 @@ async function submitApproval(action) {
       document.getElementById('approval-form').style.display = 'none';
       document.getElementById('success-card').style.display = 'block';
       if (action === 'rejected') {
-        document.getElementById('success-icon').textContent = '✕';
+        document.getElementById('success-icon').textContent = '\u2715';
         document.getElementById('success-title').textContent = 'Plan Rejected';
         document.getElementById('success-message').textContent = 'Your social media manager has been notified. They will put together a new plan and send it to you for review.';
       } else {
@@ -278,7 +282,8 @@ async function submitApproval(action) {
     var el = document.getElementById('error-msg');
     el.textContent = 'Could not submit: ' + e.message + '. Please try again or contact your manager.';
     el.style.display = 'block';
-    approveBtn.disabled = false; changesBtn.disabled = false;
+    approveBtn.disabled = false;
+    if (rejectBtn) rejectBtn.disabled = false;
     console.error(e);
   }
 }
@@ -297,7 +302,6 @@ async function saveApprovalToGitHub(entry) {
   if (!r.ok) throw new Error('GitHub save failed: ' + r.status);
 }
 
-// Load plan on page start
 loadPlan();
 </script>
 </body>
