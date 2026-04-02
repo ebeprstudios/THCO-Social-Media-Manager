@@ -17,8 +17,7 @@ from datetime import datetime
 EMAIL_FROM        = os.environ["EMAIL_FROM"]
 EMAIL_PASSWORD    = os.environ["EMAIL_PASSWORD"]
 EMAIL_TO          = os.environ["EMAIL_TO"]          # Tiffany
-EMAIL_CC          = os.environ.get("EMAIL_CC", "")  # Diana, Brittany, Erica — CC on all client emails
-MANAGER_EMAIL     = os.environ.get("MANAGER_EMAIL", EMAIL_CC.split(",")[0].strip() if EMAIL_CC else "")  # Erica — direct notifications
+EMAIL_CC          = os.environ.get("EMAIL_CC", "")  # Your email + team
 GITHUB_TOKEN      = os.environ.get("GITHUB_TOKEN", "")
 UPLOAD_TOKEN      = os.environ.get("UPLOAD_TOKEN", GITHUB_TOKEN)
 GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY", "")
@@ -206,7 +205,7 @@ def build_client_email(plan, approval_url):
 </table>
 </body></html>"""
 
-# ── NOTION TASK CREATION ──────────────────────────────────────────
+# ── BUILD TEAM TASK EMAIL ─────────────────────────────────────────
 def create_notion_task(project_name, role, description, week_of_str, post_type="Video Reels"):
     """Create a task in the Project-THCO Notion database (TCT Media Team)."""
     if not NOTION_TOKEN:
@@ -277,15 +276,20 @@ def build_planning_horizon(week_of_str):
     """Calculate the 3-week timeline from the week_of string."""
     from datetime import datetime, timedelta
     try:
+        # week_of_str is like "March 30 - April 5, 2026" — parse the start date
         start_str = week_of_str.split("-")[0].strip()
+        # Add year if missing
         if not any(str(y) in start_str for y in range(2020, 2030)):
             year = week_of_str.split(",")[-1].strip()
             start_str = f"{start_str}, {year}"
         start_date = datetime.strptime(start_str, "%B %d, %Y")
+        # Recording week = week_of itself (week 1)
         record_start = start_date
         record_end   = start_date + timedelta(days=6)
+        # Editing week = week 2
         edit_start   = start_date + timedelta(weeks=1)
         edit_end     = edit_start + timedelta(days=6)
+        # Publishing week = week 3
         pub_start    = start_date + timedelta(weeks=2)
         pub_end      = pub_start + timedelta(days=6)
 
@@ -310,6 +314,7 @@ def build_team_email(plan, feedback, recipient_role, notion_copy, day_feedback=N
     }
     rc = role_colors.get(recipient_role, {"color":"#414141","bg":"rgba(65,65,65,0.08)","label":"Team Member"})
 
+    # Build 2-week planning horizon banner
     recording, editing, publishing = build_planning_horizon(week_of)
     horizon_html = f"""
 <div style="background:#EFF6FF;border:1px solid #3A6EA8;border-radius:8px;padding:14px 16px;margin-bottom:20px;">
@@ -330,7 +335,7 @@ def build_team_email(plan, feedback, recipient_role, notion_copy, day_feedback=N
   </table>
   <div style="font-size:11px;color:#5A7A9A;margin-top:10px;line-height:1.6;">Final deliverables are due by end of the editing week so scheduling can begin on time.</div>
 </div>"""
-
+    # Build feedback section — overall + per-day notes
     feedback_parts = []
     if day_feedback:
         day_lines = "".join([
@@ -386,6 +391,7 @@ def build_manager_email(plan, feedback, action, day_feedback=None):
     action_label = "APPROVED" if action == "approved" else "REJECTED"
     action_color = "#3A9E6E" if action == "approved" else "#A00605"
 
+    # Build per-day feedback section
     day_fb_html = ""
     if day_feedback:
         day_fb_html = '<div style="margin-top:14px;border-top:1px solid #E3D3C8;padding-top:12px;">'
@@ -417,6 +423,29 @@ def build_manager_email(plan, feedback, action, day_feedback=None):
 </td></tr>
 </table>
 </body></html>"""
+    week_of = plan.get("week_of", "")
+    today = datetime.now().strftime("%B %-d, %Y")
+    action_label = "APPROVED" if action == "approved" else "REJECTED" if action == "rejected" else "CHANGES REQUESTED"
+    action_color = "#3A9E6E" if action == "approved" else "#A00605" if action == "rejected" else "#B87830"
+    feedback_section = f'<div style="background:#FFF3CD;border-left:3px solid #B87830;padding:12px 16px;border-radius:4px;font-size:13px;color:#414141;line-height:1.75;margin-top:12px;"><strong>Her feedback:</strong> {feedback}</div>' if feedback else '<div style="font-size:13px;color:#8A8A8A;margin-top:8px;font-style:italic;">No feedback provided - approved as-is.</div>'
+
+    return f"""<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#F4F0EB;font-family:Georgia,serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F4F0EB;">
+<tr><td align="center" style="padding:24px 16px 40px;">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+<tr><td style="background:#FFFDF5;border:1px solid #E3D3C8;border-radius:12px;padding:28px;">
+  <div style="font-size:10px;font-weight:700;color:{action_color};letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">{action_label}</div>
+  <div style="font-size:20px;font-weight:700;color:#414141;margin-bottom:6px;">Tiffany responded to the week of {week_of}</div>
+  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px;">{today}</div>
+  {feedback_section}
+  {"<div style='margin-top:16px;font-size:13px;color:#3A9E6E;font-weight:600;'>Team task emails have been sent automatically.</div>" if action == "approved" else "<div style='margin-top:16px;font-size:13px;color:#A00605;font-weight:600;'>Plan was REJECTED. Build a new plan from scratch.</div>" if action == "rejected" else "<div style='margin-top:16px;font-size:13px;color:#B87830;font-weight:600;'>Revise the plan and resend for her approval.</div>"}
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>"""
 
 # ── SEND EMAIL ────────────────────────────────────────────────────
 def send_email_msg(html, subject, to_email, cc_emails=""):
@@ -436,184 +465,6 @@ def send_email_msg(html, subject, to_email, cc_emails=""):
         s.sendmail(EMAIL_FROM, all_to, msg.as_string())
     print(f"Sent to {to_email}" + (f" CC: {cc_emails}" if cc_emails else ""))
 
-# ── AUTO-REGENERATE PLAN (on rejection) ──────────────────────────
-def auto_regenerate_plan(old_plan, feedback, day_feedback):
-    """Call Claude to generate a revised plan based on rejection feedback."""
-    print("Auto-regenerating plan after rejection...")
-
-    week_of  = old_plan.get("week_of", "")
-    days     = old_plan.get("days", [])
-    note     = old_plan.get("planning_note", "")
-
-    rejected_summary = "\n".join([
-        f"- {d.get('day')}: {d.get('post_type')} | {d.get('pillar')} | \"{d.get('title')}\" | Hook: {d.get('hook','')}"
-        for d in days
-    ])
-
-    day_fb_text = ""
-    if day_feedback:
-        day_fb_text = "\nPER-DAY NOTES:\n" + "\n".join([
-            f"- {d.get('day')} ({d.get('title','')}): {d.get('note','')}"
-            for d in day_feedback
-        ])
-
-    prompt = f"""You are the lead content strategist for Tiffany Haynes and Co.
-The client rejected the following 2-week content plan and provided feedback.
-Generate a REVISED plan that addresses her feedback completely.
-
-REJECTED PLAN (week of {week_of}):
-{rejected_summary}
-
-REJECTION FEEDBACK:{day_fb_text}
-OVERALL: {feedback or "No overall feedback provided."}
-
-Brand voice: Authentic, faith-driven, entrepreneurial. Bold, warm, direct.
-Pillars: Business and Entrepreneurship, Spiritual Development and Gods Math Teaching,
-Family and Lifestyle, Humor and Personality Shenanigans, Community and Testimony
-Content mix per week: 3 Reels, 2 Carousels, 1 Quote Post, 1 Lifestyle
-
-Return ONLY valid JSON matching this exact structure. No markdown. No backticks. Start with {{ end with }}.
-
-{{
-  "week_of": "{week_of}",
-  "planning_note": "Brief note explaining the revisions made based on feedback",
-  "days": [
-    {{
-      "day": "Monday",
-      "date": "",
-      "post_type": "Reel or Carousel or Quote Post or Static Image",
-      "pillar": "exact pillar name from the list above",
-      "title": "Post title",
-      "hook": "Opening hook line",
-      "content_direction": "2-3 sentences on what to cover",
-      "voiceover_topic": "Recording direction for Tiffany",
-      "designer_needed": "Designer 1 or Designer 2 or None",
-      "thumbnail_hook": "Short thumbnail text",
-      "carousel_outline": "",
-      "quote": "",
-      "fresh_or_scripted": "fresh"
-    }}
-  ],
-  "delivery": {{
-    "designer1": {{"name": "Designer 1", "sub": "Thumbnails", "notion_copy": "DESIGNER 1 TASKS\\n\\nWeek of {week_of}\\n\\nCreate thumbnails for each reel listed below..."}},
-    "designer2": {{"name": "Designer 2", "sub": "Carousels and Quote Posts", "notion_copy": "DESIGNER 2 TASKS\\n\\nWeek of {week_of}\\n\\nCreate assets for carousels and quote posts..."}},
-    "video_editor": {{"name": "Video Editor", "sub": "Reels", "notion_copy": "VIDEO EDITOR TASKS\\n\\nWeek of {week_of}\\n\\nEdit reels for the following days..."}}
-  }}
-}}"""
-
-    resp = requests.post(
-        "https://api.anthropic.com/v1/messages",
-        headers={
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json"
-        },
-        json={
-            "model": "claude-sonnet-4-6",
-            "max_tokens": 4000,
-            "messages": [{"role": "user", "content": prompt}]
-        },
-        timeout=60
-    )
-    resp.raise_for_status()
-    raw = resp.json()["content"][0]["text"].strip()
-    raw = raw.replace("```json","").replace("```","").strip()
-    return json.loads(raw)
-
-
-# ── RUN NOTIFY TEAM ───────────────────────────────────────────────
-def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha):
-    # Notify manager
-    if MANAGER_EMAIL:
-        html = build_manager_email(plan, feedback, action, day_feedback)
-        action_label = "Approved" if action == "approved" else "Rejected"
-        manager_emails = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
-        primary = manager_emails[0]
-        cc_rest = ', '.join(manager_emails[1:]) if len(manager_emails) > 1 else ''
-        send_email_msg(html, f"[{action_label}] Tiffany Plan Response - Week of {week_of}", primary, cc_rest)
-
-    if action == "approved":
-        manager_cc = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
-        manager_cc_str = ', '.join(manager_cc)
-        team = [
-            ("designer1",    DESIGNER1_EMAIL,    delivery.get("designer1",{}).get("notion_copy","")),
-            ("designer2",    DESIGNER2_EMAIL,    delivery.get("designer2",{}).get("notion_copy","")),
-            ("video_editor", VIDEO_EDITOR_EMAIL, delivery.get("video_editor",{}).get("notion_copy","")),
-        ]
-        role_map = {
-            "designer1":    "Designer 1 - Thumbnails",
-            "designer2":    "Designer 2 - Carousels & Quotes",
-            "video_editor": "Video Editor - Reels",
-        }
-        for role, email, notion_copy in team:
-            if email and notion_copy:
-                html = build_team_email(plan, feedback, role, notion_copy, day_feedback)
-                role_label = role.replace("_"," ").title()
-                send_email_msg(html, f"Your Tasks — Week of {week_of} (Approved)", email, manager_cc_str)
-                print(f"Task email sent to {role_label}: {email} (CC: {manager_cc_str})")
-                notion_role = role_map.get(role, "General/All Roles")
-                task_name = f"{notion_role} — Week of {week_of}"
-                create_notion_task(task_name, role, notion_copy, week_of)
-
-    elif action == "rejected":
-        try:
-            new_plan = auto_regenerate_plan(plan, feedback, day_feedback)
-            new_week_of = new_plan.get("week_of", week_of)
-
-            plan_file = {
-                "plan": new_plan,
-                "week_of": new_week_of,
-                "sent_to": EMAIL_TO,
-                "sent_at": datetime.now().isoformat(),
-                "status": "pending",
-                "revision": True
-            }
-            url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
-            headers_gh = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
-            existing = requests.get(url, headers=headers_gh)
-            sha = existing.json().get("sha") if existing.status_code == 200 else None
-            body = {"message": f"Auto-revised plan for {new_week_of}", "content": base64.b64encode(json.dumps(plan_file, indent=2).encode()).decode()}
-            if sha: body["sha"] = sha
-            requests.put(url, headers=headers_gh, json=body)
-            print(f"Revised plan saved to GitHub.")
-
-            upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
-            repo_encoded = GITHUB_REPOSITORY.replace("/", "%2F")
-            approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
-            html = build_client_email(new_plan, approval_url)
-            revised_cc = ", ".join([e.strip().replace("\n","").replace("\r","") for e in EMAIL_CC.replace("\n",",").split(",") if e.strip()]) if EMAIL_CC else ""
-            send_email_msg(html, f"Revised Content Plan for {new_week_of} - Please Review & Approve", EMAIL_TO, revised_cc)
-            print(f"Revised plan auto-sent to Tiffany: {EMAIL_TO}" + (f" (CC: {revised_cc})" if revised_cc else ""))
-
-            if MANAGER_EMAIL:
-                manager_emails = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
-                notify_html = f"""<html><body style="font-family:Georgia,serif;background:#F4F0EB;padding:24px;">
-<div style="max-width:520px;margin:0 auto;background:#FFFDF5;border:1px solid #E3D3C8;border-radius:12px;padding:28px;">
-<div style="font-size:10px;font-weight:700;color:#B87830;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">AUTO-REVISED PLAN SENT</div>
-<div style="font-size:18px;font-weight:700;color:#414141;margin-bottom:8px;">A revised plan was automatically generated and sent to Tiffany.</div>
-<div style="font-size:13px;color:#5A5A5A;line-height:1.7;">Based on her rejection feedback, Claude generated a new plan and sent it for approval. No action needed unless she rejects again.</div>
-<div style="margin-top:16px;font-size:13px;color:#8A8A8A;font-style:italic;">Original feedback: {feedback or "No feedback provided."}</div>
-</div></body></html>"""
-                send_email_msg(notify_html, f"[Auto-Revised] New Plan Sent to Tiffany - Week of {new_week_of}", manager_emails[0])
-
-        except Exception as e:
-            print(f"Auto-regeneration failed: {e}")
-            if MANAGER_EMAIL:
-                manager_emails = [em.strip().replace('\n','').replace('\r','') for em in MANAGER_EMAIL.replace('\n',',').split(',') if em.strip()]
-                err_html = f"""<html><body style="font-family:Georgia,serif;padding:24px;">
-<div style="max-width:520px;margin:0 auto;background:#FFF5F5;border:1px solid #A00605;border-radius:12px;padding:28px;">
-<div style="font-size:16px;font-weight:700;color:#A00605;margin-bottom:8px;">&#9888; Auto-Regeneration Failed</div>
-<div style="font-size:13px;color:#414141;line-height:1.7;">Tiffany rejected the plan but the auto-revision failed. Please generate a new plan manually and resend.<br><br><strong>Error:</strong> {str(e)}</div>
-</div></body></html>"""
-                send_email_msg(err_html, "[ACTION REQUIRED] Plan Rejected - Auto-Revision Failed", manager_emails[0])
-
-    # Clean up approval file
-    if approval_sha:
-        gh_delete("plan_approval.json", approval_sha, f"Plan approval processed - {week_of}")
-
-    print(f"Team notification complete. Action: {action}")
-
-
 # ── MAIN ──────────────────────────────────────────────────────────
 if __name__ == "__main__":
     event = WORKFLOW_EVENT
@@ -627,6 +478,8 @@ if __name__ == "__main__":
         print(f"Trigger source: {trigger_source}")
 
         # ── BI-WEEKLY CHECK ──────────────────────────────────────────
+        # When triggered by schedule, only send on even ISO week numbers
+        # This makes the auto-send bi-weekly (every other Friday)
         if trigger_source == "schedule":
             iso_week = datetime.now().isocalendar()[1]
             print(f"Scheduled run. ISO week number: {iso_week}")
@@ -635,17 +488,23 @@ if __name__ == "__main__":
                 exit(0)
             print(f"Even week ({iso_week}) — proceeding with auto-send.")
 
+            # ── AUTO-GENERATE PLAN FOR SCHEDULED RUNS ────────────────
+            # Scheduled runs have no payload — auto-generate the 2-week plan
+            # using the Anthropic API and the KB context from GitHub
             try:
                 from datetime import timedelta
+                # Calculate next Monday (start of 2-week window)
                 today = datetime.now()
                 days_to_monday = (7 - today.weekday()) % 7 or 7
                 next_monday = today + timedelta(days=days_to_monday)
+                # Build 14 date strings
                 date_strs = []
                 for i in range(14):
                     d = next_monday + timedelta(days=i)
                     date_strs.append(d.strftime("%A, %b %-d"))
                 week_of = f"{date_strs[0]} - {date_strs[13]}"
 
+                # Load KB context from GitHub
                 kb_context = ""
                 try:
                     kb_data, _ = gh_get("kb_snapshot.json")
@@ -656,25 +515,79 @@ if __name__ == "__main__":
 
                 auto_prompt = (
                     f"You are the lead content strategist for Tiffany Haynes and Co. "
-                    f"Generate a complete 2-week content plan.\n\n"
+                    f"Generate a complete 2-week social media content plan (14 days).\n\n"
                     f"{kb_context}"
                     f"WEEK 1: {date_strs[0]} through {date_strs[6]}\n"
                     f"WEEK 2: {date_strs[7]} through {date_strs[13]}\n\n"
-                    f"Brand voice: Authentic, faith-driven, entrepreneurial. Bold, warm, direct.\n"
-                    f"Pillars: Business and Entrepreneurship, Spiritual Development and Gods Math Teaching, "
-                    f"Family and Lifestyle, Humor and Personality Shenanigans, Community and Testimony\n"
-                    f"Content mix per week: 3 Reels, 2 Carousels, 1 Quote Post, 1 Lifestyle\n\n"
+
+                    f"=== BRAND VOICE ===\n"
+                    f"Authentic, faith-driven, entrepreneurial. Bold, warm, direct. She is a FUNNY person who loves jokes. "
+                    f"She is a wife and mother who wants to share her family life. She is deeply rooted in Scripture and the God of the Bible only "
+                    f"(no new age, manifestation, universe as deity, law of attraction, crystals, chakras, astrology, numerology). "
+                    f"She teaches through storytelling, real talk, and humor — not lectures.\n\n"
+
+                    f"=== CONTENT PILLARS (ALL FIVE MUST APPEAR EVERY CYCLE) ===\n"
+                    f"1. Business and Entrepreneurship — practical systems, hiring, scaling, revenue, leadership\n"
+                    f"2. Spiritual Development and Gods Math Teaching — faith applied to real life and business decisions\n"
+                    f"3. Family and Lifestyle — her life as a wife, mother, and woman building a business (REQUIRED for brand deals)\n"
+                    f"4. Humor and Personality Shenanigans — funny, relatable, she is HILARIOUS and wants the world to know it\n"
+                    f"5. Community and Testimony — client wins, audience stories, behind-the-scenes of her brand\n\n"
+
+                    f"=== MANDATORY PILLAR MINIMUMS PER 14-DAY PLAN ===\n"
+                    f"- Humor and Personality Shenanigans: MINIMUM 2 posts. Non-negotiable.\n"
+                    f"- Family and Lifestyle: MINIMUM 2 posts. Non-negotiable.\n"
+                    f"- Business: 3-4 posts\n"
+                    f"- Spiritual: 3-4 posts\n"
+                    f"- Community: 1-2 posts\n\n"
+
+                    f"=== CONTENT MIX PER WEEK ===\n"
+                    f"3 Reels (talking head or voiceover + b-roll), 2 Carousels, 1 Quote Post, 1 Static/Lifestyle post\n\n"
+
+                    f"=== NON-NEGOTIABLE RULES ===\n\n"
+
+                    f"QUOTE POST RULE: Every quote post MUST use a verbatim quote Tiffany actually said — pulled from her YouTube channel, "
+                    f"transcripts, or recorded content. Do NOT fabricate quotes or paraphrase and call it 'documented language.' "
+                    f"If you cannot source a verified verbatim quote, set the quote field to: "
+                    f"'FLAG: Needs verified Tiffany quote — pull from YouTube transcript on this topic' and suggest the topic to search.\n\n"
+
+                    f"SCROLL-STOP RULE: Every hook must stop someone who does NOT already follow Tiffany. "
+                    f"Vague, generic, or 'pretty' hooks are not enough. Hooks must be specific, bold, create a pattern interrupt, "
+                    f"or open a loop the viewer must close. Ask yourself: would a stranger stop scrolling for this?\n\n"
+
+                    f"PURPOSE RULE: Every post must serve a clear brand purpose. Include a brand_purpose field for each day: "
+                    f"one sentence explaining what this post does for the brand (builds authority / attracts brand deals / grows community / "
+                    f"shows personality / demonstrates expertise / etc.).\n\n"
+
+                    f"TREND RULE: At least 2 posts per cycle should use a trending format, sound, or concept adapted to Tiffany's voice. "
+                    f"Note this in content_direction.\n\n"
+
+                    f"AVOID: Em dashes, emojis, hustle culture language, new age spirituality, fabricated quotes, "
+                    f"vague hooks without context, posts that only work if you already know who Tiffany is.\n\n"
+
+                    f"AVOID DUPLICATES: Do not reuse angles or titles from the previous plan. Each plan must feel fresh.\n\n"
+
                     f"Return ONLY valid JSON. No markdown. No backticks.\n\n"
-                    f'{{"week_of":"{week_of}","mode":"fresh","planning_note":"Strategic direction for these two weeks.",'
+                    f'{{"week_of":"{week_of}","mode":"fresh",'
+                    f'"planning_note":"Strategic direction for these two weeks — max 15 words.",'
                     f'"pillar_balance":{{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,'
                     f'"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0}},'
-                    f'"gaps_addressed":[],'
-                    f'"days":[{{"day":"Monday","date":"{date_strs[0]}","week_label":"Week 1","post_type":"Reel",'
-                    f'"pillar":"pillar","title":"","hook":"","content_direction":"","voiceover_topic":"",'
-                    f'"designer_needed":"Designer 1","thumbnail_hook":"","carousel_outline":"","quote":"","fresh_or_scripted":"fresh"}}],'
-                    f'"delivery":{{"designer1":{{"name":"Designer 1","sub":"Thumbnails","notion_copy":""}},'
-                    f'"designer2":{{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":""}},'
-                    f'"video_editor":{{"name":"Video Editor","sub":"Reels","notion_copy":""}}}}}}'
+                    f'"days":['
+                    f'{{"day":"Monday","date":"{date_strs[0]}","week_label":"Week 1","post_type":"Reel or Carousel or Quote Post or Static Image",'
+                    f'"pillar":"exact pillar name from the list above",'
+                    f'"title":"Post title — specific and compelling",'
+                    f'"hook":"Opening hook — scroll-stopping, specific, bold",'
+                    f'"content_direction":"2 sentences max on what to cover and why it lands",'
+                    f'"brand_purpose":"One sentence: what this post does for the brand",'
+                    f'"voiceover_topic":"Exact recording direction for Tiffany if Reel",'
+                    f'"quote":"Verbatim Tiffany quote OR flag string if unverified",'
+                    f'"designer_needed":"Designer 1 or Designer 2 or None",'
+                    f'"thumbnail_hook":"Short punchy text for thumbnail if Reel",'
+                    f'"carousel_outline":"Slide-by-slide outline if Carousel",'
+                    f'"fresh_or_scripted":"fresh or scripted"}}'
+                    f'],'
+                    f'"delivery":{{"designer1":{{"name":"Designer 1","sub":"Thumbnails","notion_copy":"DESIGNER 1 TASKS\\n\\nWeek of {week_of}\\n\\nCreate thumbnails for each reel..."}},'
+                    f'"designer2":{{"name":"Designer 2","sub":"Carousels and Quote Posts","notion_copy":"DESIGNER 2 TASKS\\n\\nWeek of {week_of}\\n\\nCreate assets for..."}},'
+                    f'"video_editor":{{"name":"Video Editor","sub":"Reels","notion_copy":"VIDEO EDITOR TASKS\\n\\nWeek of {week_of}\\n\\nEdit reels for..."}}}}}}'
                 )
 
                 import urllib.request as _req
@@ -705,6 +618,7 @@ if __name__ == "__main__":
                 exit(1)
 
         else:
+            # Manual or repository_dispatch — read from payload as before
             try:
                 payload = json.loads(payload_raw)
                 if payload is None:
@@ -712,27 +626,17 @@ if __name__ == "__main__":
             except Exception:
                 payload = {}
 
-            plan      = payload.get("plan", {}) if payload else {}
-            week_of   = payload.get("week_of", plan.get("week_of", "")) if payload else ""
-            is_test   = payload.get("is_test", False) if payload else False
+            plan = payload.get("plan", {}) if payload else {}
+            week_of = payload.get("week_of", plan.get("week_of", "")) if payload else ""
+            is_test = payload.get("is_test", False) if payload else False
             recipient = payload.get("sent_to", EMAIL_TO) if payload else EMAIL_TO
 
-            print(f"Payload plan days: {len(plan.get('days', []))}, week_of: '{week_of}'")
-
-            # Fallback: if payload had no plan, try pending_plan.json
             if not plan:
-                print("No plan in payload — trying pending_plan.json fallback...")
-                plan_data, _ = gh_get("pending_plan.json")
-                if plan_data:
-                    plan      = plan_data.get("plan", {})
-                    week_of   = plan_data.get("week_of", plan.get("week_of", ""))
-                    recipient = plan_data.get("sent_to", recipient)
-                    print(f"Plan loaded from pending_plan.json — week_of: '{week_of}'")
-                else:
-                    print("No plan in payload and no pending_plan.json found. Exiting.")
-                    exit(0)
+                print("No plan data in payload — trigger from Content Studio Send button only.")
+                exit(0)
 
-        # Save plan to GitHub so plan_approval.html and notify-team can load it
+        # Save plan to GitHub so plan_approval.html can load it
+        # No tokens stored - only plan content which is safe
         try:
             plan_file = {
                 "plan": plan,
@@ -741,10 +645,6 @@ if __name__ == "__main__":
                 "sent_at": datetime.now().isoformat(),
                 "status": "pending"
             }
-            print(f"Saving pending_plan.json — week_of: '{week_of}', days: {len(plan.get('days',[]))}, delivery keys: {list(plan.get('delivery',{}).keys())}")
-            for role in ["designer1", "designer2", "video_editor"]:
-                nc = plan.get("delivery",{}).get(role,{}).get("notion_copy","")
-                print(f"  {role} notion_copy length being saved: {len(nc)}")
             url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
             headers = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
             sha = None
@@ -760,65 +660,239 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Could not save plan to GitHub: {e}")
 
-        # Build approval URL and send email
+        # Build approval URL with token
         upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
         repo_encoded = GITHUB_REPOSITORY.replace("/", "%2F")
         approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
 
         html = build_client_email(plan, approval_url)
         subject = f"[TEST PREVIEW] Content Plan for {week_of}" if is_test else f"Your Content Plan for {week_of} - Please Review & Approve"
-        plan_cc = ", ".join([e.strip().replace("\n","").replace("\r","") for e in EMAIL_CC.replace("\n",",").split(",") if e.strip()]) if EMAIL_CC else ""
-        send_email_msg(html, subject, recipient, plan_cc)
-        print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else "") + (f" (CC: {plan_cc})" if plan_cc else ""))
+        send_email_msg(html, subject, recipient)
+        print(f"Plan email sent to {recipient}" + (" (TEST)" if is_test else ""))
 
     elif event == "notify_team":
+        # Load approval from GitHub and send team task emails
         approval_data, approval_sha = gh_get("plan_approval.json")
         if not approval_data:
             print("No plan_approval.json found. Exiting.")
             exit(0)
 
-        action       = approval_data.get("action", "approved")
-        feedback     = approval_data.get("overall_feedback", approval_data.get("feedback", ""))
-        day_feedback = approval_data.get("day_feedback", [])
-        week_of      = approval_data.get("week_of", "")
-        print(f"Approval loaded — action: '{action}', week_of from approval: '{week_of}'")
+        action      = approval_data.get("action", "approved")
+        feedback    = approval_data.get("overall_feedback", approval_data.get("feedback", ""))
+        day_feedback= approval_data.get("day_feedback", [])
+        week_of     = approval_data.get("week_of", "")
 
-        import time
-        plan_data = None
-        for attempt in range(6):
-            raw, _ = gh_get("pending_plan.json")
-            if raw and isinstance(raw, dict) and raw.get("plan"):
-                plan_data = raw
-                break
-            print(f"pending_plan.json attempt {attempt+1}/6 — got: {str(raw)[:100]} — retrying in 5s...")
-            time.sleep(5)
-
-        print(f"pending_plan.json returned: {type(plan_data).__name__} — value: {str(plan_data)[:200]}")
-        if plan_data is not None and isinstance(plan_data, dict) and plan_data:
-            print(f"pending_plan.json top-level keys: {list(plan_data.keys())}")
-            print(f"pending_plan.json week_of: '{plan_data.get('week_of','')}'")
-            plan = plan_data.get("plan", {})
-            print(f"plan keys: {list(plan.keys()) if plan else 'EMPTY'}")
-            print(f"plan.week_of: '{plan.get('week_of','')}'")
-            print(f"plan days count: {len(plan.get('days', []))}")
-            delivery = plan.get("delivery", {})
-            print(f"delivery keys: {list(delivery.keys())}")
-            for role in ["designer1", "designer2", "video_editor"]:
-                nc = delivery.get(role, {}).get("notion_copy", "")
-                print(f"  {role} notion_copy length: {len(nc)}")
-        else:
-            print("pending_plan.json is empty or invalid — plan will be empty")
-            plan = {}
-            delivery = {}
-
-        # week_of fallback chain
-        if not week_of:
-            week_of = (plan_data or {}).get("week_of", "") or plan.get("week_of", "")
-            print(f"week_of after fallback: '{week_of}'")
-
-        print(f"MANAGER_EMAIL set: {bool(MANAGER_EMAIL)}")
-        print(f"DESIGNER1_EMAIL set: {bool(DESIGNER1_EMAIL)}")
-        print(f"DESIGNER2_EMAIL set: {bool(DESIGNER2_EMAIL)}")
-        print(f"VIDEO_EDITOR_EMAIL set: {bool(VIDEO_EDITOR_EMAIL)}")
+        plan_data, _ = gh_get("pending_plan.json")
+        plan = plan_data.get("plan", {}) if plan_data else {}
+        delivery = plan.get("delivery", {})
 
         run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha)
+
+def auto_regenerate_plan(old_plan, feedback, day_feedback):
+    """Call Claude to generate a revised plan based on rejection feedback."""
+    print("Auto-regenerating plan after rejection...")
+
+    week_of  = old_plan.get("week_of", "")
+    days     = old_plan.get("days", [])
+    note     = old_plan.get("planning_note", "")
+
+    # Build context from rejected plan
+    rejected_summary = "\n".join([
+        f"- {d.get('day')}: {d.get('post_type')} | {d.get('pillar')} | \"{d.get('title')}\" | Hook: {d.get('hook','')}"
+        for d in days
+    ])
+
+    # Per-day feedback context
+    day_fb_text = ""
+    if day_feedback:
+        day_fb_text = "\nPer-day feedback:\n" + "\n".join([
+            f"- {d.get('day')} ({d.get('title','')}): {d.get('note','')}"
+            for d in day_feedback
+        ])
+
+    overall_fb = f"\nOverall feedback: {feedback}" if feedback else ""
+
+    prompt = f"""You are the lead content strategist for Tiffany Haynes and Co., a Christian entrepreneur, theologian, and coach.
+
+=== BRAND VOICE ===
+Authentic, faith-driven, entrepreneurial. Bold, warm, direct. She is a FUNNY person who loves jokes and wants the world to know it.
+She is a wife and mother. She wants to share her family life. She is deeply rooted in Scripture and the God of the Bible only.
+No new age, manifestation, universe as deity, law of attraction, crystals, chakras, astrology, or numerology.
+She teaches through storytelling, real talk, and humor — not lectures.
+
+=== CONTENT PILLARS ===
+1. Business and Entrepreneurship
+2. Spiritual Development and Gods Math Teaching
+3. Family and Lifestyle (REQUIRED — brand deals depend on this)
+4. Humor and Personality Shenanigans (REQUIRED — she is hilarious, the world needs to see this)
+5. Community and Testimony
+
+=== MANDATORY PILLAR MINIMUMS IN REVISED PLAN ===
+- Humor and Personality Shenanigans: MINIMUM 2 posts. Non-negotiable.
+- Family and Lifestyle: MINIMUM 2 posts. Non-negotiable.
+
+=== NON-NEGOTIABLE RULES ===
+
+QUOTE POST RULE: Every quote post MUST use a verbatim quote Tiffany actually said — from her YouTube channel or transcripts.
+Do NOT fabricate quotes or paraphrase and call it "documented language."
+If you cannot source a verified verbatim quote, set the quote field to:
+"FLAG: Needs verified Tiffany quote — pull from YouTube transcript on [topic]"
+
+SCROLL-STOP RULE: Every hook must stop someone who does NOT already follow Tiffany.
+Vague, generic, or "pretty" hooks are not enough. Be specific, bold, or create a pattern interrupt.
+
+PURPOSE RULE: Every post must serve a clear brand purpose. Include a brand_purpose field for each day.
+
+AVOID: Em dashes, emojis, hustle culture, new age spirituality, fabricated quotes, vague hooks without context.
+
+The client REJECTED the following plan for the week of {week_of}.
+
+REJECTED PLAN:
+{rejected_summary}
+
+CLIENT FEEDBACK:{day_fb_text}{overall_fb}
+
+Generate a completely revised plan that directly addresses all feedback and follows all rules above.
+Return ONLY valid JSON with no markdown or backticks:
+{{
+  "week_of": "{week_of}",
+  "planning_note": "Brief note explaining the revisions — max 15 words",
+  "days": [
+    {{
+      "day": "Monday",
+      "date": "",
+      "post_type": "Reel or Carousel or Quote Post or Static Image",
+      "pillar": "exact pillar name from the list above",
+      "title": "Post title — specific and compelling",
+      "hook": "Opening hook — scroll-stopping, specific, bold",
+      "content_direction": "2 sentences max on what to cover and why it lands",
+      "brand_purpose": "One sentence: what this post does for the brand",
+      "voiceover_topic": "Exact recording direction for Tiffany if Reel",
+      "designer_needed": "Designer 1 or Designer 2 or None",
+      "thumbnail_hook": "Short punchy text for thumbnail if Reel",
+      "carousel_outline": "Slide-by-slide outline if Carousel",
+      "quote": "Verbatim Tiffany quote OR flag string if unverified",
+      "fresh_or_scripted": "fresh"
+    }}
+  ],
+  "delivery": {{
+    "designer1": {{"name": "Designer 1", "sub": "Thumbnails", "notion_copy": "DESIGNER 1 TASKS\\n\\nWeek of {week_of}\\n\\nCreate thumbnails for each reel listed below..."}},
+    "designer2": {{"name": "Designer 2", "sub": "Carousels and Quote Posts", "notion_copy": "DESIGNER 2 TASKS\\n\\nWeek of {week_of}\\n\\nCreate assets for carousels and quote posts..."}},
+    "video_editor": {{"name": "Video Editor", "sub": "Reels", "notion_copy": "VIDEO EDITOR TASKS\\n\\nWeek of {week_of}\\n\\nEdit reels for the following days..."}}
+  }}
+}}"""
+
+    resp = requests.post(
+        "https://api.anthropic.com/v1/messages",
+        headers={
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"
+        },
+        json={
+            "model": "claude-sonnet-4-6",
+            "max_tokens": 4000,
+            "messages": [{"role": "user", "content": prompt}]
+        },
+        timeout=60
+    )
+    resp.raise_for_status()
+    raw = resp.json()["content"][0]["text"].strip()
+    raw = raw.replace("```json","").replace("```","").strip()
+    return json.loads(raw)
+
+
+# ── MAIN ── notify_team section (continued)
+def run_notify_team(action, feedback, day_feedback, week_of, plan, delivery, approval_sha):
+    # Notify manager
+    if MANAGER_EMAIL:
+        html = build_manager_email(plan, feedback, action, day_feedback)
+        action_label = "Approved" if action == "approved" else "Rejected"
+        manager_emails = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
+        primary = manager_emails[0]
+        cc_rest = ', '.join(manager_emails[1:]) if len(manager_emails) > 1 else ''
+        send_email_msg(html, f"[{action_label}] Tiffany Plan Response - Week of {week_of}", primary, cc_rest)
+
+    if action == "approved":
+        manager_cc = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
+        manager_cc_str = ', '.join(manager_cc)
+        team = [
+            ("designer1",    DESIGNER1_EMAIL,    delivery.get("designer1",{}).get("notion_copy","")),
+            ("designer2",    DESIGNER2_EMAIL,    delivery.get("designer2",{}).get("notion_copy","")),
+            ("video_editor", VIDEO_EDITOR_EMAIL, delivery.get("video_editor",{}).get("notion_copy","")),
+        ]
+        role_map = {
+            "designer1":    "Designer 1 - Thumbnails",
+            "designer2":    "Designer 2 - Carousels & Quotes",
+            "video_editor": "Video Editor - Reels",
+        }
+        for role, email, notion_copy in team:
+            if email and notion_copy:
+                html = build_team_email(plan, feedback, role, notion_copy, day_feedback)
+                role_label = role.replace("_"," ").title()
+                send_email_msg(html, f"Your Tasks — Week of {week_of} (Approved)", email, manager_cc_str)
+                print(f"Task email sent to {role_label}: {email} (CC: {manager_cc_str})")
+                # Create Notion task simultaneously
+                notion_role = role_map.get(role, "General/All Roles")
+                task_name = f"{notion_role} — Week of {week_of}"
+                create_notion_task(task_name, role, notion_copy, week_of)
+
+    elif action == "rejected":
+        try:
+            new_plan = auto_regenerate_plan(plan, feedback, day_feedback)
+            new_week_of = new_plan.get("week_of", week_of)
+
+            # Save new plan to GitHub
+            plan_file = {
+                "plan": new_plan,
+                "week_of": new_week_of,
+                "sent_to": EMAIL_TO,
+                "sent_at": datetime.now().isoformat(),
+                "status": "pending",
+                "revision": True
+            }
+            url = f"https://api.github.com/repos/{GITHUB_REPOSITORY}/contents/pending_plan.json"
+            headers_gh = {"Authorization": f"token {GITHUB_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+            existing = requests.get(url, headers=headers_gh)
+            sha = existing.json().get("sha") if existing.status_code == 200 else None
+            body = {"message": f"Auto-revised plan for {new_week_of}", "content": base64.b64encode(json.dumps(plan_file, indent=2).encode()).decode()}
+            if sha: body["sha"] = sha
+            requests.put(url, headers=headers_gh, json=body)
+            print(f"Revised plan saved to GitHub.")
+
+            # Send new plan to Tiffany
+            upload_token = UPLOAD_TOKEN or GITHUB_TOKEN
+            repo_encoded = GITHUB_REPOSITORY.replace("/", "%2F")
+            approval_url = f"https://media.ebeprstudios.com/plan_approval.html?repo={repo_encoded}&ght={upload_token}"
+            html = build_client_email(new_plan, approval_url)
+            send_email_msg(html, f"Revised Content Plan for {new_week_of} - Please Review & Approve", EMAIL_TO)
+            print(f"Revised plan auto-sent to Tiffany: {EMAIL_TO}")
+
+            # Notify manager
+            if MANAGER_EMAIL:
+                manager_emails = [e.strip().replace('\n','').replace('\r','') for e in MANAGER_EMAIL.replace('\n',',').split(',') if e.strip()]
+                notify_html = f"""<html><body style="font-family:Georgia,serif;background:#F4F0EB;padding:24px;">
+<div style="max-width:520px;margin:0 auto;background:#FFFDF5;border:1px solid #E3D3C8;border-radius:12px;padding:28px;">
+<div style="font-size:10px;font-weight:700;color:#B87830;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">AUTO-REVISED PLAN SENT</div>
+<div style="font-size:18px;font-weight:700;color:#414141;margin-bottom:8px;">A revised plan was automatically generated and sent to Tiffany.</div>
+<div style="font-size:13px;color:#5A5A5A;line-height:1.7;">Based on her rejection feedback, Claude generated a new plan and sent it for approval. No action needed unless she rejects again.</div>
+<div style="margin-top:16px;font-size:13px;color:#8A8A8A;font-style:italic;">Original feedback: {feedback or "No feedback provided."}</div>
+</div></body></html>"""
+                send_email_msg(notify_html, f"[Auto-Revised] New Plan Sent to Tiffany - Week of {new_week_of}", manager_emails[0])
+
+        except Exception as e:
+            print(f"Auto-regeneration failed: {e}")
+            if MANAGER_EMAIL:
+                manager_emails = [em.strip().replace('\n','').replace('\r','') for em in MANAGER_EMAIL.replace('\n',',').split(',') if em.strip()]
+                err_html = f"""<html><body style="font-family:Georgia,serif;padding:24px;">
+<div style="max-width:520px;margin:0 auto;background:#FFF5F5;border:1px solid #A00605;border-radius:12px;padding:28px;">
+<div style="font-size:16px;font-weight:700;color:#A00605;margin-bottom:8px;">&#9888; Auto-Regeneration Failed</div>
+<div style="font-size:13px;color:#414141;line-height:1.7;">Tiffany rejected the plan but the auto-revision failed. Please generate a new plan manually and resend.<br><br><strong>Error:</strong> {str(e)}</div>
+</div></body></html>"""
+                send_email_msg(err_html, "[ACTION REQUIRED] Plan Rejected - Auto-Revision Failed", manager_emails[0])
+
+    # Clean up approval file
+    if approval_sha:
+        gh_delete("plan_approval.json", approval_sha, f"Plan approval processed - {week_of}")
+
+    print(f"Team notification complete. Action: {action}")
