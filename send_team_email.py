@@ -1,15 +1,7 @@
 """
 send_team_email.py
 EBEPR Studios - THCO Content Studio
-Sends team_plan_email.html to Brittany and Diana (Tiffany's creative team).
-
-Secrets needed in GitHub repo:
-  BRITTANY_EMAIL   - brittany@transactionez.com
-  DIANA_EMAIL      - diana@divineordersupport.com
-  MANAGER_EMAIL    - Erica (CC'd on every send)
-  EMAIL_FROM       - sending Gmail address
-  EMAIL_PASSWORD   - Gmail app password
-  UPLOAD_TOKEN     - PAT with repo scope
+Sends team_plan_email.html to Brittany and Diana.
 """
 import smtplib
 import os
@@ -20,13 +12,17 @@ from email.mime.text import MIMEText
 
 EMAIL_FROM        = os.environ["EMAIL_FROM"]
 EMAIL_PASSWORD    = os.environ["EMAIL_PASSWORD"]
-BRITTANY_EMAIL    = os.environ.get("BRITTANY_EMAIL", "")
-DIANA_EMAIL       = os.environ.get("DIANA_EMAIL", "")
 MANAGER_EMAIL     = os.environ.get("MANAGER_EMAIL", "")
 GITHUB_TOKEN      = os.environ.get("UPLOAD_TOKEN", os.environ.get("GITHUB_TOKEN", ""))
 GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY", "")
 EMAIL_SUBJECT     = os.environ.get("EMAIL_SUBJECT", "THCO Content Plan: April 5 to May 4")
 EMAIL_FILE        = os.environ.get("EMAIL_FILE", "team_plan_email.html")
+
+# Brittany and Diana — hardcoded, never touches production team secrets
+TO_EMAILS = [
+    "brittany@transactionez.com",
+    "diana@divineordersupport.com"
+]
 
 def read_html_from_repo(filename):
     if not GITHUB_TOKEN or not GITHUB_REPOSITORY:
@@ -41,8 +37,6 @@ def read_html_from_repo(filename):
     return content
 
 def send_html_email(subject, html_body, to_emails, cc_emails=None):
-    if not to_emails:
-        raise Exception("No recipients. Set BRITTANY_EMAIL and DIANA_EMAIL in GitHub secrets.")
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
     msg["From"]    = EMAIL_FROM
@@ -61,6 +55,5 @@ def send_html_email(subject, html_body, to_emails, cc_emails=None):
 
 if __name__ == "__main__":
     html_body = read_html_from_repo(EMAIL_FILE)
-    to_list = [e.strip() for e in [BRITTANY_EMAIL, DIANA_EMAIL] if e.strip()]
-    cc_list = [e.strip() for e in [MANAGER_EMAIL] if e.strip()]
-    send_html_email(EMAIL_SUBJECT, html_body, to_list, cc_list)
+    cc_list = [MANAGER_EMAIL.strip()] if MANAGER_EMAIL.strip() else []
+    send_html_email(EMAIL_SUBJECT, html_body, TO_EMAILS, cc_list)
