@@ -1,0 +1,46 @@
+name: Send Team Plan Email
+
+on:
+  repository_dispatch:
+    types: [send_team_plan_email]
+  workflow_dispatch:
+    inputs:
+      subject:
+        description: 'Email subject line'
+        required: false
+        default: 'THCO Content Plan: April 5 to May 4'
+      email_file:
+        description: 'HTML file in repo to send'
+        required: false
+        default: 'team_plan_email.html'
+
+jobs:
+  send_team_email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Send team plan email
+        run: python send_team_email.py
+        env:
+          EMAIL_FROM:         ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD:     ${{ secrets.EMAIL_PASSWORD }}
+          DESIGNER1_EMAIL:    ${{ secrets.DESIGNER1_EMAIL }}
+          DESIGNER2_EMAIL:    ${{ secrets.DESIGNER2_EMAIL }}
+          VIDEO_EDITOR_EMAIL: ${{ secrets.VIDEO_EDITOR_EMAIL }}
+          MANAGER_EMAIL:      ${{ secrets.MANAGER_EMAIL }}
+          UPLOAD_TOKEN:       ${{ secrets.UPLOAD_TOKEN }}
+          GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY:  ${{ github.repository }}
+          EMAIL_SUBJECT:      ${{ github.event.client_payload.subject || github.event.inputs.subject || 'THCO Content Plan: April 5 to May 4' }}
+          EMAIL_FILE:         ${{ github.event.client_payload.email_file || github.event.inputs.email_file || 'team_plan_email.html' }}
