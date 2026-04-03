@@ -17,6 +17,9 @@
   --amber:#B87830; --amber-bg:rgba(184,120,48,0.08);
   --blue:#3A6EA8; --blue-bg:rgba(58,110,168,0.08);
   --purple:#6A50A8; --purple-bg:rgba(106,80,168,0.08);
+  /* v2 accent */
+  --coral:#FF5740; --coral-dark:#CC3D29; --coral-dim:rgba(255,87,64,0.08); --coral-mid:rgba(255,87,64,0.2);
+  --ink:#0d0d0d;
 }
 
 * { box-sizing:border-box; margin:0; padding:0; }
@@ -34,13 +37,13 @@ body::before {
 
 /* GATE */
 #password-gate {
-  position:fixed; inset:0; background:var(--cream-2);
+  position:fixed; inset:0; background:var(--ink);
   z-index:99999; display:flex; align-items:center; justify-content:center;
 }
 .gate-box {
-  background:var(--cream-1); border:1px solid var(--border-md);
-  border-radius:12px; padding:48px 40px; width:400px; max-width:92vw;
-  text-align:center; box-shadow:0 4px 32px var(--shadow);
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px; padding:48px 40px; width:420px; max-width:92vw;
+  text-align:center; backdrop-filter:blur(8px);
 }
 .gate-brand { font-family:'Cormorant Garamond',serif; font-size:10px; font-weight:500; color:var(--charcoal3); letter-spacing:4px; text-transform:uppercase; margin-bottom:6px; }
 .gate-title { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600; color:var(--charcoal); margin-bottom:4px; }
@@ -51,13 +54,13 @@ body::before {
   padding:11px 16px; border-radius:6px; margin-bottom:10px; outline:none;
   text-align:center; letter-spacing:2px; transition:border-color 0.2s;
 }
-.gate-input:focus { border-color:var(--red); }
+.gate-input:focus { border-color:var(--coral); }
 .gate-btn {
   width:100%; background:var(--red); color:white; border:none; padding:11px;
   font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
   cursor:pointer; border-radius:6px; transition:background 0.2s;
 }
-.gate-btn:hover { background:#8A0504; }
+.gate-btn:hover { opacity:0.88; }
 .gate-error { color:var(--red); font-size:11px; margin-top:8px; display:none; }
 
 /* API MODAL */
@@ -118,7 +121,10 @@ body::before {
   transition:all 0.15s; white-space:nowrap;
 }
 .tab-btn:hover { color:var(--charcoal); }
-.tab-btn.active { color:var(--red); border-bottom-color:var(--red); font-weight:600; }
+.tab-btn.active { color:var(--coral); border-bottom-color:var(--coral); font-weight:600; }
+
+/* SEND HUB */
+.sh-card { background:var(--cream-1);border:1px solid var(--border-md);border-radius:12px;overflow:hidden;box-shadow:0 2px 10px var(--shadow); }
 
 /* MAIN */
 #main { max-width:1100px; margin:0 auto; padding:32px 28px; position:relative; z-index:1; }
@@ -446,13 +452,18 @@ body::before {
 
 <!-- PASSWORD GATE -->
 <div id="password-gate">
-  <div class="gate-box">
-    <div class="gate-brand">Tiffany Haynes &amp; Co.</div>
-    <div class="gate-title">Content Studio</div>
-    <div class="gate-math">1 + 1 = 10,000</div>
-    <input class="gate-input" id="gate-input" type="password" placeholder="Enter password" />
-    <button class="gate-btn" onclick="checkPassword()">Enter</button>
-    <div class="gate-error" id="gate-error">Incorrect password. Try again.</div>
+  <div style="position:absolute;inset:0;background:var(--ink);opacity:0.96;"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--coral);"></div>
+  <div class="gate-box" style="position:relative;z-index:2;">
+    <div style="font-family:'Inter',sans-serif;font-size:10px;font-weight:700;color:var(--coral);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;">EBEPR Studios</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:white;margin-bottom:4px;line-height:1.1;">THCO<span style="color:var(--coral);"> ·</span> Content Studio</div>
+    <div style="font-family:'Inter',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-bottom:28px;">VERSION 2.0</div>
+    <input class="gate-input" id="gate-input" type="password" placeholder="Enter password"
+      style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:white;"
+      onkeydown="if(event.key==='Enter')checkPassword()" />
+    <button class="gate-btn" onclick="checkPassword()" style="background:var(--coral);margin-top:6px;">Enter Studio</button>
+    <div class="gate-error" id="gate-error" style="color:var(--coral);">Incorrect password. Try again.</div>
+    <div style="margin-top:20px;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;">Tiffany Haynes &amp; Co. &bull; Internal Use Only</div>
   </div>
 </div>
 
@@ -469,32 +480,32 @@ body::before {
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <div>
-    <div class="logo-brand">Content Studio</div>
-    <div class="logo-title">Tiffany Haynes <span class="logo-accent">&amp;</span> Co.</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div style="border-right:1px solid var(--border-md);padding-right:14px;">
+      <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:700;color:var(--coral);letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;">EBEPR Studios</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--charcoal);line-height:1.1;">THCO <span style="color:var(--coral);">·</span> Content Studio <span style="font-size:11px;font-weight:400;color:var(--charcoal3);">v2.0</span></div>
+    </div>
     <!-- CLOCKS -->
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="text-align:center;background:rgba(65,65,65,0.06);border:1px solid var(--border-md);border-radius:8px;padding:5px 12px;min-width:90px;">
-        <div style="font-size:8px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">EST</div>
-        <div id="clock-est" style="font-size:14px;font-weight:700;color:var(--charcoal);font-variant-numeric:tabular-nums;letter-spacing:0.5px;">--:--</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="text-align:center;background:rgba(65,65,65,0.06);border:1px solid var(--border-md);border-radius:8px;padding:4px 10px;min-width:80px;">
+        <div style="font-size:7px;font-weight:700;color:var(--coral);letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">EST</div>
+        <div id="clock-est" style="font-size:13px;font-weight:700;color:var(--charcoal);font-variant-numeric:tabular-nums;letter-spacing:0.5px;">--:--</div>
         <div id="date-est" style="font-size:9px;color:var(--charcoal3);margin-top:1px;"></div>
       </div>
-      <div style="text-align:center;background:rgba(65,65,65,0.06);border:1px solid var(--border-md);border-radius:8px;padding:5px 12px;min-width:90px;">
-        <div style="font-size:8px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">CST</div>
-        <div id="clock-cst" style="font-size:14px;font-weight:700;color:var(--charcoal);font-variant-numeric:tabular-nums;letter-spacing:0.5px;">--:--</div>
+      <div style="text-align:center;background:rgba(65,65,65,0.06);border:1px solid var(--border-md);border-radius:8px;padding:4px 10px;min-width:80px;">
+        <div style="font-size:7px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">CST</div>
+        <div id="clock-cst" style="font-size:13px;font-weight:700;color:var(--charcoal);font-variant-numeric:tabular-nums;letter-spacing:0.5px;">--:--</div>
         <div id="date-cst" style="font-size:9px;color:var(--charcoal3);margin-top:1px;"></div>
       </div>
     </div>
-    <div class="topbar-right">
-      <button class="tb-btn" onclick="exportProfile()">Export Profile</button>
-      <button class="tb-btn" onclick="importProfileClick()">Import Profile</button>
-      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importProfile(event)" />
-      <button class="tb-btn" onclick="showKeyModal()">API Key</button>
-      <button class="tb-btn" onclick="window.print()">Print</button>
-      <button class="tb-btn" id="send-report-btn" onclick="sendMonthlyReport()" style="border-color:var(--red);color:var(--red);">Send Report</button>
-    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="tb-btn" onclick="exportProfile()">Export Profile</button>
+    <button class="tb-btn" onclick="importProfileClick()">Import Profile</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importProfile(event)" />
+    <button class="tb-btn" onclick="showKeyModal()">API Key</button>
+    <button class="tb-btn" onclick="window.print()">Print</button>
+    <button class="tb-btn" id="send-report-btn" onclick="sendMonthlyReport()" style="border-color:var(--coral);color:var(--coral);">Send Report</button>
   </div>
 </div>
 
@@ -502,10 +513,11 @@ body::before {
 <div id="tab-bar">
   <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
   <button class="tab-btn" onclick="switchTab('studio')">Transcript to Content</button>
-  <button class="tab-btn" onclick="switchTab('planner')">Weekly Planner</button>
-  <button class="tab-btn" onclick="switchTab('knowledge')">Knowledge Base</button>
+  <button class="tab-btn" onclick="switchTab('planner')">Plan Builder</button>
+  <button class="tab-btn" onclick="switchTab('sendhub')" id="tab-btn-sendhub">Send Hub</button>
   <button class="tab-btn" onclick="switchTab('emailpreview')">Email Preview</button>
   <button class="tab-btn" onclick="switchTab('voiceovers')">Voiceovers</button>
+  <button class="tab-btn" onclick="switchTab('knowledge')">Knowledge Base</button>
 </div>
 
 <!-- MAIN -->
@@ -513,20 +525,20 @@ body::before {
 
   <!-- LANDING -->
   <div id="landing">
-    <div class="landing-eyebrow">Tiffany Haynes &amp; Co. Media Team</div>
-    <div class="landing-title">Content Studio</div>
-    <div class="landing-math">1 + 1 = 10,000</div>
-    <div class="landing-sub">Paste scripts, generate captions, carousels, quote pulls, and thumbnail briefs. Build weekly calendars. All in Tiffany's voice.</div>
-    <button class="landing-btn" onclick="startStudio()">Open Studio</button>
+    <div class="landing-eyebrow">EBEPR Studios &bull; Tiffany Haynes &amp; Co.</div>
+    <div class="landing-title">THCO <span style="color:var(--coral);">Content</span> Studio</div>
+    <div class="landing-math" style="color:var(--coral);">v2.0</div>
+    <div class="landing-sub">Generate captions, carousels, weekly plans, and send branded emails to the team — all in Tiffany's voice.</div>
+    <button class="landing-btn" onclick="startStudio()" style="background:var(--coral);">Open Studio</button>
     <br><br>
     <button class="key-btn-land" onclick="showKeyModal()">Enter API Key</button>
     <div class="tool-chips">
-      <div class="tool-chip">Script-Powered Dashboard</div>
-      <div class="tool-chip">Captions Ready to Post</div>
-      <div class="tool-chip">Thumbnail Briefs</div>
-      <div class="tool-chip">Carousel Copy</div>
-      <div class="tool-chip">Weekly Planner</div>
+      <div class="tool-chip">Dashboard</div>
+      <div class="tool-chip">Plan Builder</div>
+      <div class="tool-chip">Send Hub</div>
+      <div class="tool-chip">Voiceovers</div>
       <div class="tool-chip">Knowledge Base</div>
+      <div class="tool-chip">Email Preview</div>
     </div>
   </div>
 
@@ -950,6 +962,138 @@ body::before {
     </div>
 
     <!-- TAB: EMAIL PREVIEW -->
+    <!-- TAB: SEND HUB -->
+    <div id="tab-sendhub" class="tab-pane">
+
+      <!-- HEADER -->
+      <div style="margin-bottom:22px;">
+        <div style="font-size:10px;font-weight:700;color:var(--coral);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">Send Hub</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--charcoal);margin-bottom:4px;">Email sends &amp; approvals</div>
+        <div style="font-size:12px;color:var(--charcoal3);line-height:1.6;">Team emails and client approvals in one place. Always accessible — no plan generation required.</div>
+      </div>
+
+      <!-- ALERT BANNER - shows when no GitHub token -->
+      <div id="sh-token-banner" style="background:var(--amber-bg);border:1px solid rgba(184,120,48,0.25);border-radius:8px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:var(--amber);display:none;">
+        No GitHub token saved. Go to <strong>Email Preview</strong> tab and enter your token in Email Settings before sending.
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+        <!-- TEAM SEND CARD -->
+        <div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:12px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);">
+          <div style="background:var(--ink);padding:12px 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <div style="font-size:9px;font-weight:700;color:var(--coral);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:2px;">Creative Team</div>
+            <div style="font-size:14px;font-weight:600;color:white;">Send Plan to Team</div>
+          </div>
+          <div style="padding:18px;">
+
+            <!-- Brittany -->
+            <div style="background:var(--cream-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--charcoal2);margin-bottom:2px;">Brittany Nesmith</div>
+              <div style="font-size:10px;color:var(--charcoal3);margin-bottom:8px;">brittany@transactionez.com &nbsp;&bull;&nbsp; Brand Director</div>
+              <div id="sh-team-last" style="font-size:10px;color:var(--charcoal3);margin-bottom:10px;">Last sent: never</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button onclick="sendTeamPlanEmail(false)" id="send-team-btn"
+                  style="background:var(--coral);color:white;border:none;padding:8px 18px;border-radius:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;flex:1;min-width:120px;">
+                  Send to Team
+                </button>
+                <button onclick="sendTeamPlanEmail(true)" id="send-team-test-btn"
+                  style="background:transparent;color:var(--coral);border:1px solid var(--coral);padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;">
+                  Test to Me
+                </button>
+              </div>
+              <div id="send-team-status" style="display:none;margin-top:8px;font-size:11px;color:var(--green);font-weight:600;"></div>
+            </div>
+
+            <!-- Diana (always CC'd) -->
+            <div style="background:var(--cream-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+              <div style="font-size:11px;font-weight:600;color:var(--charcoal2);margin-bottom:2px;">Diana Sarnor</div>
+              <div style="font-size:10px;color:var(--charcoal3);margin-bottom:4px;">diana@divineordersupport.com &nbsp;&bull;&nbsp; Marketing Ops</div>
+              <div style="font-size:10px;color:var(--charcoal3);font-style:italic;">Always CC'd on team sends above</div>
+            </div>
+
+            <!-- What gets sent -->
+            <div style="margin-top:12px;padding:10px 12px;background:rgba(255,87,64,0.04);border:1px solid rgba(255,87,64,0.15);border-radius:6px;">
+              <div style="font-size:10px;font-weight:700;color:var(--coral);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">What gets sent</div>
+              <div style="font-size:11px;color:var(--charcoal2);line-height:1.65;">Sends <code style="background:var(--cream-2);padding:1px 5px;border-radius:3px;font-size:10px;">team_plan_email.html</code> from the repo via Python SMTP. Replace that file whenever the plan changes.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENT APPROVAL CARD -->
+        <div style="background:var(--cream-1);border:1px solid var(--border-md);border-radius:12px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);">
+          <div style="background:var(--ink);padding:12px 18px;border-bottom:1px solid rgba(255,255,255,0.06);">
+            <div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:2px;">Client</div>
+            <div style="font-size:14px;font-weight:600;color:white;">Send for Approval</div>
+          </div>
+          <div style="padding:18px;">
+
+            <!-- Tiffany -->
+            <div style="background:var(--cream-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--charcoal2);margin-bottom:2px;">Tiffany Haynes</div>
+              <div style="font-size:10px;color:var(--charcoal3);margin-bottom:8px;">thecreativetheologian@gmail.com &nbsp;&bull;&nbsp; Client</div>
+              <div style="font-size:10px;color:var(--charcoal3);margin-bottom:10px;display:flex;align-items:center;gap:5px;" id="sh-client-status">
+                <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);"></span>
+                Awaiting approval
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button id="send-client-btn2" onclick="sendPlanToClient()"
+                  style="background:var(--red);color:white;border:none;padding:8px 18px;border-radius:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;flex:1;min-width:120px;">
+                  Send to Tiffany
+                </button>
+                <button onclick="sendTestPlanEmail()"
+                  style="background:transparent;color:var(--amber);border:1px solid var(--amber);padding:8px 14px;border-radius:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;">
+                  Test to Me
+                </button>
+              </div>
+            </div>
+
+            <!-- Approval flow -->
+            <div style="padding:10px 12px;background:rgba(160,6,5,0.04);border:1px solid rgba(160,6,5,0.12);border-radius:6px;">
+              <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Approval Flow</div>
+              <div style="font-size:11px;color:var(--charcoal2);line-height:1.9;">
+                1. Generate plan in Plan Builder<br>
+                2. Send to Tiffany for approval<br>
+                3. She reviews and replies Approved<br>
+                4. Team gets tasks in Notion automatically
+              </div>
+            </div>
+
+            <!-- Notion tasks note -->
+            <div style="margin-top:10px;padding:10px 12px;background:var(--cream-2);border:1px solid var(--border);border-radius:6px;">
+              <div style="font-size:10px;font-weight:600;color:var(--charcoal3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">On Approval</div>
+              <div style="font-size:11px;color:var(--charcoal2);line-height:1.6;">Notion tasks auto-created for Designer 1, Designer 2, and Video Editor. Manager CC'd on all team emails.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- QUICK REFERENCE -->
+      <div style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:16px 20px;">
+        <div style="font-size:10px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Send Reference</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal2);margin-bottom:4px;">Team email file</div>
+            <code style="font-size:11px;background:var(--cream-1);padding:3px 8px;border-radius:4px;color:var(--charcoal);">team_plan_email.html</code>
+            <div style="font-size:10px;color:var(--charcoal3);margin-top:4px;">Root of the GitHub repo. Replace this file when the plan changes.</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal2);margin-bottom:4px;">Workflow</div>
+            <code style="font-size:11px;background:var(--cream-1);padding:3px 8px;border-radius:4px;color:var(--charcoal);">send_team_email_workflow.yml</code>
+            <div style="font-size:10px;color:var(--charcoal3);margin-top:4px;">In .github/workflows/. Triggered by Send Hub button.</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--charcoal2);margin-bottom:4px;">Recipients locked</div>
+            <div style="font-size:11px;color:var(--charcoal);margin-top:2px;">Brittany + Diana (hardcoded)<br>Erica CC'd (MANAGER_EMAIL)</div>
+            <div style="font-size:10px;color:var(--charcoal3);margin-top:4px;">Never touches production team secrets.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB: EMAIL PREVIEW -->
     <div id="tab-emailpreview" class="tab-pane">
 
       <!-- SETTINGS PANEL -->
@@ -1280,13 +1424,23 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-pane').forEach(function(el) { el.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
   document.getElementById('tab-' + tab).classList.add('active');
-  var tabs = ['dashboard','studio','planner','knowledge','emailpreview','voiceovers'];
+  var tabs = ['dashboard','studio','planner','sendhub','emailpreview','voiceovers','knowledge'];
   var idx = tabs.indexOf(tab);
   if (idx >= 0) document.querySelectorAll('.tab-btn')[idx].classList.add('active');
   if (tab === 'knowledge') { renderKnowledgeBase(); loadMetaSettings(); }
   if (tab === 'emailpreview') initEmailPreview();
   if (tab === 'voiceovers') initVoiceovers();
   if (tab === 'planner') { initPlannerBalance(); initWeekSelector(); }
+  if (tab === 'sendhub') {
+    var token = getGithubToken();
+    var banner = document.getElementById('sh-token-banner');
+    if (banner) banner.style.display = token ? 'none' : 'block';
+    var lastEl = document.getElementById('sh-team-last');
+    if (lastEl) {
+      var lastSent = localStorage.getItem('sh_team_last_sent');
+      lastEl.textContent = lastSent ? 'Last sent: ' + lastSent : 'Last sent: never';
+    }
+  }
 }
 
 // ================================================================
