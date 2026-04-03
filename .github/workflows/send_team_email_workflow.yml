@@ -8,7 +8,7 @@ on:
       subject:
         description: 'Email subject line'
         required: false
-        default: 'THCO Content Plan: April 5 to May 4'
+        default: 'THCO Content Plan'
       email_file:
         description: 'HTML file in repo to send'
         required: false
@@ -30,6 +30,27 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      - name: Resolve email subject
+        id: vars
+        run: |
+          SUBJECT="${{ github.event.client_payload.subject }}"
+          if [ -z "$SUBJECT" ]; then
+            SUBJECT="${{ github.event.inputs.subject }}"
+          fi
+          if [ -z "$SUBJECT" ]; then
+            SUBJECT="THCO Content Plan: April 5 to May 4"
+          fi
+          echo "subject=$SUBJECT" >> $GITHUB_OUTPUT
+
+          FILE="${{ github.event.client_payload.email_file }}"
+          if [ -z "$FILE" ]; then
+            FILE="${{ github.event.inputs.email_file }}"
+          fi
+          if [ -z "$FILE" ]; then
+            FILE="team_plan_email.html"
+          fi
+          echo "email_file=$FILE" >> $GITHUB_OUTPUT
+
       - name: Send team plan email
         run: python send_team_email.py
         env:
@@ -42,5 +63,5 @@ jobs:
           UPLOAD_TOKEN:       ${{ secrets.UPLOAD_TOKEN }}
           GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY:  ${{ github.repository }}
-          EMAIL_SUBJECT:      ${{ github.event.client_payload.subject || github.event.inputs.subject || 'THCO Content Plan: April 5 to May 4' }}
-          EMAIL_FILE:         ${{ github.event.client_payload.email_file || github.event.inputs.email_file || 'team_plan_email.html' }}
+          EMAIL_SUBJECT:      ${{ steps.vars.outputs.subject }}
+          EMAIL_FILE:         ${{ steps.vars.outputs.email_file }}
