@@ -30,25 +30,17 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Resolve email subject
+      - name: Resolve subject and file
         id: vars
         run: |
           SUBJECT="${{ github.event.client_payload.subject }}"
-          if [ -z "$SUBJECT" ]; then
-            SUBJECT="${{ github.event.inputs.subject }}"
-          fi
-          if [ -z "$SUBJECT" ]; then
-            SUBJECT="THCO Content Plan: April 5 to May 4"
-          fi
+          if [ -z "$SUBJECT" ]; then SUBJECT="${{ github.event.inputs.subject }}"; fi
+          if [ -z "$SUBJECT" ]; then SUBJECT="THCO Content Plan: April 5 to May 4"; fi
           echo "subject=$SUBJECT" >> $GITHUB_OUTPUT
 
           FILE="${{ github.event.client_payload.email_file }}"
-          if [ -z "$FILE" ]; then
-            FILE="${{ github.event.inputs.email_file }}"
-          fi
-          if [ -z "$FILE" ]; then
-            FILE="team_plan_email.html"
-          fi
+          if [ -z "$FILE" ]; then FILE="${{ github.event.inputs.email_file }}"; fi
+          if [ -z "$FILE" ]; then FILE="team_plan_email.html"; fi
           echo "email_file=$FILE" >> $GITHUB_OUTPUT
 
       - name: Send team plan email
@@ -56,9 +48,8 @@ jobs:
         env:
           EMAIL_FROM:         ${{ secrets.EMAIL_FROM }}
           EMAIL_PASSWORD:     ${{ secrets.EMAIL_PASSWORD }}
-          DESIGNER1_EMAIL:    ${{ secrets.DESIGNER1_EMAIL }}
-          DESIGNER2_EMAIL:    ${{ secrets.DESIGNER2_EMAIL }}
-          VIDEO_EDITOR_EMAIL: ${{ secrets.VIDEO_EDITOR_EMAIL }}
+          BRITTANY_EMAIL:     ${{ secrets.BRITTANY_EMAIL }}
+          DIANA_EMAIL:        ${{ secrets.DIANA_EMAIL }}
           MANAGER_EMAIL:      ${{ secrets.MANAGER_EMAIL }}
           UPLOAD_TOKEN:       ${{ secrets.UPLOAD_TOKEN }}
           GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
