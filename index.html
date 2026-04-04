@@ -102,13 +102,22 @@ body::before {
 .modal-btn:hover { background:#8A0504; }
 .modal-note { color:var(--charcoal3); font-size:10px; margin-top:10px; text-align:center; }
 
-/* TOPBAR — exact match to mockup */
+/* TOPBAR + TAB-BAR — visually part of the shell even though outside studio-wrap in DOM */
+/* Body has padding-top so the shell has breathing room below the sticky topbar */
+body { padding-top: 0; }
+
+/* Topbar is the top of the shell */
 #topbar {
   background:#ffffff;
   border-bottom:0.5px solid rgba(26,26,26,0.1);
   padding:12px 20px;
   display:flex; align-items:center; justify-content:space-between;
   position:sticky; top:0; z-index:100;
+  max-width:1080px;
+  margin:12px auto 0 auto;
+  border-radius:12px 12px 0 0;
+  border:0.5px solid rgba(26,26,26,0.1);
+  border-bottom:0.5px solid rgba(26,26,26,0.1);
 }
 .logo-brand { font-size:12px; font-weight:500; color:#666; letter-spacing:1px; text-transform:uppercase; font-family:'Inter',sans-serif; }
 .logo-brand span { color:#FF5740; }
@@ -125,12 +134,16 @@ body::before {
   font-family:'Inter',sans-serif;
 }
 
-/* TABS — exact match to mockup .nav */
+/* TABS — connects directly below topbar as part of the visual shell */
 #tab-bar {
   background:#ffffff;
   border-bottom:0.5px solid rgba(26,26,26,0.1);
-  padding:0 20px; display:flex; position:sticky; top:45px; z-index:99; display:none;
+  border-left:0.5px solid rgba(26,26,26,0.1);
+  border-right:0.5px solid rgba(26,26,26,0.1);
+  padding:0 20px; display:flex; position:sticky; top:49px; z-index:99; display:none;
   overflow-x:auto;
+  max-width:1080px;
+  margin:0 auto;
 }
 .tab-btn {
   background:transparent; border:none; padding:10px 14px;
@@ -147,21 +160,30 @@ body::before {
    CSS variables replaced with real hex values
 ═══════════════════════════════════════════════ */
 
-/* Shell container — the mockup wraps everything in a max-width shell */
-#studio-wrap, #tab-dashboard, #tab-studio, #tab-planner,
+/* Shell container — white card sitting on warm #f0ede8 body background, matching mockup */
+#studio-wrap {
+  background: #ffffff;
+  border: 0.5px solid rgba(26,26,26,0.1);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+  max-width: 1080px;
+  margin: 0 auto 32px auto;
+}
+#tab-dashboard, #tab-studio, #tab-planner,
 #tab-sendhub, #tab-emailpreview, #tab-voiceovers, #tab-knowledge {
   background: #ffffff;
 }
 
 /* Main area — matches mockup padding */
-#main { max-width:1100px; margin:0 auto; padding:20px; position:relative; z-index:1; }
+/* NOTE: single rule below at MAIN section — this one removed to avoid cascade conflict */
 
 /* CARD — exact mockup .card */
 .dash-card, .panel, .v2-card {
   background: #ffffff !important;
   border: 0.5px solid rgba(26,26,26,0.1) !important;
   border-radius: 12px !important;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: none !important;
 }
 
@@ -284,7 +306,7 @@ body::before {
 
 
 /* MAIN */
-#main { max-width:1100px; margin:0 auto; padding:28px 28px; position:relative; z-index:1; }
+#main { max-width:1080px; margin:0 auto; padding:20px; position:relative; z-index:1; }
 
 /* LANDING */
 #landing {
@@ -4945,14 +4967,14 @@ async function sendTeamPlanEmail(isTest) {
   var btn      = document.getElementById(btnId);
   var statusEl = document.getElementById('send-team-status');
 
-  if (isTest) {
-    var testEmail = localStorage.getItem('tiffany_ep_email_test') || '';
-    if (!testEmail) { alert('No test email saved. Enter your test email in the Email Preview settings first.'); return; }
-  }
-
   var originalText = btn.textContent;
   btn.disabled = true;
   btn.textContent = isTest ? 'Sending test...' : 'Sending to team...';
+
+  // Two completely separate event types — no flags, no variables to misread
+  // send_team_plan_test  → ERICA ONLY (ebeprinc@gmail.com). Period.
+  // send_team_plan_live  → Brittany + Diana. Erica CC'd always.
+  var eventType = isTest ? 'send_team_plan_test' : 'send_team_plan_live';
 
   try {
     var parts = repoFull.split('/');
@@ -4966,38 +4988,44 @@ async function sendTeamPlanEmail(isTest) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          event_type: 'send_team_plan_email',
+          event_type: eventType,
           client_payload: {
-            subject:    'THCO Content Plan: April 5 to May 4',
-            email_file: 'team_plan_email.html',
-            is_test:    isTest
+            subject:    'THCO Content Plan: Week 1',
+            email_file: 'team_plan_email.html'
           }
         })
       }
     );
 
     if (res.status === 204 || res.status === 200) {
-      btn.textContent = isTest ? 'Test Sent!' : 'Sent to Team!';
-      btn.style.background = 'var(--green)';
-      if (isTest) { btn.style.border = 'none'; }
+      btn.textContent = isTest ? 'Test Sent to Erica!' : 'Sent to Team!';
+      btn.style.background = '#3A9E6E';
+      if (isTest) { btn.style.color = 'white'; btn.style.border = 'none'; }
       if (statusEl) {
         statusEl.textContent = isTest
-          ? 'Test email triggered. Check your inbox in about 30 seconds.'
-          : 'Team email triggered. Brittany and Diana will receive it in about 30 seconds.';
+          ? 'Test sent to ebeprinc@gmail.com only. Brittany and Diana NOT included.'
+          : 'Sent to Brittany and Diana. Erica CC\'d.';
         statusEl.style.display = 'block';
+        statusEl.style.color = isTest ? '#B87830' : '#3A9E6E';
       }
       setTimeout(function() {
         btn.disabled = false;
         btn.textContent = originalText;
-        btn.style.background = isTest ? 'transparent' : 'var(--amber)';
-        if (isTest) { btn.style.border = '1.5px solid var(--amber)'; }
+        if (isTest) {
+          btn.style.background = 'transparent';
+          btn.style.color = 'var(--coral)';
+          btn.style.border = '1px solid var(--coral)';
+        } else {
+          btn.style.background = 'var(--coral)';
+          btn.style.color = 'white';
+        }
       }, 6000);
     } else {
       var errText = await res.text();
       throw new Error('Workflow trigger returned ' + res.status + ': ' + errText);
     }
   } catch(e) {
-    alert('Could not trigger team email: ' + e.message);
+    alert('Could not trigger email: ' + e.message);
     btn.disabled = false;
     btn.textContent = originalText;
     console.error(e);
