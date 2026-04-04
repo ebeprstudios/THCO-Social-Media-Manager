@@ -8,14 +8,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* EBEPR Studios interior palette */
   --cream-1:#ffffff;
   --cream-2:#f7f6f3;
   --cream-3:#e8e5de;
-  /* Coral replaces red throughout — cascades to every existing element */
   --red:#FF5740; --red-dim:rgba(255,87,64,0.07); --red-mid:rgba(255,87,64,0.2);
   --charcoal:#1a1a1a; --charcoal2:#444444; --charcoal3:#888888; --charcoal4:#b8b8b8;
-  --border:rgba(26,26,26,0.08); --border-md:rgba(26,26,26,0.14);
+  --border:rgba(26,26,26,0.08); --border-md:rgba(26,26,26,0.1);
   --shadow:rgba(26,26,26,0.06);
   --green:#3A9E6E; --green-bg:rgba(58,158,110,0.08);
   --amber:#B87830; --amber-bg:rgba(184,120,48,0.08);
@@ -23,12 +21,23 @@
   --purple:#6A50A8; --purple-bg:rgba(106,80,168,0.08);
   --coral:#FF5740; --coral-dark:#CC3D29; --coral-dim:rgba(255,87,64,0.07); --coral-mid:rgba(255,87,64,0.2);
   --ink:#0d0d0d;
+  /* MOCKUP TOKENS — exact match to uploaded design */
+  --bg-primary:#ffffff;
+  --bg-secondary:#f7f6f3;
+  --bg-tertiary:#f0ede8;
+  --txt-primary:#1a1a1a;
+  --txt-secondary:#666666;
+  --txt-tertiary:#999999;
+  --bdr-tertiary:rgba(26,26,26,0.1);
+  --bdr-secondary:rgba(26,26,26,0.18);
+  --radius-lg:12px;
+  --radius-md:8px;
 }
 
 * { box-sizing:border-box; margin:0; padding:0; }
 html { scroll-behavior:smooth; }
 body {
-  background:#f7f6f3; color:var(--charcoal);
+  background:#f0ede8; color:#1a1a1a;
   font-family:'Inter',sans-serif; font-size:13px;
   line-height:1.6; min-height:100vh; -webkit-font-smoothing:antialiased;
 }
@@ -93,39 +102,186 @@ body::before {
 .modal-btn:hover { background:#8A0504; }
 .modal-note { color:var(--charcoal3); font-size:10px; margin-top:10px; text-align:center; }
 
-/* TOPBAR */
+/* TOPBAR — exact match to mockup */
 #topbar {
-  background:#ffffff; border-bottom:1px solid var(--border-md);
-  padding:10px 28px; display:flex; align-items:center; justify-content:space-between;
-  position:sticky; top:0; z-index:100; border-top:2px solid var(--coral);
+  background:#ffffff;
+  border-bottom:0.5px solid rgba(26,26,26,0.1);
+  padding:12px 20px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
 }
-.logo-brand { font-family:'Cormorant Garamond',serif; font-size:9px; font-weight:500; color:var(--charcoal3); letter-spacing:4px; text-transform:uppercase; }
-.logo-title { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; color:var(--charcoal); line-height:1.1; }
-.logo-accent { color:var(--red); }
+.logo-brand { font-size:12px; font-weight:500; color:#666; letter-spacing:1px; text-transform:uppercase; font-family:'Inter',sans-serif; }
+.logo-brand span { color:#FF5740; }
 .topbar-right { display:flex; align-items:center; gap:8px; }
 .tb-btn {
-  background:transparent; border:1px solid var(--border-md); color:var(--charcoal2);
-  padding:6px 13px; font-family:'Inter',sans-serif; font-size:11px; font-weight:500;
-  cursor:pointer; border-radius:5px; transition:all 0.15s;
+  background:transparent; border:0.5px solid rgba(26,26,26,0.18); color:#666;
+  padding:5px 10px; font-family:'Inter',sans-serif; font-size:11px; font-weight:500;
+  cursor:pointer; border-radius:8px; transition:all 0.15s;
 }
-.tb-btn:hover { border-color:var(--red); color:var(--red); }
+.tb-btn:hover { border-color:#FF5740; color:#FF5740; }
+.status-pill {
+  background:#f7f6f3; border:0.5px solid rgba(26,26,26,0.1);
+  border-radius:20px; padding:4px 10px; font-size:11px; color:#666;
+  font-family:'Inter',sans-serif;
+}
 
-/* TABS */
+/* TABS — exact match to mockup .nav */
 #tab-bar {
-  background:#ffffff; border-bottom:1px solid var(--border-md);
-  padding:0 28px; display:flex; position:sticky; top:55px; z-index:99; display:none;
+  background:#ffffff;
+  border-bottom:0.5px solid rgba(26,26,26,0.1);
+  padding:0 20px; display:flex; position:sticky; top:45px; z-index:99; display:none;
+  overflow-x:auto;
 }
 .tab-btn {
-  background:transparent; border:none; padding:12px 20px;
-  font-family:'Inter',sans-serif; font-size:12px; font-weight:500;
-  color:var(--charcoal3); cursor:pointer; border-bottom:2px solid transparent;
+  background:transparent; border:none; padding:10px 14px;
+  font-family:'Inter',sans-serif; font-size:12px; font-weight:400;
+  color:#666; cursor:pointer; border-bottom:2px solid transparent;
   transition:all 0.15s; white-space:nowrap;
 }
-.tab-btn:hover { color:var(--charcoal); }
-.tab-btn.active { color:var(--coral); border-bottom-color:var(--coral); font-weight:600; }
+.tab-btn:hover { color:#1a1a1a; }
+.tab-btn.active { color:#FF5740; border-bottom-color:#FF5740; font-weight:500; }
 
-/* SEND HUB */
-.sh-card { background:var(--cream-1);border:1px solid var(--border-md);border-radius:12px;overflow:hidden;box-shadow:0 2px 10px var(--shadow); }
+/* ═══════════════════════════════════════════════
+   MOCKUP-EXACT CSS
+   Translated from uploaded thco_content_studio_redesign.html
+   CSS variables replaced with real hex values
+═══════════════════════════════════════════════ */
+
+/* Shell container — the mockup wraps everything in a max-width shell */
+#studio-wrap, #tab-dashboard, #tab-studio, #tab-planner,
+#tab-sendhub, #tab-emailpreview, #tab-voiceovers, #tab-knowledge {
+  background: #ffffff;
+}
+
+/* Main area — matches mockup padding */
+#main { max-width:1100px; margin:0 auto; padding:20px; position:relative; z-index:1; }
+
+/* CARD — exact mockup .card */
+.dash-card, .panel, .v2-card {
+  background: #ffffff !important;
+  border: 0.5px solid rgba(26,26,26,0.1) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+
+/* Dark card headers */
+.dash-card-header, .card-header {
+  background: #0d0d0d !important;
+  border-bottom: 0.5px solid rgba(255,255,255,0.06) !important;
+  padding: 10px 16px !important;
+}
+.dash-card-name  { color: #ffffff !important; font-size:12px !important; font-weight:500 !important; }
+.dash-card-desc  { color: rgba(255,255,255,0.45) !important; font-size:10px !important; }
+.dash-card-body  { background: #ffffff; }
+.card-title      { color: #ffffff !important; }
+
+/* CARD LABEL — mockup .card-label */
+.card-label-v2, .panel-eyebrow {
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #999 !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  margin-bottom: 10px !important;
+  font-family: 'Inter', sans-serif !important;
+}
+.panel-eyebrow { color: #FF5740 !important; }
+
+/* STAT — mockup .stat */
+.v2-stat-num { font-size:24px; font-weight:500; color:#1a1a1a; line-height:1; }
+.v2-stat-label { font-size:11px; color:#666; margin-top:4px; }
+.v2-stat { background:#ffffff; border:0.5px solid rgba(26,26,26,0.1); border-radius:12px; padding:14px; }
+.v2-stat-sub { font-size:11px; color:#666; margin-top:8px; padding-top:8px; border-top:0.5px solid rgba(26,26,26,0.1); }
+
+/* DIVIDER */
+.v2-divider { height:0.5px; background:rgba(26,26,26,0.1); margin:10px 0; }
+
+/* BADGES — exact mockup */
+.badge-open    { background:rgba(255,87,64,0.1); color:#CC3D29; }
+.badge-done    { background:rgba(58,158,110,0.1); color:#1E6B48; }
+.badge-pending { background:rgba(184,120,48,0.1); color:#7A4E0D; }
+
+/* SLOTS — exact mockup */
+.v2-slot { display:flex; align-items:flex-start; gap:8px; padding:7px 0; border-bottom:0.5px solid rgba(26,26,26,0.1); }
+.v2-slot:last-child { border-bottom:none; }
+.v2-slot-dot { width:7px; height:7px; border-radius:50%; background:#FF5740; flex-shrink:0; margin-top:4px; }
+.v2-slot-day { font-size:11px; font-weight:500; color:#666; min-width:70px; }
+.v2-slot-title { font-size:12px; color:#1a1a1a; font-weight:500; }
+.v2-slot-note { font-size:11px; color:#666; margin-top:1px; }
+.v2-badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:10px; font-weight:500; }
+.v2-badge-open { background:rgba(255,87,64,0.1); color:#CC3D29; }
+.v2-badge-done { background:rgba(58,158,110,0.1); color:#1E6B48; }
+
+/* DECLARATION ROWS — exact mockup */
+.v2-decl { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:0.5px solid rgba(26,26,26,0.1); }
+.v2-decl:last-child { border-bottom:none; }
+.v2-decl-num { width:18px; height:18px; border-radius:3px; background:#f7f6f3; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:500; color:#666; flex-shrink:0; }
+.v2-decl-num.active { background:#FF5740; color:#fff; }
+.v2-decl-date { font-size:11px; color:#666; min-width:72px; }
+.v2-decl-title { font-size:12px; color:#1a1a1a; }
+.v2-decl-note { font-size:10px; color:#999; margin-left:auto; white-space:nowrap; }
+
+/* CALENDAR — exact mockup */
+.v2-cal { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top:4px; }
+.v2-cal-hdr { font-size:9px; color:#999; text-align:center; padding:2px 0; font-weight:500; }
+.v2-cal-day { border-radius:4px; padding:5px 4px; min-height:44px; border:0.5px solid rgba(26,26,26,0.1); font-size:9px; background:#ffffff; }
+.v2-cal-day.bridge  { background:rgba(255,87,64,0.05); border-color:rgba(255,87,64,0.2); }
+.v2-cal-day.has-spi { border-top:2px solid #FF5740; }
+.v2-cal-day.has-biz { border-top:2px solid #0d0d0d; }
+.v2-cal-day.has-open{ border-top:2px dashed #FF5740; background:rgba(255,87,64,0.04); }
+.v2-cal-day.has-decl{ border-top:2px solid #B87830; }
+.v2-cal-day.empty   { background:#f7f6f3; border-color:transparent; }
+.v2-cal-num  { color:#999; font-size:9px; font-weight:500; margin-bottom:2px; }
+.v2-cal-name { color:#1a1a1a; font-size:9px; line-height:1.3; font-weight:500; }
+
+/* SEND BLOCKS — exact mockup */
+.v2-send-block { border:0.5px solid rgba(26,26,26,0.1); border-radius:8px; padding:10px 12px; margin-bottom:8px; }
+.v2-send-who   { font-size:11px; color:#666; font-weight:500; margin-bottom:4px; }
+.v2-send-email { font-size:11px; color:#999; margin-bottom:8px; }
+.v2-btn-row    { display:flex; gap:6px; }
+.v2-btn-primary{ background:#FF5740; color:white; border:0.5px solid #FF5740; padding:5px 10px; border-radius:8px; font-size:11px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; }
+.v2-btn-ghost  { background:transparent; color:#FF5740; border:0.5px solid #FF5740; padding:5px 10px; border-radius:8px; font-size:11px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; }
+.v2-btn-default{ background:transparent; color:#666; border:0.5px solid rgba(26,26,26,0.18); padding:5px 10px; border-radius:8px; font-size:11px; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; }
+.v2-send-status{ font-size:10px; color:#999; margin-top:6px; display:flex; align-items:center; gap:4px; }
+.v2-send-dot   { width:5px; height:5px; border-radius:50%; background:#3A9E6E; flex-shrink:0; }
+
+/* BANNER — exact mockup */
+.v2-banner { background:rgba(255,87,64,0.06); border:0.5px solid rgba(255,87,64,0.2); border-radius:8px; padding:8px 12px; font-size:11px; color:#CC3D29; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+.v2-banner-icon { width:14px; height:14px; border-radius:50%; background:#FF5740; color:white; display:flex; align-items:center; justify-content:center; font-size:8px; flex-shrink:0; }
+
+/* SECTION HEADER */
+.v2-section-header { font-size:11px; font-weight:500; color:#666; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; }
+
+/* LEGEND */
+.v2-legend { display:flex; gap:10px; flex-wrap:wrap; }
+.v2-leg-item { display:flex; align-items:center; gap:4px; font-size:10px; color:#666; }
+.v2-leg-line { width:14px; height:2px; border-radius:1px; }
+
+/* Panel title */
+.panel-title { font-family:'Inter',sans-serif !important; font-size:16px !important; font-weight:600 !important; color:#1a1a1a !important; }
+
+/* Primary buttons → coral */
+.btn-primary { background:#FF5740 !important; border-color:#FF5740 !important; }
+.btn-primary:hover { background:#CC3D29 !important; }
+.landing-btn { background:#FF5740 !important; }
+
+/* Dash header */
+.dash-title { font-family:'Inter',sans-serif !important; font-size:18px !important; font-weight:600 !important; color:#1a1a1a !important; }
+.dash-sub { color:#666 !important; }
+
+/* Remove old box shadows from panels */
+.card, .panel, .dash-card { box-shadow: none !important; }
+
+/* Profile panel */
+#profile-panel { background:#ffffff !important; border:0.5px solid rgba(26,26,26,0.1) !important; border-radius:12px !important; }
+.profile-header { background:#0d0d0d; border-radius:12px 12px 0 0; margin:-18px -22px 14px; padding:10px 22px; }
+.profile-title { color:#ffffff !important; font-family:'Inter',sans-serif !important; font-size:12px !important; font-weight:500 !important; }
+
+/* Quad grid for content cards */
+.quad-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; }
+
+
 
 /* MAIN */
 #main { max-width:1100px; margin:0 auto; padding:28px 28px; position:relative; z-index:1; }
@@ -481,44 +637,40 @@ body::before {
 
 <!-- TOPBAR -->
 <div id="topbar">
-  <div style="display:flex;align-items:center;gap:14px;">
-    <div style="border-right:1px solid var(--border-md);padding-right:14px;">
-      <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:700;color:var(--coral);letter-spacing:3px;text-transform:uppercase;margin-bottom:2px;">EBEPR Studios</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--charcoal);line-height:1.1;">THCO <span style="color:var(--coral);">·</span> Content Studio <span style="font-size:11px;font-weight:400;color:var(--charcoal3);">v2.0</span></div>
-    </div>
-    <!-- CLOCKS -->
+  <div class="logo-brand">THCO &nbsp;·&nbsp; <span>Content Studio</span> <span style="color:#999;font-weight:400">v2.0</span></div>
+  <div style="display:flex;align-items:center;gap:10px;">
     <div style="display:flex;align-items:center;gap:8px;">
-      <div style="text-align:center;background:rgba(65,65,65,0.06);border:1px solid var(--border-md);border-radius:8px;padding:4px 10px;min-width:80px;">
-        <div style="font-size:7px;font-weight:700;color:var(--coral);letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">EST</div>
-        <div id="clock-est" style="font-size:13px;font-weight:700;color:var(--charcoal);font-variant-numeric:tabular-nums;letter-spacing:0.5px;">--:--</div>
-        <div id="date-est" style="font-size:9px;color:var(--charcoal3);margin-top:1px;"></div>
+      <div style="text-align:center;background:#f7f6f3;border:0.5px solid rgba(26,26,26,0.1);border-radius:8px;padding:4px 10px;min-width:76px;">
+        <div style="font-size:7px;font-weight:700;color:#FF5740;letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">EST</div>
+        <div id="clock-est" style="font-size:12px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums;">--:--</div>
+        <div id="date-est" style="font-size:8px;color:#999;margin-top:1px;"></div>
       </div>
-      <div style="text-align:center;background:rgba(65,65,65,0.06);border:1px solid var(--border-md);border-radius:8px;padding:4px 10px;min-width:80px;">
-        <div style="font-size:7px;font-weight:700;color:var(--charcoal3);letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">CST</div>
-        <div id="clock-cst" style="font-size:13px;font-weight:700;color:var(--charcoal);font-variant-numeric:tabular-nums;letter-spacing:0.5px;">--:--</div>
-        <div id="date-cst" style="font-size:9px;color:var(--charcoal3);margin-top:1px;"></div>
+      <div style="text-align:center;background:#f7f6f3;border:0.5px solid rgba(26,26,26,0.1);border-radius:8px;padding:4px 10px;min-width:76px;">
+        <div style="font-size:7px;font-weight:700;color:#999;letter-spacing:2px;text-transform:uppercase;margin-bottom:1px;">CST</div>
+        <div id="clock-cst" style="font-size:12px;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums;">--:--</div>
+        <div id="date-cst" style="font-size:8px;color:#999;margin-top:1px;"></div>
       </div>
     </div>
-  </div>
-  <div class="topbar-right">
-    <button class="tb-btn" onclick="exportProfile()">Export Profile</button>
-    <button class="tb-btn" onclick="importProfileClick()">Import Profile</button>
-    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importProfile(event)" />
-    <button class="tb-btn" onclick="showKeyModal()">API Key</button>
-    <button class="tb-btn" onclick="window.print()">Print</button>
-    <button class="tb-btn" id="send-report-btn" onclick="sendMonthlyReport()" style="border-color:var(--coral);color:var(--coral);">Send Report</button>
+    <div class="status-pill" id="cycle-status-pill">Cycle: Apr 5 – May 4, 2026</div>
+    <div class="topbar-right">
+      <button class="tb-btn" onclick="exportProfile()">Export</button>
+      <button class="tb-btn" onclick="importProfileClick()">Import</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importProfile(event)" />
+      <button class="tb-btn" onclick="showKeyModal()">API Key</button>
+      <button class="tb-btn" id="send-report-btn" onclick="sendMonthlyReport()" style="border-color:#FF5740;color:#FF5740;">Report</button>
+    </div>
   </div>
 </div>
 
-<!-- TAB BAR -->
+<!-- TAB BAR — matches mockup .nav exactly -->
 <div id="tab-bar">
   <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
   <button class="tab-btn" onclick="switchTab('studio')">Transcript to Content</button>
   <button class="tab-btn" onclick="switchTab('planner')">Plan Builder</button>
-  <button class="tab-btn" onclick="switchTab('sendhub')" id="tab-btn-sendhub">Send Hub</button>
-  <button class="tab-btn" onclick="switchTab('emailpreview')">Email Preview</button>
+  <button class="tab-btn" onclick="switchTab('sendhub')" id="tab-btn-sendhub">Send Hub <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#FF5740;margin-left:4px;vertical-align:middle;"></span></button>
   <button class="tab-btn" onclick="switchTab('voiceovers')">Voiceovers</button>
   <button class="tab-btn" onclick="switchTab('knowledge')">Knowledge Base</button>
+  <button class="tab-btn" onclick="switchTab('emailpreview')">Email Preview</button>
 </div>
 
 <!-- MAIN -->
@@ -562,94 +714,190 @@ body::before {
     <!-- TAB: DASHBOARD -->
     <div id="tab-dashboard" class="tab-pane active">
 
-      <div class="dash-header">
+      <!-- HEADER -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
         <div>
-          <div class="dash-title">Weekly Content Dashboard</div>
-          <div class="dash-sub" id="dash-last">Not yet generated</div>
+          <div style="font-size:10px;font-weight:700;color:var(--coral);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Command Center</div>
+          <div class="dash-title">THCO Content Studio</div>
+          <div class="dash-sub" id="dash-last">Cycle: April 5 – May 4, 2026</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <button class="btn-secondary" id="test-conn-btn" onclick="testConnection()">Test Connection</button>
-          <button class="btn-primary" id="dash-gen-btn" onclick="generateDashboard()">Generate From Script</button>
+          <button onclick="switchTab('planner')" style="background:var(--coral);color:white;border:none;padding:8px 18px;border-radius:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Open Plan Builder</button>
+        </div>
+      </div>
+
+      <!-- OPEN SLOTS BANNER -->
+      <div class="v2-banner">
+        <div class="v2-banner-dot"></div>
+        <strong>5 open slots need ideas</strong> — Fri Apr 10 Lifestyle, Fri Apr 11 Shenanigans, and 3 Friday slots in the main cycle. Drop references in Notion before the Wednesday prior.
+      </div>
+
+      <!-- STAT CARDS ROW -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;">
+        <div class="v2-stat">
+          <div class="v2-stat-num">Bridge</div>
+          <div class="v2-stat-label">This Week</div>
+          <div class="v2-stat-sub">Apr 5–12 &nbsp;·&nbsp; <span style="color:var(--coral);">2 slots open</span></div>
+        </div>
+        <div class="v2-stat">
+          <div class="v2-stat-num">17</div>
+          <div class="v2-stat-label">Posts mapped Apr 14 – May 4</div>
+          <div class="v2-stat-sub">8 Business &nbsp;·&nbsp; 6 Spiritual &nbsp;·&nbsp; 3 Carousels</div>
+        </div>
+        <div class="v2-stat">
+          <div class="v2-stat-num">May 12</div>
+          <div class="v2-stat-label">Next shoot deadline</div>
+          <div class="v2-stat-sub">4 pieces carry from batch 2</div>
+        </div>
+      </div>
+
+      <!-- TWO COLUMN: OPEN SLOTS + DECLARATIONS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
+
+        <!-- OPEN SLOTS -->
+        <div style="background:#fff;border:1px solid #e8e5de;border-radius:10px;overflow:hidden;box-shadow:0 1px 8px rgba(26,26,26,0.06);">
+          <div style="background:#0d0d0d;padding:11px 16px;">
+            <div style="font-size:9px;font-weight:700;color:var(--coral);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;">Action Required</div>
+            <div style="font-size:13px;font-weight:600;color:#fff;">Open Slots</div>
+          </div>
+          <div style="padding:14px 16px;">
+            <div class="v2-slot"><div class="v2-slot-dot"></div><div class="v2-slot-day">Thu Apr 10</div><div><div class="v2-slot-title">Lifestyle</div><div class="v2-slot-note">Diana sending ideas</div></div><span class="v2-badge v2-badge-open" style="margin-left:auto;">Bridge</span></div>
+            <div class="v2-slot"><div class="v2-slot-dot"></div><div class="v2-slot-day">Fri Apr 11</div><div><div class="v2-slot-title">Shenanigans</div><div class="v2-slot-note">Diana sending ideas</div></div><span class="v2-badge v2-badge-open" style="margin-left:auto;">Bridge</span></div>
+            <div class="v2-slot"><div class="v2-slot-dot"></div><div class="v2-slot-day">Fri Apr 18</div><div><div class="v2-slot-title">Lifestyle / Shenanigans</div><div class="v2-slot-note">Ideas by Wed Apr 9</div></div><span class="v2-badge v2-badge-open" style="margin-left:auto;">Wk 1</span></div>
+            <div class="v2-slot"><div class="v2-slot-dot"></div><div class="v2-slot-day">Fri Apr 25</div><div><div class="v2-slot-title">Lifestyle / Shenanigans</div><div class="v2-slot-note">Ideas by Wed Apr 16</div></div><span class="v2-badge v2-badge-open" style="margin-left:auto;">Wk 2</span></div>
+            <div class="v2-slot"><div class="v2-slot-dot"></div><div class="v2-slot-day">Fri May 2</div><div><div class="v2-slot-title">Lifestyle / Shenanigans</div><div class="v2-slot-note">Ideas by Wed Apr 23</div></div><span class="v2-badge v2-badge-open" style="margin-left:auto;">Wk 3</span></div>
+          </div>
+        </div>
+
+        <!-- DECLARATION SERIES -->
+        <div style="background:#fff;border:1px solid #e8e5de;border-radius:10px;overflow:hidden;box-shadow:0 1px 8px rgba(26,26,26,0.06);">
+          <div style="background:#0d0d0d;padding:11px 16px;">
+            <div style="font-size:9px;font-weight:700;color:#B87830;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;">Every Sunday</div>
+            <div style="font-size:13px;font-weight:600;color:#fff;">Declaration Series</div>
+          </div>
+          <div style="padding:14px 16px;">
+            <div class="v2-decl"><div class="v2-decl-num" style="background:rgba(58,158,110,0.15);color:#1E6B48;">✓</div><div class="v2-decl-date">Sat Apr 12</div><div class="v2-decl-title" style="color:#888;">3 Declarations over Your Mind</div></div>
+            <div class="v2-decl"><div class="v2-decl-num active">→</div><div class="v2-decl-date">Sun Apr 20</div><div class="v2-decl-title">3 Declarations Before the Week Begins</div></div>
+            <div class="v2-decl"><div class="v2-decl-num">–</div><div class="v2-decl-date">Sun Apr 27</div><div class="v2-decl-title" style="color:#aaa;">Reva Challenge Launch</div><div class="v2-decl-note">Paused</div></div>
+            <div class="v2-decl"><div class="v2-decl-num">4</div><div class="v2-decl-date">Sun May 4</div><div class="v2-decl-title">3 Declarations over Your Kids</div></div>
+            <div class="v2-decl"><div class="v2-decl-num" style="color:#ccc;">5</div><div class="v2-decl-date">Sun May 11</div><div class="v2-decl-title" style="color:#ccc;">3 Declarations over Your Marriage</div><div class="v2-decl-note">Next cycle</div></div>
+            <div style="margin-top:10px;padding:8px 10px;background:rgba(184,120,48,0.06);border-radius:5px;font-size:10px;color:#B87830;">All declarations rooted in scripture. Reference verse by book, chapter, verse.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CONTENT CALENDAR -->
+      <div style="background:#fff;border:1px solid #e8e5de;border-radius:10px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 8px rgba(26,26,26,0.06);">
+        <div style="background:#0d0d0d;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:9px;font-weight:700;color:var(--coral);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;">Apr 5 – May 4</div>
+            <div style="font-size:13px;font-weight:600;color:#fff;">Content Calendar</div>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,0.5);"><span style="display:inline-block;width:10px;height:2px;background:var(--coral);"></span>Spiritual</span>
+            <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,0.5);"><span style="display:inline-block;width:10px;height:2px;background:#fff;"></span>Business</span>
+            <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,0.5);"><span style="display:inline-block;width:10px;height:2px;background:#B87830;"></span>Declaration</span>
+            <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:rgba(255,255,255,0.5);"><span style="display:inline-block;width:10px;border-top:1.5px dashed var(--coral);"></span>Open</span>
+          </div>
+        </div>
+        <div style="padding:14px 16px;">
+          <div class="v2-cal">
+            <div class="v2-cal-hdr">Mon</div><div class="v2-cal-hdr">Tue</div><div class="v2-cal-hdr">Wed</div><div class="v2-cal-hdr">Thu</div><div class="v2-cal-hdr">Fri</div><div class="v2-cal-hdr">Sat</div><div class="v2-cal-hdr">Sun</div>
+            <div class="v2-cal-day empty"></div><div class="v2-cal-day empty"></div><div class="v2-cal-day empty"></div><div class="v2-cal-day empty"></div><div class="v2-cal-day empty"></div>
+            <div class="v2-cal-day bridge has-spi"><div class="v2-cal-num">Apr 5</div><div class="v2-cal-name">Resurrection Sunday</div></div>
+            <div class="v2-cal-day empty"></div>
+            <div class="v2-cal-day empty"></div><div class="v2-cal-day empty"></div>
+            <div class="v2-cal-day bridge has-biz"><div class="v2-cal-num">Apr 9</div><div class="v2-cal-name">Marriage Intensive</div></div>
+            <div class="v2-cal-day bridge has-open"><div class="v2-cal-num">Apr 10</div><div class="v2-cal-name" style="color:var(--coral);">Lifestyle ···</div></div>
+            <div class="v2-cal-day bridge has-open"><div class="v2-cal-num">Apr 11</div><div class="v2-cal-name" style="color:var(--coral);">Shenanigans ···</div></div>
+            <div class="v2-cal-day bridge has-decl"><div class="v2-cal-num">Apr 12</div><div class="v2-cal-name">3 Decl. Mind</div></div>
+            <div class="v2-cal-day empty"></div>
+            <div class="v2-cal-day has-biz"><div class="v2-cal-num">Apr 14</div><div class="v2-cal-name">Driving to Job</div></div>
+            <div class="v2-cal-day has-spi"><div class="v2-cal-num">Apr 15</div><div class="v2-cal-name">Empire vs Sandcastle</div></div>
+            <div class="v2-cal-day has-biz"><div class="v2-cal-num">Apr 16</div><div class="v2-cal-name">Overtime Backup</div></div>
+            <div class="v2-cal-day has-spi"><div class="v2-cal-num">Apr 17</div><div class="v2-cal-name">Be Realistic</div></div>
+            <div class="v2-cal-day has-open"><div class="v2-cal-num">Apr 18</div><div class="v2-cal-name" style="color:var(--coral);">Open ···</div></div>
+            <div class="v2-cal-day has-biz"><div class="v2-cal-num">Apr 19</div><div class="v2-cal-name">Introvert vs Fear</div></div>
+            <div class="v2-cal-day has-decl"><div class="v2-cal-num">Apr 20</div><div class="v2-cal-name">3 Decl. Week</div></div>
+            <div class="v2-cal-day has-biz"><div class="v2-cal-num">Apr 21</div><div class="v2-cal-name">Money Mondays</div></div>
+            <div class="v2-cal-day has-spi"><div class="v2-cal-num">Apr 22</div><div class="v2-cal-name">David Heart</div></div>
+            <div class="v2-cal-day has-biz"><div class="v2-cal-num">Apr 23</div><div class="v2-cal-name">Empty Room</div></div>
+            <div class="v2-cal-day has-spi"><div class="v2-cal-num">Apr 24</div><div class="v2-cal-name">Hidden in Christ</div></div>
+            <div class="v2-cal-day has-open"><div class="v2-cal-num">Apr 25</div><div class="v2-cal-name" style="color:var(--coral);">Open ···</div></div>
+            <div class="v2-cal-day has-biz"><div class="v2-cal-num">Apr 26</div><div class="v2-cal-name">Business Advice</div></div>
+            <div class="v2-cal-day has-decl" style="border-top-color:var(--coral);"><div class="v2-cal-num">Apr 27</div><div class="v2-cal-name">Reva Launch</div></div>
+            <div class="v2-cal-day has-biz"><div class="v2-cal-num">Apr 28</div><div class="v2-cal-name">Financial Prayer</div></div>
+            <div class="v2-cal-day has-spi"><div class="v2-cal-num">Apr 29</div><div class="v2-cal-name">Ambassador</div></div>
+            <div class="v2-cal-day has-biz"><div class="v2-cal-num">Apr 30</div><div class="v2-cal-name">Quiet the Noise</div></div>
+            <div class="v2-cal-day has-spi"><div class="v2-cal-num">May 1</div><div class="v2-cal-name">Date w/ Holy Spirit</div></div>
+            <div class="v2-cal-day has-open"><div class="v2-cal-num">May 2</div><div class="v2-cal-name" style="color:var(--coral);">Open ···</div></div>
+            <div class="v2-cal-day has-biz"><div class="v2-cal-num">May 3</div><div class="v2-cal-name">Don't Uproot</div></div>
+            <div class="v2-cal-day has-decl"><div class="v2-cal-num">May 4</div><div class="v2-cal-name">3 Decl. Kids</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEND HUB QUICK ACCESS -->
+      <div style="background:#fff;border:1px solid #e8e5de;border-radius:10px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 8px rgba(26,26,26,0.06);">
+        <div style="background:#0d0d0d;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:13px;font-weight:600;color:#fff;">Send Hub</div>
+          <button onclick="switchTab('sendhub')" style="background:transparent;color:var(--coral);border:1px solid var(--coral);padding:4px 12px;border-radius:4px;font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;">Open Full Send Hub →</button>
+        </div>
+        <div style="padding:14px 16px;">
+          <div class="v2-send-row">
+            <div><div class="v2-send-who">Brittany + Diana</div><div class="v2-send-email">brittany@transactionez.com, diana@divineordersupport.com</div></div>
+            <div style="display:flex;gap:6px;">
+              <button onclick="sendTeamPlanEmail(false)" id="dash-send-team-btn" style="background:var(--coral);color:white;border:none;padding:6px 14px;border-radius:5px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;">Send Plan Email</button>
+              <button onclick="sendTeamPlanEmail(true)" style="background:transparent;color:var(--coral);border:1px solid var(--coral);padding:6px 12px;border-radius:5px;font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;">Test</button>
+            </div>
+          </div>
+          <div class="v2-send-row">
+            <div><div class="v2-send-who">Tiffany Haynes · Client Approval</div><div class="v2-send-email">thecreativetheologian@gmail.com</div></div>
+            <div style="display:flex;gap:6px;">
+              <button id="send-client-btn3" onclick="sendPlanToClient()" style="background:#A00605;color:white;border:none;padding:6px 14px;border-radius:5px;font-family:'Inter',sans-serif;font-size:11px;font-weight:600;cursor:pointer;">Send for Approval</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCRIPT INPUT (moved below command center) -->
+      <div style="background:#fff;border:1px solid #e8e5de;border-radius:10px;padding:20px 24px;margin-bottom:18px;box-shadow:0 1px 8px rgba(26,26,26,0.06);">
+        <div style="font-size:10px;font-weight:700;color:var(--coral);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Script Input</div>
+        <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:10px;">Generate From Script</div>
+        <textarea class="textarea" id="dash-script" placeholder="Paste Tiffany's voiceover script or transcript here. Quotes, captions, and title hooks are pulled directly from this script."></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:11px;color:#888;" id="dash-script-note">No script pasted yet</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-secondary" id="test-conn-btn2" onclick="testConnection()">Test Connection</button>
+            <button class="btn-primary" id="dash-gen-btn" onclick="generateDashboard()">Generate Content</button>
+          </div>
         </div>
       </div>
 
       <div class="diag-box" id="diag-box"><div id="diag-content"></div></div>
 
-      <!-- SCRIPT INPUT -->
-      <div class="panel" style="margin-bottom:20px;">
-        <div class="panel-eyebrow">Script Input</div>
-        <div class="panel-title" style="margin-bottom:10px;">Paste Tiffany's Script</div>
-        <textarea class="textarea" id="dash-script" placeholder="Paste Tiffany's voiceover script or transcript here. Quotes, captions, and title hooks are pulled directly from this script. Carousels use it as additional context."></textarea>
-        <div class="script-note-row">
-          <span class="script-note" id="dash-script-note">No script pasted yet</span>
-          <span style="font-size:11px;color:var(--charcoal3);">Use Chrome for best results</span>
-        </div>
-      </div>
-
-      <!-- 4 CARDS -->
+      <!-- 4 CONTENT CARDS -->
       <div class="quad-grid">
-
-        <!-- QUOTE PULLS -->
         <div class="dash-card">
-          <div class="dash-card-header">
-            <div class="dash-card-hl">
-              <div class="dash-accent" style="background:var(--red);height:28px;"></div>
-              <div>
-                <div class="dash-card-name">Quote Pulls</div>
-                <div class="dash-card-desc">Word-for-word from the script</div>
-              </div>
-            </div>
-            <span class="badge badge-script">From Script</span>
-          </div>
-          <div class="dash-card-body" id="body-quotes"><div class="dash-empty">Paste a script above and click Generate From Script</div></div>
+          <div class="dash-card-header"><div class="dash-card-hl"><div class="dash-accent" style="background:var(--coral);height:28px;"></div><div><div class="dash-card-name">Quote Pulls</div><div class="dash-card-desc">Word-for-word from the script</div></div></div><span class="badge badge-script">Script</span></div>
+          <div class="dash-card-body" id="body-quotes"><div class="dash-empty">Paste a script above and click Generate Content</div></div>
         </div>
-
-        <!-- CAPTION STARTERS -->
         <div class="dash-card">
-          <div class="dash-card-header">
-            <div class="dash-card-hl">
-              <div class="dash-accent" style="background:var(--green);height:28px;"></div>
-              <div>
-                <div class="dash-card-name">Caption Starters</div>
-                <div class="dash-card-desc">Written from the script's message</div>
-              </div>
-            </div>
-            <span class="badge badge-script">From Script</span>
-          </div>
-          <div class="dash-card-body" id="body-captions"><div class="dash-empty">Paste a script above and click Generate From Script</div></div>
+          <div class="dash-card-header"><div class="dash-card-hl"><div class="dash-accent" style="background:var(--green);height:28px;"></div><div><div class="dash-card-name">Caption Starters</div><div class="dash-card-desc">Written from the script's message</div></div></div><span class="badge badge-script">Script</span></div>
+          <div class="dash-card-body" id="body-captions"><div class="dash-empty">Paste a script above and click Generate Content</div></div>
         </div>
-
-        <!-- TITLE HOOKS -->
         <div class="dash-card">
-          <div class="dash-card-header">
-            <div class="dash-card-hl">
-              <div class="dash-accent" style="background:var(--amber);height:28px;"></div>
-              <div>
-                <div class="dash-card-name">Title Hooks</div>
-                <div class="dash-card-desc">Reel titles + thumbnail text for Designer 1</div>
-              </div>
-            </div>
-            <span class="badge badge-script">From Script</span>
-          </div>
-          <div class="dash-card-body" id="body-hooks"><div class="dash-empty">Paste a script above and click Generate From Script</div></div>
+          <div class="dash-card-header"><div class="dash-card-hl"><div class="dash-accent" style="background:var(--amber);height:28px;"></div><div><div class="dash-card-name">Title Hooks</div><div class="dash-card-desc">Reel titles + thumbnail text</div></div></div><span class="badge badge-script">Script</span></div>
+          <div class="dash-card-body" id="body-hooks"><div class="dash-empty">Paste a script above and click Generate Content</div></div>
         </div>
-
-        <!-- CAROUSELS -->
         <div class="dash-card">
-          <div class="dash-card-header">
-            <div class="dash-card-hl">
-              <div class="dash-accent" style="background:var(--blue);height:28px;"></div>
-              <div>
-                <div class="dash-card-name">Carousel Concepts</div>
-                <div class="dash-card-desc">Profile + KB + script context</div>
-              </div>
-            </div>
-            <button class="rbtn" id="rbtn-car" onclick="refreshCarousels()" title="Refresh carousels">&#8635;</button>
-          </div>
-          <div class="dash-card-body" id="body-carousels"><div class="dash-empty">Generate from script or click refresh for profile-based ideas</div></div>
+          <div class="dash-card-header"><div class="dash-card-hl"><div class="dash-accent" style="background:var(--blue);height:28px;"></div><div><div class="dash-card-name">Carousel Concepts</div><div class="dash-card-desc">Profile + KB + script context</div></div></div><button class="rbtn" id="rbtn-car" onclick="refreshCarousels()" title="Refresh">&#8635;</button></div>
+          <div class="dash-card-body" id="body-carousels"><div class="dash-empty">Generate from script or click refresh</div></div>
         </div>
-
       </div>
+
     </div>
 
     <!-- TAB: TRANSCRIPT TO CONTENT -->
@@ -680,132 +928,183 @@ body::before {
       <div class="results-wrap" id="results-studio"></div>
     </div>
 
-    <!-- TAB: WEEKLY PLANNER -->
+    <!-- TAB: PLAN BUILDER (Weekly Planner) -->
     <div id="tab-planner" class="tab-pane">
 
+      <!-- HEADER -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--coral);letter-spacing:3px;text-transform:uppercase;margin-bottom:3px;">Plan Builder</div>
+          <div style="font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:3px;">Build the Weekly Plan</div>
+          <div style="font-size:12px;color:#888;">Generate a full 14-day calendar in Tiffany's voice. Approve it to lock pillar balance.</div>
+        </div>
+      </div>
+
       <!-- MODE TOGGLE -->
-      <div style="display:flex;gap:10px;margin-bottom:20px;">
-        <button id="mode-btn-fresh" onclick="setPlannerMode('fresh')" style="flex:1;padding:14px;border-radius:8px;border:2px solid var(--red);background:var(--red);color:white;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.15s;">
-          Fresh Ideas Mode
-          <div style="font-size:10px;font-weight:400;opacity:0.85;margin-top:3px;">AI generates brand new concepts from profile and data</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+        <button id="mode-btn-fresh" onclick="setPlannerMode('fresh')"
+          style="padding:14px 18px;border-radius:10px;border:2px solid var(--coral);background:var(--coral);color:white;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;text-align:left;transition:all 0.15s;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:white;"></div>
+            Fresh Ideas Mode
+          </div>
+          <div style="font-size:11px;font-weight:400;opacity:0.85;line-height:1.4;">AI generates brand new concepts from Tiffany's profile and knowledge base</div>
         </button>
-        <button id="mode-btn-script" onclick="setPlannerMode('script')" style="flex:1;padding:14px;border-radius:8px;border:2px solid var(--border-md);background:transparent;color:var(--charcoal2);font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.15s;">
-          Script-Based Mode
-          <div style="font-size:10px;font-weight:400;opacity:0.7;margin-top:3px;">Build the week around videos already recorded</div>
+        <button id="mode-btn-script" onclick="setPlannerMode('script')"
+          style="padding:14px 18px;border-radius:10px;border:2px solid #e8e5de;background:#fff;color:#444;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;text-align:left;transition:all 0.15s;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#ccc;"></div>
+            Script-Based Mode
+          </div>
+          <div style="font-size:11px;font-weight:400;color:#888;line-height:1.4;">Build the week around videos Tiffany has already recorded</div>
         </button>
       </div>
 
-      <!-- STEP 1: WEEK SETUP (both modes) -->
-      <div class="panel" id="planner-setup-panel">
-        <div class="panel-eyebrow">Step 1</div>
-        <div class="panel-title" id="planner-step1-title">Set Up This Week</div>
-        <div class="panel-sub" id="planner-step1-sub">Tell the AI what to build around. The more context you give, the sharper the plan.</div>
+      <!-- SETUP CARD -->
+      <div style="background:#fff;border:1px solid #e8e5de;border-radius:10px;overflow:hidden;box-shadow:0 1px 8px rgba(26,26,26,0.06);margin-bottom:16px;" id="planner-setup-panel">
 
-        <!-- WEEK SELECTOR -->
-        <div style="margin-bottom:16px;">
-          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Which Week Are You Planning?</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;" id="week-selector-btns"></div>
-          <div style="font-size:11px;color:var(--charcoal3);margin-top:6px;" id="week-selector-label"></div>
+        <!-- CARD HEADER -->
+        <div style="background:#0d0d0d;padding:12px 20px;">
+          <div style="font-size:9px;font-weight:700;color:var(--coral);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;" id="planner-step1-title">Step 1 — Set Up This Week</div>
+          <div style="font-size:13px;font-weight:600;color:#fff;" id="planner-step1-sub">Tell the AI what to build around. More context = sharper plan.</div>
         </div>
 
-        <!-- WEEK THEME -->
-        <div style="margin-bottom:16px;">
-          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Week Theme or Focus <span style="font-weight:400;font-style:italic;">(optional)</span></div>
-          <input id="week-theme" type="text" placeholder="e.g. God's Math week, family focus, entrepreneurship push, back to basics..." style="width:100%;background:var(--cream-2);border:1px solid var(--border-md);color:var(--charcoal);font-family:'Inter',sans-serif;font-size:13px;padding:10px 14px;border-radius:6px;outline:none;" />
-        </div>
+        <div style="padding:20px;">
 
-        <!-- PILLAR BALANCE TRACKER -->
-        <div id="planner-balance-panel" style="background:var(--cream-2);border:1px solid var(--border-md);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <!-- WEEK SELECTOR -->
+          <div style="margin-bottom:18px;">
+            <div style="font-size:10px;font-weight:700;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Which Week Are You Planning?</div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap;" id="week-selector-btns"></div>
+            <div style="font-size:11px;color:#888;margin-top:6px;" id="week-selector-label"></div>
+          </div>
+
+          <!-- TWO COLUMN: THEME + EVENTS -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;">
             <div>
-              <div style="font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;">Cumulative Pillar Balance</div>
-              <div style="font-size:11px;color:var(--charcoal3);">Based on approved plans only. Regenerations don't count.</div>
+              <div style="font-size:10px;font-weight:700;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Week Theme or Focus <span style="font-weight:400;font-style:italic;text-transform:none;">(optional)</span></div>
+              <input id="week-theme" type="text" placeholder="e.g. God's Math week, entrepreneurship push..."
+                style="width:100%;background:#f7f6f3;border:1px solid #e8e5de;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:13px;padding:10px 13px;border-radius:7px;outline:none;transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='var(--coral)'" onblur="this.style.borderColor='#e8e5de'" />
             </div>
-            <div style="display:flex;gap:6px;">
-              <button onclick="autoSelectPillars()" style="font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--green);color:var(--green);background:transparent;cursor:pointer;font-family:Inter,sans-serif;font-weight:600;">Auto-Select Underused</button>
-              <button onclick="clearApprovedHistory()" style="font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid var(--border-md);color:var(--charcoal3);background:transparent;cursor:pointer;font-family:Inter,sans-serif;">Reset History</button>
+            <div>
+              <div style="font-size:10px;font-weight:700;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Events, Launches, Promotions <span style="font-weight:400;font-style:italic;text-transform:none;">(optional)</span></div>
+              <input id="week-events-inline" type="text" placeholder="e.g. REVA Nation enrollment opens Thursday..."
+                style="width:100%;background:#f7f6f3;border:1px solid #e8e5de;color:#1a1a1a;font-family:'Inter',sans-serif;font-size:13px;padding:10px 13px;border-radius:7px;outline:none;transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='var(--coral)'" onblur="this.style.borderColor='#e8e5de'"
+                oninput="document.getElementById('week-events').value=this.value" />
+              <textarea id="week-events" class="textarea" style="display:none;min-height:70px;"></textarea>
             </div>
           </div>
-          <div id="balance-bars"></div>
-          <div id="balance-recommendation" style="margin-top:10px;display:none;"></div>
-        </div>
 
-        <!-- PILLAR PRIORITY -->
-        <div style="margin-bottom:16px;">
-          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Prioritize These Pillars This Week <span style="font-weight:400;font-style:italic;">(auto-selected based on balance — adjust as needed)</span></div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;" id="pillar-checkboxes">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Business and Entrepreneurship" class="pillar-cb" style="accent-color:var(--red);"> Business &amp; Entrepreneurship</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Spiritual Development and Gods Math Teaching" class="pillar-cb" style="accent-color:var(--red);"> God's Math Teaching</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Family and Lifestyle" class="pillar-cb" style="accent-color:var(--red);"> Family &amp; Lifestyle</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Humor and Personality Shenanigans" class="pillar-cb" style="accent-color:var(--red);"> Shenanigans</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--charcoal2);cursor:pointer;background:var(--cream-2);padding:6px 12px;border-radius:20px;border:1px solid var(--border-md);"><input type="checkbox" value="Community and Testimony" class="pillar-cb" style="accent-color:var(--red);"> Community &amp; Testimony</label>
+          <!-- PILLAR BALANCE -->
+          <div style="background:#f7f6f3;border:1px solid #e8e5de;border-radius:8px;padding:14px 16px;margin-bottom:18px;" id="planner-balance-panel">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--coral);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px;">Cumulative Pillar Balance</div>
+                <div style="font-size:11px;color:#888;">Based on approved plans only. Regenerations don't count.</div>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button onclick="autoSelectPillars()"
+                  style="font-size:10px;padding:5px 10px;border-radius:5px;border:1px solid var(--green);color:var(--green);background:transparent;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;">Auto-Select Underused</button>
+                <button onclick="clearApprovedHistory()"
+                  style="font-size:10px;padding:5px 10px;border-radius:5px;border:1px solid #e8e5de;color:#888;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;">Reset History</button>
+              </div>
+            </div>
+            <div id="balance-bars"></div>
+            <div id="balance-recommendation" style="margin-top:10px;display:none;"></div>
           </div>
-        </div>
 
-        <!-- EVENTS / PROMOTIONS -->
-        <div style="margin-bottom:16px;">
-          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Upcoming Events, Launches, or Promotions <span style="font-weight:400;font-style:italic;">(optional)</span></div>
-          <textarea id="week-events" class="textarea" placeholder="e.g. REVA Nation enrollment opens Thursday, live event Saturday in Atlanta, God's Math masterclass launching..." style="min-height:70px;"></textarea>
-        </div>
+          <!-- PILLAR PRIORITY -->
+          <div style="margin-bottom:18px;">
+            <div style="font-size:10px;font-weight:700;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Prioritize These Pillars This Week <span style="font-weight:400;font-style:italic;text-transform:none;">(auto-selected based on balance)</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;" id="pillar-checkboxes">
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#444;cursor:pointer;background:#f7f6f3;padding:7px 13px;border-radius:20px;border:1px solid #e8e5de;transition:all 0.15s;"
+                onmouseover="this.style.borderColor='var(--coral)'" onmouseout="this.style.borderColor='#e8e5de'">
+                <input type="checkbox" value="Business and Entrepreneurship" class="pillar-cb" style="accent-color:var(--coral);"> Business &amp; Entrepreneurship</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#444;cursor:pointer;background:#f7f6f3;padding:7px 13px;border-radius:20px;border:1px solid #e8e5de;transition:all 0.15s;"
+                onmouseover="this.style.borderColor='var(--coral)'" onmouseout="this.style.borderColor='#e8e5de'">
+                <input type="checkbox" value="Spiritual Development and Gods Math Teaching" class="pillar-cb" style="accent-color:var(--coral);"> God's Math Teaching</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#444;cursor:pointer;background:#f7f6f3;padding:7px 13px;border-radius:20px;border:1px solid #e8e5de;transition:all 0.15s;"
+                onmouseover="this.style.borderColor='var(--coral)'" onmouseout="this.style.borderColor='#e8e5de'">
+                <input type="checkbox" value="Family and Lifestyle" class="pillar-cb" style="accent-color:var(--coral);"> Family &amp; Lifestyle</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#444;cursor:pointer;background:#f7f6f3;padding:7px 13px;border-radius:20px;border:1px solid #e8e5de;transition:all 0.15s;"
+                onmouseover="this.style.borderColor='var(--coral)'" onmouseout="this.style.borderColor='#e8e5de'">
+                <input type="checkbox" value="Humor and Personality Shenanigans" class="pillar-cb" style="accent-color:var(--coral);"> Shenanigans</label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#444;cursor:pointer;background:#f7f6f3;padding:7px 13px;border-radius:20px;border:1px solid #e8e5de;transition:all 0.15s;"
+                onmouseover="this.style.borderColor='var(--coral)'" onmouseout="this.style.borderColor='#e8e5de'">
+                <input type="checkbox" value="Community and Testimony" class="pillar-cb" style="accent-color:var(--coral);"> Community &amp; Testimony</label>
+            </div>
+          </div>
 
-        <!-- CONTENT MIX -->
-        <div style="margin-bottom:16px;">
-          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;">Content Mix Per Week</div>
-          <div style="font-size:11px;color:var(--charcoal3);margin-bottom:10px;line-height:1.6;">Per contract: 5 Reels + 2 Carousels required. 3 Quote Posts pulled from Knowledge Base &amp; scripts as a bonus.</div>
-          <div style="background:var(--cream-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:10px;height:10px;border-radius:50%;background:var(--red);"></div>
-              <span style="font-size:13px;font-weight:700;color:var(--charcoal);">5</span>
-              <span style="font-size:12px;color:var(--charcoal2);">Reels</span>
-              <span style="font-size:10px;color:var(--charcoal3);background:rgba(160,6,5,0.08);padding:2px 7px;border-radius:10px;">Contract</span>
+          <!-- CONTENT MIX -->
+          <div style="background:#0d0d0d;border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+            <div style="font-size:9px;font-weight:700;color:var(--coral);letter-spacing:2px;text-transform:uppercase;margin-right:4px;">Contract Mix</div>
+            <div style="display:flex;align-items:center;gap:7px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--coral);"></div>
+              <span style="font-size:16px;font-weight:700;color:#fff;">5</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.5);">Reels</span>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:10px;height:10px;border-radius:50%;background:var(--blue);"></div>
-              <span style="font-size:13px;font-weight:700;color:var(--charcoal);">2</span>
-              <span style="font-size:12px;color:var(--charcoal2);">Carousels</span>
-              <span style="font-size:10px;color:var(--charcoal3);background:rgba(58,110,168,0.08);padding:2px 7px;border-radius:10px;">Contract</span>
+            <div style="display:flex;align-items:center;gap:7px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);"></div>
+              <span style="font-size:16px;font-weight:700;color:#fff;">2</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.5);">Carousels</span>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div style="width:10px;height:10px;border-radius:50%;background:var(--amber);"></div>
-              <span style="font-size:13px;font-weight:700;color:var(--charcoal);">3</span>
-              <span style="font-size:12px;color:var(--charcoal2);">Quote Posts</span>
-              <span style="font-size:10px;color:var(--charcoal3);background:rgba(196,158,60,0.1);padding:2px 7px;border-radius:10px;">Bonus · From KB &amp; Scripts</span>
+            <div style="display:flex;align-items:center;gap:7px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--amber);"></div>
+              <span style="font-size:16px;font-weight:700;color:#fff;">3</span>
+              <span style="font-size:11px;color:rgba(255,255,255,0.5);">Quote Posts <span style="color:rgba(255,255,255,0.3);">· From KB</span></span>
             </div>
-            <div style="margin-left:auto;font-size:11px;color:var(--charcoal3);font-style:italic;">10 posts/week · 20 posts over 2 weeks</div>
+            <div style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);">10 posts/week · 20 over 2 weeks</div>
           </div>
           <input type="hidden" id="mix-reels" value="5">
           <input type="hidden" id="mix-carousels" value="2">
           <input type="hidden" id="mix-quotes" value="3">
           <input type="hidden" id="mix-lifestyle" value="0">
-        </div>
 
-        <!-- SCRIPT MODE: TRANSCRIPT INPUT -->
-        <div id="script-mode-inputs" style="display:none;border-top:1px solid var(--border);padding-top:16px;margin-top:4px;">
-          <div style="font-size:10px;font-weight:600;color:var(--charcoal3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Step 2 - Paste Recorded Scripts</div>
-          <div style="font-size:12px;color:var(--charcoal3);margin-bottom:12px;line-height:1.6;">Paste scripts from videos already recorded this week. The AI builds the plan around them and fills remaining days with fresh concepts.</div>
-          <div class="transcript-list" id="transcript-list">
-            <div class="transcript-entry" id="t-entry-0">
-              <div class="transcript-entry-label">Script 1</div>
-              <textarea class="textarea" id="t-0" placeholder="Paste first recorded script here..." style="min-height:80px;"></textarea>
-            </div>
+          <!-- DIRECTOR'S NOTES -->
+          <div style="margin-bottom:18px;">
+            <div style="font-size:10px;font-weight:700;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Director's Notes <span style="font-weight:400;font-style:italic;text-transform:none;">(optional — extra context for the AI)</span></div>
+            <textarea id="directors-notes" class="textarea" placeholder="Any specific guidance for this week... avoid certain topics, lean into a specific message, match a recent sermon theme..."
+              style="min-height:70px;background:#f7f6f3;border:1px solid #e8e5de;"
+              onfocus="this.style.borderColor='var(--coral)'" onblur="this.style.borderColor='#e8e5de'"></textarea>
           </div>
-          <button class="add-transcript-btn" onclick="addTranscript()">+ Add Another Script</button>
-        </div>
 
-        <div style="margin-top:16px;display:flex;gap:10px;align-items:center;">
-          <button class="btn-primary" id="gen-btn-week" onclick="generateWeeklyPlan()">Generate Weekly Plan</button>
-          <span style="font-size:11px;color:var(--charcoal3);" id="planner-gen-note">Generates a complete Mon-Sun calendar with fresh original concepts.</span>
+          <!-- SCRIPT MODE INPUTS -->
+          <div id="script-mode-inputs" style="display:none;border-top:1px solid #e8e5de;padding-top:16px;margin-top:4px;">
+            <div style="font-size:10px;font-weight:700;color:#888;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Step 2 — Paste Recorded Scripts</div>
+            <div style="font-size:12px;color:#888;margin-bottom:12px;line-height:1.6;">Paste scripts from videos already recorded this week. The AI builds the plan around them and fills remaining days with fresh concepts.</div>
+            <div class="transcript-list" id="transcript-list">
+              <div class="transcript-entry" id="t-entry-0">
+                <div class="transcript-entry-label">Script 1</div>
+                <textarea class="textarea" id="t-0" placeholder="Paste first recorded script here..." style="min-height:80px;background:#f7f6f3;"></textarea>
+              </div>
+            </div>
+            <button class="add-transcript-btn" onclick="addTranscript()">+ Add Another Script</button>
+          </div>
+
+          <!-- GENERATE BUTTON -->
+          <div style="border-top:1px solid #e8e5de;padding-top:16px;margin-top:4px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <button style="background:var(--coral);color:white;border:none;padding:12px 32px;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.15s;flex-shrink:0;"
+              id="gen-btn-week" onclick="generateWeeklyPlan()"
+              onmouseover="this.style.background='var(--coral-dark)'" onmouseout="this.style.background='var(--coral)'">
+              Generate Weekly Plan
+            </button>
+            <span style="font-size:11px;color:#888;line-height:1.5;" id="planner-gen-note">Generates a complete Mon–Sun calendar with fresh original concepts in Tiffany's voice.</span>
+          </div>
+
         </div>
       </div>
 
+      <!-- LOADING -->
       <div class="gen-loading" id="loading-week">
-        <div class="gen-label">Building this week's calendar...</div>
+        <div class="gen-label" style="font-family:'Inter',sans-serif;font-weight:700;">Building this week's calendar...</div>
         <div class="gen-track"></div>
         <div class="gen-msg" id="gen-msg-week">Developing fresh concepts...</div>
       </div>
 
       <div class="gen-error" id="error-planner"></div>
       <div class="results-wrap" id="results-planner"></div>
+
     </div>
 
     <!-- TAB: KNOWLEDGE BASE -->
@@ -1299,7 +1598,7 @@ body::before {
 var BRAND = {
   voice: "Conviction-based, rooted in testimony and scripture. Authoritative but warm. Spiritually mature but relatable. Compassionate big sister in Christ. Gods Math: 1+1=10000. She has lived both bankruptcy and breakthrough.",
   avoid: "NEVER use: words divine or activate, em dashes, emojis, generic Christian cliches, hustle culture language, self-reliance messaging, complex theological jargon without practical application, hype-based motivation, passive or apologetic language, fabricated quotes. No sales CTAs unless directed by leadership.",
-  captions: "Caption rules: No emojis. No em dashes. No typos. No filler language. Hook in the first line. Story or teaching in the middle. Engagement CTA at the end. In Tiffany's exact voice.",
+  captions: "CAPTION RULES — MEMORIZE THESE. EVERY CAPTION. NO EXCEPTIONS.\n\nVOICE: Tiffany is a woman who has lived bankruptcy and breakthrough. She does not perform conviction — she has it. Write from that place. Authority without needing to prove it. Bold. Warm. Real. Big sister energy — not a teacher, not a coach with a lanyard, not a pastor at a podium. A woman talking to one person she genuinely cares about.\n\nFORMAT NON-NEGOTIABLES:\n- No em dashes. Not one. Ever.\n- No dashes of any kind used as sentence breaks.\n- No staccato sentence fragments used for dramatic effect. No robotic breaks. Sentences flow like conversation.\n- No negation openers. Never start with 'You are not ready' or any forced 'you are not / you cannot / stop doing' phrasing.\n- No emojis.\n- No typos.\n- No filler language.\n\nTONE NON-NEGOTIABLES:\n- Not churchy. Not corporate. Not over-polished. Not corny. Not super serious.\n- Sounds human. Sounds like a real conversation. Feels like it came from lived experience.\n- When the content is humor or lifestyle — light, airy, funny. She has personality.\n- When the content is spiritual or business — warm authority. Grounded. Real.\n- Stop sounding like a teacher explaining a lesson. She is sharing something she has walked through.\n\nCONTENT RULES:\n- DO NOT regurgitate, copy, paraphrase, or echo any line from the script. The script gives you the MESSAGE. You write it fresh.\n- No generic motivational fluff. No 'believe in yourself' energy. No hustle culture language.\n- No weird CTAs. The CTA must feel natural and specific to the post — not a copy-paste template like 'drop a comment below and let me know your thoughts.'\n- Must convert views to likes and saves. The hook, the body, and the CTA all serve that goal.\n- Reads like she is talking directly to one person — not broadcasting to a crowd.\n\nSTRUCTURE:\n- Hook in the first line. Not a question. Not a generic statement. A line that stops the scroll with Tiffany's energy.\n- Story or teaching in the middle — her testimony, her revelation, her God's Math in action.\n- Real engagement CTA at the end — something specific, not a formula.",
   pillars: ["Business and Entrepreneurship","Spiritual Development and Gods Math Teaching","Family and Lifestyle","Humor and Personality Shenanigans","Community and Testimony"],
   pillarColors: {
     "Business and Entrepreneurship":{color:"#B87830",bg:"rgba(184,120,48,0.1)"},
@@ -1891,7 +2190,7 @@ async function generateDashboard() {
     'IMPORTANT: Return ONLY a raw JSON object. No markdown. No backticks. Start with { and end with }.\n\n' +
     'Generate four sections:\n' +
     '1. quotes: 4 exact word-for-word quotes pulled from the script. Real words only. Under 35 words each. Never fabricated.\n' +
-    '2. captions: 2 captions from this script. First for Instagram and Facebook (150-250 words, hook first line, no emojis, no em dashes). Second for TikTok (80-130 words).\n' +
+    '2. captions: Write 2 ORIGINAL captions in Tiffany\'s voice. DO NOT copy, quote, or echo any line from the script — the script gives you the message, you write it completely fresh. First caption for Instagram and Facebook: 150-250 words. Bold hook first line that stops the scroll. Her story or conviction in the middle. Specific real CTA at the end. No em dashes. No dashes. No staccato fragments. No negation openers. No churchy tone. No fluff. No corny phrases. No emojis. Sounds like a real conversation with one person. Second caption for TikTok: 80-130 words, same rules, punchier.\n' +
     '3. hooks: 5 title options from the strongest moments in this script. Each has a title, hook text, and thumbnail text for Designer 1.\n' +
     '4. carousels: 3 carousel concepts. First goes deeper into this script topic. Second and third from her pillars freely. Max 4 slides each.\n\n' +
     '{"quotes":[{"quote":"exact quote","pillar":"pillar name","design_note":"one sentence for Designer 2"}],' +
@@ -2029,7 +2328,7 @@ async function generateStudioContent() {
     'Return ONLY valid JSON. No markdown. No backticks. Start with {.\n\n' +
     '{"content_summary":"2-3 sentences on what this is about","primary_pillar":"pillar",' +
     '"profile_learning":{"topics_covered":["topic1"],"recurring_phrases":["phrase"],"themes":["theme"],"pillar_hits":{"Business and Entrepreneurship":0,"Spiritual Development and Gods Math Teaching":0,"Family and Lifestyle":0,"Humor and Personality Shenanigans":0,"Community and Testimony":0},"transcript_count":1},' +
-    '"captions":[{"platform":"Instagram and Facebook","caption":"Full caption. Hook first. Teaching middle. Engagement CTA end. 150-300 words. No emojis. No em dashes.","hashtags":"#tag1 #tag2 (8-10 hashtags)","cta":"specific CTA"},{"platform":"TikTok","caption":"Shorter adapted version. 80-150 words. Same voice rules.","hashtags":"#tag1 #tag2","cta":"cta"}],' +
+    '"captions":[{"platform":"Instagram and Facebook","caption":"ORIGINAL caption. DO NOT copy from the transcript. Write it fresh in Tiffany\'s voice. Bold hook first line. Her lived story or conviction in the middle. Real specific CTA at the end. 150-300 words. No em dashes. No dashes. No staccato fragments. No negation openers. No churchy tone. No fluff. No corny. No emojis. Sounds human. Sounds like one woman talking to one person she cares about.","hashtags":"8-10 hashtags","cta":"specific natural CTA"},{"platform":"TikTok","caption":"Same rules. Shorter and punchier. 80-150 words. Same original voice.","hashtags":"8-10 hashtags","cta":"cta"}],' +
     '"thumbnail":{"hook_text":"Short hook text to overlay on photo. 5-8 words max.","photo_direction":"What kind of photo to use.","text_treatment":"Typography direction for Designer 1"},' +
     '"carousels":[{"title":"Carousel title","pillar":"pillar","slides":[{"role":"Hook","headline":"Hook headline","body":""},{"role":"Content","headline":"Slide 2","body":"copy"},{"role":"Content","headline":"Slide 3","body":"copy"},{"role":"CTA","headline":"CTA","body":"engagement CTA"}],"design_brief":{"palette":"palette direction","typography":"type direction","layout":"layout direction","accents":"accent elements","mood":"5 words"}},{"title":"Second carousel","pillar":"pillar","slides":[{"role":"Hook","headline":"Hook","body":""},{"role":"Content","headline":"Slide 2","body":"copy"},{"role":"Content","headline":"Slide 3","body":"copy"},{"role":"CTA","headline":"CTA","body":"CTA"}],"design_brief":{"palette":"palette","typography":"type","layout":"layout","accents":"accents","mood":"mood"}}],' +
     '"quotes":[{"quote":"EXACT word-for-word quote from transcript only. Never fabricated.","design_note":"Design direction for photo quote post."},{"quote":"Second exact quote","design_note":"Design direction"},{"quote":"Third exact quote","design_note":"Design direction"}]}';
