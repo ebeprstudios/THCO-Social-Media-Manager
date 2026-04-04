@@ -1640,6 +1640,13 @@ var lastDashScript = '';
     if (simpleHash(val) === HASH) {
       sessionStorage.setItem('unlocked','1');
       document.getElementById('password-gate').style.display = 'none';
+      // Go straight to dashboard — no landing page, no API key gate
+      document.getElementById('landing').style.display = 'none';
+      document.getElementById('studio-wrap').style.display = 'block';
+      document.getElementById('tab-bar').style.display = 'flex';
+      renderProfilePanel();
+      renderKnowledgeBase();
+      startClocks();
     } else {
       document.getElementById('gate-error').style.display = 'block';
       document.getElementById('gate-input').value = '';
@@ -1649,6 +1656,12 @@ var lastDashScript = '';
   window.addEventListener('DOMContentLoaded', function() {
     if (sessionStorage.getItem('unlocked') === '1') {
       document.getElementById('password-gate').style.display = 'none';
+      document.getElementById('landing').style.display = 'none';
+      document.getElementById('studio-wrap').style.display = 'block';
+      document.getElementById('tab-bar').style.display = 'flex';
+      renderProfilePanel();
+      renderKnowledgeBase();
+      startClocks();
     }
     var g = document.getElementById('gate-input');
     if (g) g.addEventListener('keydown', function(e) { if (e.key === 'Enter') window.checkPassword(); });
@@ -1712,12 +1725,12 @@ function checkApiKey() {
 // NAVIGATION
 // ================================================================
 function startStudio() {
-  if (!checkApiKey()) return;
   document.getElementById('landing').style.display = 'none';
   document.getElementById('studio-wrap').style.display = 'block';
   document.getElementById('tab-bar').style.display = 'flex';
   renderProfilePanel();
   renderKnowledgeBase();
+  startClocks();
 }
 
 function switchTab(tab) {
