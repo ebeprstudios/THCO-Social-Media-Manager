@@ -13,6 +13,10 @@ on:
         description: 'HTML file in repo to send'
         required: false
         default: 'team_plan_email.html'
+      is_test:
+        description: 'Send test to manager only (true/false)'
+        required: false
+        default: 'false'
 
 jobs:
   send_team_email:
@@ -30,12 +34,12 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Resolve subject and file
+      - name: Resolve variables
         id: vars
         run: |
           SUBJECT="${{ github.event.client_payload.subject }}"
           if [ -z "$SUBJECT" ]; then SUBJECT="${{ github.event.inputs.subject }}"; fi
-          if [ -z "$SUBJECT" ]; then SUBJECT="THCO Content Plan: April 5 to May 4"; fi
+          if [ -z "$SUBJECT" ]; then SUBJECT="THCO Content Plan: Week 1"; fi
           echo "subject=$SUBJECT" >> $GITHUB_OUTPUT
 
           FILE="${{ github.event.client_payload.email_file }}"
@@ -43,16 +47,20 @@ jobs:
           if [ -z "$FILE" ]; then FILE="team_plan_email.html"; fi
           echo "email_file=$FILE" >> $GITHUB_OUTPUT
 
-      - name: Send team plan email
+          IS_TEST="${{ github.event.client_payload.is_test }}"
+          if [ -z "$IS_TEST" ]; then IS_TEST="${{ github.event.inputs.is_test }}"; fi
+          if [ -z "$IS_TEST" ]; then IS_TEST="false"; fi
+          echo "is_test=$IS_TEST" >> $GITHUB_OUTPUT
+
+      - name: Send email
         run: python send_team_email.py
         env:
           EMAIL_FROM:         ${{ secrets.EMAIL_FROM }}
           EMAIL_PASSWORD:     ${{ secrets.EMAIL_PASSWORD }}
-          BRITTANY_EMAIL:     ${{ secrets.BRITTANY_EMAIL }}
-          DIANA_EMAIL:        ${{ secrets.DIANA_EMAIL }}
           MANAGER_EMAIL:      ${{ secrets.MANAGER_EMAIL }}
           UPLOAD_TOKEN:       ${{ secrets.UPLOAD_TOKEN }}
           GITHUB_TOKEN:       ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY:  ${{ github.repository }}
           EMAIL_SUBJECT:      ${{ steps.vars.outputs.subject }}
           EMAIL_FILE:         ${{ steps.vars.outputs.email_file }}
+          IS_TEST:            ${{ steps.vars.outputs.is_test }}
